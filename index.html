@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTalk - Stranger Chat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header>
+    <img src="assets/logo.svg" alt="TikTalk Logo" class="logo" />
+    <h1>TikTalk</h1>
+  </header>
+
+  <main id="chat">
+    <div id="messages"></div>
+  </main>
+
+  <footer>
+    <textarea id="messageInput" placeholder="Type a message..."></textarea>
+    <button id="sendBtn">Send</button>
+    <button id="nextBtn">Next</button>
+  </footer>
+
+  <script>window.TIKTALK_BACKEND = "REPLACE_WITH_SERVER_URL";</script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
