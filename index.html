@@ -16,6 +16,20 @@
     <div id="messages"></div>
   </main>
 
+ <div class="chat-options">
+      <a href="chat/index.html" class="chat-button">Start Text Chat</a>
+      </div>
+    
+    <p style="text-align: center; margin-top: 20px;">Made in Bharat ♥️</p>
+  </div>
+
+  <!-- Photo Share Project (kept at bottom as requested) -->
+  <div class="app-card">
+    <h3>Photo Share</h3>
+    <p>Secure photo sharing tool where uploaded images are automatically deleted after 24 hours. Share photos with a unique 5-digit code.</p>
+    <a href="photoshare.html" class="app-button">Use Photo Share</a>
+  </div>
+  
   <footer>
     <textarea id="messageInput" placeholder="Type a message..."></textarea>
     <button id="sendBtn">Send</button>
@@ -25,5 +39,24 @@
   <script>window.TIKTALK_BACKEND = "https://tiktalk-server.onrender.com";</script>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="app.js"></script>
+<footer>
+  &copy; Copyright 2024-<script>document.write(new Date().getFullYear())</script> TalkRush. All rights reserved.
+  </footer>
+</div>
+  
+  <script>
+  function toggleMenu() {
+    var menu = document.getElementById("menu");
+    var menuToggle = document.getElementById("menuToggle");
+
+    if (menu.style.left === "0px") {
+      menu.style.left = "-300px";
+      menuToggle.innerHTML = "&#9776;";
+    } else {
+      menu.style.left = "0px";
+      menuToggle.innerHTML = "&#10006;";
+    }
+  }
+  </script>
 </body>
 </html>
