@@ -3,6 +3,6 @@ function showTyping(isTyping) {
   indicator.style.display = isTyping ? "block" : "none";
 }
 
-// Example usage from server event
+// Socket events
 socket.on("typing", () => showTyping(true));
 socket.on("stopTyping", () => showTyping(false));
