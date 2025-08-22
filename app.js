@@ -1,70 +1,72 @@
-const socket = io(window.TIKTALK_BACKEND);
-
-// Elements
-const localVideo = document.getElementById('localVideo');
-const remoteVideo = document.getElementById('remoteVideo');
-const chatArea = document.getElementById('chatArea');
-const messageInput = document.getElementById('messageInput');
-const sendBtn = document.getElementById('sendBtn');
-const emojiBtn = document.getElementById('emojiBtn');
-const imageBtn = document.getElementById('imageBtn');
-
-// Video Stream
-let localStream;
-navigator.mediaDevices.getUserMedia({ video: true, audio: true })
-  .then(stream => { localVideo.srcObject = stream; localStream = stream; })
-  .catch(err => alert('Camera/Mic access needed'));
-
-// Send message
-sendBtn.addEventListener('click', ()=>{
-  const msg = messageInput.value.trim();
-  if(msg){
-    appendMessage('You', msg);
-    socket.emit('chat-message', msg);
-    messageInput.value = '';
-  }
-});
-
-// Receive message
-socket.on('chat-message', data => {
-  appendMessage('Stranger', data);
-});
-
-function appendMessage(sender, msg){
-  const p = document.createElement('p');
-  p.textContent = `${sender}: ${msg}`;
-  chatArea.appendChild(p);
-  chatArea.scrollTop = chatArea.scrollHeight;
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f5f5f5;
 }
 
-// Emoji
-emojiBtn.addEventListener('click', ()=>{
-  const emoji = prompt("Enter emoji:");
-  if(emoji) messageInput.value += emoji;
-});
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 10px;
+  background: #2196f3;
+  color: white;
+}
 
-// Image
-imageBtn.addEventListener('click', ()=>{
-  let input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.onchange = e => {
-    let file = e.target.files[0];
-    if(file) appendMessage('You', '[Image] ' + file.name);
-    // Backend send code required
-  }
-  input.click();
-});
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+}
 
-// Share buttons
-function shareApp(platform){
-  const url = "https://TikTalkchat.github.io/tiktalk-client/";
-  if(platform==='whatsapp'){
-    window.open(`https://wa.me/?text=Check TikTalk: ${url}`);
-  } else if(platform==='facebook'){
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`);
-  } else if(platform==='copy'){
-    navigator.clipboard.writeText(url);
-    alert("Link copied!");
-  }
+.share-header button {
+  margin-left: 5px;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  font-size: 14px;
+}
+
+.container {
+  max-width: 480px;
+  margin: auto;
+  padding: 5px;
+}
+
+.video-container {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 5px 0;
+}
+
+video {
+  width: 100%;
+  height: 200px;
+  border-radius: 8px;
+  background: black;
+}
+
+#chatArea {
+  height: 200px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 5px;
+  background: white;
+  margin-bottom: 5px;
+}
+
+.chat-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+#messageInput {
+  flex: 1;
+  height: 35px;
+  border-radius: 5px;
+  padding: 5px;
 }
