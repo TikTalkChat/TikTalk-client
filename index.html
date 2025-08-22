@@ -20,7 +20,8 @@
     header h1 {font-size:20px; color:#007bff;}
 
     #chat {
-      flex:1; overflow-y:auto; padding:70px 15px 15px; /* top padding header ke liye */
+      flex:1; overflow-y:auto;
+      padding:70px 15px 70px; /* top header + bottom footer space */
     }
     #messages {display:flex; flex-direction:column; gap:8px;}
 
@@ -46,9 +47,10 @@
     }
 
     footer {
+      position:fixed; bottom:0; left:0; right:0;
       display:flex; padding:8px; border-top:1px solid #ddd; gap:6px;
       background:#fff;
-      position:sticky; bottom:0;
+      z-index:1000;
     }
     textarea {
       flex:1; resize:none; padding:10px;
@@ -63,7 +65,7 @@
     button#nextBtn {background:#ff3b30;}
     button:active {opacity:0.8;}
 
-    p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666;}
+    p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin-bottom:50px;}
   </style>
 </head>
 <body>
@@ -82,6 +84,7 @@
     <button id="sendBtn">Send</button>
     <button id="nextBtn">Next</button>
   </footer>
+
   <p class="footerNote">Made in India ♥️</p>
 
   <script>
