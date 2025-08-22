@@ -1,56 +1,603 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TikTalk - Stranger Chat</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTalk - Meet New People</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo::before {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #fff;
+            border-radius: 50%;
+            top: 8px;
+            left: 8px;
+            opacity: 0.9;
+        }
+
+        .logo::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 50%;
+            bottom: 6px;
+            right: 6px;
+        }
+
+        .logo-text {
+            font-size: 16px;
+            font-weight: 800;
+            z-index: 1;
+            position: relative;
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .icon-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+
+        .whatsapp-btn {
+            background: #25D366;
+        }
+
+        .whatsapp-btn:hover {
+            background: #22c55e;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chat-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%23ffffff" fill-opacity="0.05"><circle cx="30" cy="30" r="2"/></g></svg>') repeat;
+            pointer-events: none;
+        }
+
+        .status-container {
+            text-align: center;
+            z-index: 1;
+            position: relative;
+        }
+
+        .online-count {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 16px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        .status-message {
+            background: rgba(255,255,255,0.9);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            max-width: 400px;
+            margin-bottom: 40px;
+        }
+
+        .status-text {
+            font-size: 18px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 35px;
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        .start-btn:active {
+            transform: translateY(0);
+        }
+
+        .input-area {
+            display: flex;
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e1e5e9;
+            gap: 15px;
+        }
+
+        .shuffle-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b, #ffa726);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 20px;
+        }
+
+        .shuffle-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .input-container {
+            flex: 1;
+            position: relative;
+        }
+
+        .message-input {
+            width: 100%;
+            padding: 12px 50px 12px 18px;
+            border: 2px solid #e1e5e9;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .message-input:focus {
+            border-color: #667eea;
+            background: white;
+        }
+
+        .input-icons {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .input-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            background: rgba(102, 126, 234, 0.1);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #667eea;
+        }
+
+        .input-icon:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .send-btn:hover {
+            background: linear-gradient(135deg, #5a67d8, #6b46c1);
+        }
+
+        /* Chat Messages */
+        .messages-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+        }
+
+        .message.own {
+            justify-content: flex-end;
+        }
+
+        .message-bubble {
+            max-width: 70%;
+            padding: 12px 18px;
+            border-radius: 18px;
+            font-size: 16px;
+            line-height: 1.4;
+        }
+
+        .message.own .message-bubble {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+
+        .message.other .message-bubble {
+            background: #f1f3f5;
+            color: #333;
+            border-bottom-left-radius: 6px;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 15px 20px;
+            font-style: italic;
+            color: #666;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .app-container {
+                height: 100vh;
+            }
+            
+            .header {
+                padding: 12px 15px;
+            }
+            
+            .app-title {
+                font-size: 20px;
+            }
+            
+            .chat-area {
+                padding: 20px;
+            }
+            
+            .start-btn {
+                padding: 15px 30px;
+                font-size: 16px;
+            }
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff6b6b;
+            animation: blink 1s infinite;
+        }
+
+        .status-dot.connected {
+            background: #51cf66;
+            animation: none;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <img src="assets/logo.svg" alt="TikTalk Logo" class="logo" />
-    <h1></h1>
-  </header>
+    <div class="app-container">
+        <div class="header">
+            <div class="logo-container">
+                <div class="logo">
+                    <span class="logo-text">💬</span>
+                </div>
+                <div class="app-title">TikTalk</div>
+            </div>
+            <div class="header-icons">
+                <button class="icon-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.65-.07-.97l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.32-.07.65-.07.97 0 .33.03.65.07.97L2.46 14.6c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.31.61.22l2.49-1c.52.39 1.06.73 1.69.98l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.25 1.17-.59 1.69-.98l2.49 1c.22.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.63Z"/>
+                    </svg>
+                </button>
+                <button class="icon-btn whatsapp-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.890-5.335 11.893-11.893A11.821 11.821 0 0020.064 3.687"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
 
-  <main id="chat">
-<div id="typingIndicator" style="text-align: left; margin: 5px 10px; font-style: italic; font-size: 0.9rem; color: gray; display: none;">
-  Stranger is typing...
-</div>
-    <div id="messages"></div>
-  </main>
+        <div class="chat-area" id="chatArea">
+            <div class="status-container">
+                <div class="status-message">
+                    <div class="connection-status">
+                        <div class="status-dot" id="statusDot"></div>
+                        <span id="connectionText">Connection error. Click 'Start New Chat' to try again.</span>
+                    </div>
+                </div>
+                <button class="start-btn" onclick="startNewChat()">Start New Chat</button>
+            </div>
+        </div>
 
-  <p style="text-align: center; margin-top: 20px;">Made in India ♥️</p>
-  </div>
+        <div class="messages-container" id="messagesContainer">
+            <!-- Messages will appear here -->
+        </div>
 
-   <footer>
-    <textarea id="messageInput" placeholder="Type a message..."></textarea>
-    <button id="sendBtn">Send</button>
-    <button id="nextBtn">Next</button>
-       </div>
-     
-  </footer>
+        <div class="typing-indicator" id="typingIndicator">
+            Stranger is typing...
+        </div>
 
-  <script>window.TIKTALK_BACKEND = "https://tiktalk-server.onrender.com";</script>
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-  <script src="app.js"></script>
-<footer>
-  &copy; Copyright 2025-<script>document.write(new Date().getFullYear())</script> TikTalk. All rights reserved.
-  </footer>
-</div>
-  
-  <script>
-  function toggleMenu() {
-    var menu = document.getElementById("menu");
-    var menuToggle = document.getElementById("menuToggle");
+        <div class="input-area">
+            <button class="shuffle-btn" onclick="shuffleChat()" title="Find new stranger">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                </svg>
+            </button>
+            
+            <div class="input-container">
+                <input type="text" class="message-input" placeholder="Type your message..." id="messageInput" onkeypress="handleKeyPress(event)">
+                <div class="input-icons">
+                    <button class="input-icon" onclick="attachImage()" title="Send image">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21,19V5c0,-1.1 -0.9,-2 -2,-2H5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h14c1.1,0 2,-0.9 2,-2zM8.5,13.5l2.5,3.01L14.5,12l4.5,6H5l3.5,-4.5z"/>
+                        </svg>
+                    </button>
+                    <button class="input-icon send-btn" onclick="sendMessage()" title="Send message">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    if (menu.style.left === "0px") {
-      menu.style.left = "-300px";
-      menuToggle.innerHTML = "&#9776;";
-    } else {
-      menu.style.left = "0px";
-      menuToggle.innerHTML = "&#10006;";
-    }
-  }
-  </script>
+    <script>
+        let isConnected = false;
+        let currentChat = null;
+        let onlineUsers = 96275;
+        
+        function updateOnlineCount() {
+            // Function removed since online count is no longer displayed
+        }
+        
+        function startNewChat() {
+            const statusDot = document.getElementById('statusDot');
+            const connectionText = document.getElementById('connectionText');
+            const chatArea = document.getElementById('chatArea');
+            const messagesContainer = document.getElementById('messagesContainer');
+            
+            // Show connecting status
+            statusDot.style.background = '#ffa726';
+            connectionText.textContent = 'Connecting to a stranger...';
+            
+            // Simulate connection process
+            setTimeout(() => {
+                isConnected = true;
+                statusDot.classList.add('connected');
+                connectionText.textContent = 'Connected! You can start chatting now.';
+                
+                // Hide status area and show chat
+                chatArea.style.display = 'none';
+                messagesContainer.style.display = 'flex';
+                
+                // Add welcome message
+                addMessage('system', '🎉 Connected! You are now chatting with a random stranger. Say hello!');
+                
+                // Focus input
+                document.getElementById('messageInput').focus();
+            }, 2000);
+        }
+        
+        function shuffleChat() {
+            if (isConnected) {
+                addMessage('system', '🔄 Finding a new stranger...');
+                setTimeout(() => {
+                    addMessage('system', '🎉 Connected to a new stranger! Say hello!');
+                }, 1500);
+            } else {
+                startNewChat();
+            }
+        }
+        
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (message && isConnected) {
+                addMessage('own', message);
+                input.value = '';
+                
+                // Simulate stranger response
+                setTimeout(() => {
+                    showTypingIndicator();
+                    setTimeout(() => {
+                        hideTypingIndicator();
+                        addRandomResponse();
+                    }, 2000);
+                }, 500);
+            }
+        }
+        
+        function addMessage(type, text) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            if (type === 'system') {
+                messageDiv.innerHTML = `<div class="message-bubble" style="background: #e3f2fd; color: #1976d2; text-align: center; border-radius: 12px; font-size: 14px; max-width: 90%; margin: 0 auto;">${text}</div>`;
+            } else {
+                messageDiv.innerHTML = `<div class="message-bubble">${text}</div>`;
+            }
+            
+            messagesContainer.appendChild(messageDiv);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        function showTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'block';
+        }
+        
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+        
+        function addRandomResponse() {
+            const responses = [
+                "Hello! How are you doing?",
+                "Hi there! Nice to meet you!",
+                "Hey! What's up?",
+                "Greetings! Where are you from?",
+                "Hello! What brings you here today?",
+                "Hi! Hope you're having a great day!",
+                "Hey there! What's your favorite hobby?",
+                "Hello! The weather's nice today, isn't it?",
+                "Hi! Do you come here often?",
+                "Hey! What kind of music do you like?"
+            ];
+            
+            const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+            addMessage('other', randomResponse);
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        function attachImage() {
+            if (isConnected) {
+                addMessage('own', '📷 [Image sent]');
+                setTimeout(() => {
+                    addMessage('other', 'Nice picture! 👍');
+                }, 1000);
+            }
+        }
+        
+        function attachVideo() {
+            if (isConnected) {
+                addMessage('own', '🎥 [Video sent]');
+                setTimeout(() => {
+                    addMessage('other', 'Cool video! 🎬');
+                }, 1000);
+            }
+        }
+        
+        // No need to update online count since it's removed
+        // setInterval(updateOnlineCount, 30000);
+        
+        // Initialize - removed online count update
+        // updateOnlineCount();
+    </script>
 </body>
 </html>
