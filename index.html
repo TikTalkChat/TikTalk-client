@@ -6,110 +6,168 @@
   <title>TikTalk - Stranger Chat</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* ===== Theme ===== */
-    :root { --card: #ffffff; --text: #0f172a; --muted:#e5e7eb; --muted2:#cbd5e1; }
-    body.light { background:#ffffff; color:#0f172a; transition:background .3s,color .3s; }
-    body.dark  { background:#0f172a; color:#f8fafc; transition:background .3s,color .3s; }
-    body.dark .share-menu{ background:#0b1220; border-color:#1f2937; }
-    body.dark .round-btn{ background:#1f2937; }
-    body.dark .round-btn:hover{ background:#334155; }
-
-    /* ===== Header (fixed layout safe) ===== */
-    header{
-      position:relative; /* so popup anchors to header */
-      display:flex; justify-content:space-between; align-items:center;
-      padding:8px 12px;
+    /* ====== Dark/Light Theme ====== */
+    body.light {
+      background: #ffffff;
+      color: #0f172a;
+      transition: all 0.3s ease;
     }
-    .logo{ height:32px; }
-    .header-right{ display:flex; gap:8px; align-items:center; }
-
-    .round-btn{
-      width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
-      display:flex; justify-content:center; align-items:center; font-size:16px;
-      background:#e5e7eb; transition:background .2s, transform .08s;
+    body.dark {
+      background: #0f172a;
+      color: #f8fafc;
+      transition: all 0.3s ease;
     }
-    .round-btn:active{ transform: scale(0.98); }
-    .round-btn:hover{ background:#cbd5e1; }
-
-    /* ===== Share popup ===== */
-    .share-menu{
-      position:absolute; top:50px; right:12px;
-      background:#fff; border:1px solid #ddd; border-radius:10px;
-      display:none; flex-direction:column; padding:10px; gap:8px;
-      box-shadow:0 8px 24px rgba(0,0,0,.18); z-index:100; min-width:190px;
+    .theme-btn {
+      border: none;
+      background: transparent;
+      font-size: 20px;
+      cursor: pointer;
+      margin-left: 10px;
     }
-    .share-item{
-      display:flex; align-items:center; gap:10px;
-      border:none; padding:10px 12px; border-radius:8px; cursor:pointer;
-      font-size:14px; font-weight:600; color:#fff;
+
+    /* ====== Share Button Modern ====== */
+    .share-btn-modern {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      box-shadow: 0 4px 10px rgba(99,102,241,.5);
+      transition: transform 0.15s ease, box-shadow 0.2s ease;
+      margin-left: 8px;
     }
-    .share-item:hover{ filter:brightness(0.95); }
-    .share-icon{ width:18px; height:18px; display:inline-block; }
+    .share-btn-modern:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 14px rgba(139,92,246,.6);
+    }
+    .share-btn-modern:active {
+      transform: scale(0.95);
+    }
+    .share-arrow {
+      width: 20px;
+      height: 20px;
+      pointer-events: none;
+    }
 
-    .wa{ background:#25D366; }
-    .tg{ background:#229ED9; }
-    .tw{ background:#0f1419; color:#fff; }      /* X (Twitter) black */
-    .fb{ background:#1877F2; }
-    .cp{ background:#6b7280; }
+    /* ====== Share Menu ====== */
+    #share-menu {
+      display: none;
+      position: absolute;
+      right: 10px;
+      top: 60px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,.2);
+      padding: 10px;
+      z-index: 100;
+    }
+    #share-menu a, #share-menu button {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      margin: 5px 0;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: #111;
+      transition: background 0.2s;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+    }
+    #share-menu a:hover, #share-menu button:hover {
+      background: #f3f4f6;
+    }
 
-    /* keep chat layout untouched */
-    main#chat{ }
-    footer textarea{ }
+    /* Round Icon BG */
+    .icon-round {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .wa { background: #25D366; }
+    .fb { background: #1877F2; }
+    .tg { background: #0088cc; }
+    .x { background: #000000; }
+    .ws { background: #6366f1; }
+
+    .icon-round svg {
+      width: 16px;
+      height: 16px;
+      fill: white;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 14px;
+    }
+    .header-right {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
   </style>
 </head>
 <body>
   <header>
-    <div class="header-left">
-      <img src="assets/logo.svg" alt="TikTalk Logo" class="logo" />
-    </div>
-
+    <img src="assets/logo.svg" alt="TikTalk Logo" class="logo" />
     <div class="header-right">
-      <!-- Theme Toggle -->
-      <button id="theme-toggle" class="round-btn" aria-label="Toggle theme">🌙</button>
+      <!-- 🌙 Theme Toggle -->
+      <button id="theme-toggle" class="theme-btn">🌙</button>
 
-      <!-- Share Button -->
-      <button id="share-btn" class="round-btn" aria-label="Share">⤴️</button>
+      <!-- Modern Share Button -->
+      <button id="share-btn" class="share-btn-modern" aria-label="Share">
+        <svg class="share-arrow" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7"/>
+          <polyline points="16 6 12 2 8 6"/>
+          <line x1="12" y1="2" x2="12" y2="15"/>
+        </svg>
+      </button>
 
-      <!-- Share Menu with SVG icons -->
-      <div id="share-menu" class="share-menu">
-        <button class="share-item wa" onclick="shareWhatsApp()">
-          <span class="share-icon" aria-hidden="true">
-            <!-- WhatsApp SVG -->
-            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-8.61 15.1L2 22l4.99-1.31A9.99 9.99 0 1 0 12 2Z" fill="currentColor" opacity=".15"/><path d="M12 4a8 8 0 0 0-6.91 11.94l-.2.34-.77 2.94 2.98-.78.33-.19A8 8 0 1 0 12 4Zm4.42 9.69c-.22-.11-1.3-.64-1.5-.71-.2-.07-.35-.11-.5.11-.15.22-.57.71-.7.86-.13.15-.26.17-.48.06-.22-.11-.94-.35-1.79-1.11-.66-.59-1.1-1.31-1.23-1.53-.13-.22-.01-.34.1-.45.11-.11.22-.26.33-.39.11-.13.15-.22.22-.37.07-.15.04-.28-.02-.39-.06-.11-.5-1.2-.69-1.65-.18-.44-.37-.38-.5-.39-.13-.01-.28-.01-.43-.01-.15 0-.39.06-.59.28-.2.22-.77.75-.77 1.83 0 1.09.79 2.14.9 2.29.11.15 1.55 2.37 3.77 3.32 2.22.95 2.22.63 2.63.61.41-.02 1.3-.53 1.48-1.05.18-.52.18-.97.13-1.05-.05-.08-.2-.13-.42-.24Z" fill="currentColor"/></svg>
-          </span>
+      <!-- Share Menu -->
+      <div id="share-menu">
+        <a href="https://wa.me/?text=Check%20this%20cool%20chat%20app:%20https://tiktalkchat.github.io/TikTalk-client/" target="_blank">
+          <div class="icon-round wa">
+            <svg viewBox="0 0 24 24"><path d="M20.5 3.5A11.78 11.78 0 0 0 12 0C5.4 0 0 5.4 0 12c0 2.1.5 4.1 1.4 5.9L0 24l6.3-1.6c1.7.9 3.7 1.4 5.7 1.4 6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.5-8.3z"/></svg>
+          </div>
           WhatsApp
-        </button>
-
-        <button class="share-item tg" onclick="shareTelegram()">
-          <span class="share-icon" aria-hidden="true">
-            <!-- Telegram SVG -->
-            <svg viewBox="0 0 24 24" fill="none"><path d="M22 3L2.9 10.2c-.8.32-.77 1.47.05 1.75l4.78 1.67 1.86 5.97c.24.78 1.25.98 1.79.35l2.7-3.14 4.56 3.35c.7.52 1.7.12 1.89-.76L23.9 4.24C24.11 3.27 23.05 2.58 22 3Z" fill="currentColor" opacity=".95"/></svg>
-          </span>
-          Telegram
-        </button>
-
-        <button class="share-item tw" onclick="shareTwitter()">
-          <span class="share-icon" aria-hidden="true">
-            <!-- X (Twitter) SVG -->
-            <svg viewBox="0 0 24 24" fill="none"><path d="M18.25 3h3.1l-6.78 7.75L22 21h-6.56l-4.7-6.16L5.29 21H2.18l7.3-8.35L2 3h6.7l4.22 5.6L18.25 3Zm-1.15 16.2h1.72L7.03 4.71H5.2l11.9 14.49Z" fill="currentColor"/></svg>
-          </span>
-          Twitter
-        </button>
-
-        <button class="share-item fb" onclick="shareFacebook()">
-          <span class="share-icon" aria-hidden="true">
-            <!-- Facebook SVG -->
-            <svg viewBox="0 0 24 24" fill="none"><path d="M22 12a10 10 0 1 0-11.56 9.9v-7H7.9V12h2.54V9.8c0-2.5 1.49-3.88 3.77-3.88 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.9h-2.34v7A10 10 0 0 0 22 12Z" fill="currentColor"/></svg>
-          </span>
+        </a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=https://tiktalkchat.github.io/TikTalk-client/" target="_blank">
+          <div class="icon-round fb">
+            <svg viewBox="0 0 24 24"><path d="M22 12c0-5.5-4.5-10-10-10S2 6.5 2 12c0 5 3.7 9.2 8.5 9.9v-7h-2.5v-2.9h2.5V9.5c0-2.5 1.5-3.9 3.7-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.2c-1.2 0-1.5.8-1.5 1.5v1.9h2.7l-.4 2.9h-2.3v7C18.3 21.2 22 17 22 12z"/></svg>
+          </div>
           Facebook
-        </button>
-
-        <button class="share-item cp" onclick="copyLink()">
-          <span class="share-icon" aria-hidden="true">
-            <!-- Link SVG -->
-            <svg viewBox="0 0 24 24" fill="none"><path d="M10.59 13.41a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 1 0-7.07-7.07L11.6 5.33" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.41 10.59a5 5 0 0 0-7.07 0L4.22 12.7a5 5 0 1 0 7.07 7.07l1.12-1.12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </span>
-          Copy Link
+        </a>
+        <a href="https://t.me/share/url?url=https://tiktalkchat.github.io/TikTalk-client/" target="_blank">
+          <div class="icon-round tg">
+            <svg viewBox="0 0 24 24"><path d="M9.999 15.5v5.25s-1.301.525-2.251-1.05c-1.425-2.25-2.748-4.725-2.748-4.725L0 10.501s2.249-1.799 7.5-2.249c5.249-.45 12.001-.45 12.001-.45s1.8 0 2.249 1.799c.45 1.8-.899 2.999-2.249 3.449-1.35.45-8.25 2.55-8.25 2.55z"/></svg>
+          </div>
+          Telegram
+        </a>
+        <a href="https://twitter.com/intent/tweet?url=https://tiktalkchat.github.io/TikTalk-client/" target="_blank">
+          <div class="icon-round x">
+            <svg viewBox="0 0 24 24"><path d="M18 2H14.5L9 9.5L3.5 2H0l9 12L0 22h3.5l5.5-7.5L18 22h3.5L12.5 12 21.5 2H18z"/></svg>
+          </div>
+          X
+        </a>
+        <button onclick="copyWebsite()">
+          <div class="icon-round ws">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.3 0-8-3.5-8-8s3.7-8 8-8 8 3.5 8 8-3.7 8-8 8z"/></svg>
+          </div>
+          Copy Website Link
         </button>
       </div>
     </div>
@@ -117,80 +175,56 @@
 
   <main id="chat">
     <div id="messages"></div>
-    <div id="typingIndicator" style="display:none; font-size:13px; color:gray; margin:5px 10px;">Stranger is typing...</div>
   </main>
 
-  <p style="text-align:center; margin-top:20px;">Made in India ♥️</p>
+  <p style="text-align: center; margin-top: 20px;">Made in India ♥️</p>
 
-  <!-- === Chat Input Area (unchanged) === -->
   <footer>
     <textarea id="messageInput" placeholder="Type a message..."></textarea>
     <button id="sendBtn">Send</button>
     <button id="nextBtn">Next</button>
   </footer>
 
-  <p style="text-align:center; margin-top:10px;">
-    &copy; Copyright 2025-
-    <script>document.write(new Date().getFullYear())</script> TikTalk. All rights reserved.
-  </p>
-
-  <!-- Backend + App -->
   <script>window.TIKTALK_BACKEND = "https://tiktalk-server.onrender.com";</script>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="app.js"></script>
 
-  <!-- Custom JS (safe load) -->
+  <footer>
+    &copy; Copyright 2025-
+    <script>document.write(new Date().getFullYear())</script> TikTalk. All rights reserved.
+  </footer>
+
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      // Theme toggle
-      const themeBtn = document.getElementById("theme-toggle");
-      const saved = localStorage.getItem("theme") || "light";
-      document.body.classList.add(saved);
-      themeBtn.textContent = saved === "light" ? "🌙" : "☀️";
-
-      themeBtn.addEventListener("click", () => {
-        document.body.classList.toggle("dark");
-        document.body.classList.toggle("light");
-        const mode = document.body.classList.contains("dark") ? "dark" : "light";
-        localStorage.setItem("theme", mode);
-        themeBtn.textContent = mode === "light" ? "🌙" : "☀️";
-      });
-
-      // Share popup open/close
-      const shareBtn = document.getElementById("share-btn");
-      const shareMenu = document.getElementById("share-menu");
-
-      shareBtn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        shareMenu.style.display = shareMenu.style.display === "flex" ? "none" : "flex";
-      });
-
-      // Close on outside click
-      document.addEventListener("click", (e) => {
-        if (!shareMenu.contains(e.target) && e.target !== shareBtn) {
-          shareMenu.style.display = "none";
-        }
-      });
+    // ========== Theme Toggle ==========
+    const themeBtn = document.getElementById("theme-toggle");
+    const currentTheme = localStorage.getItem("theme") || "light";
+    document.body.classList.add(currentTheme);
+    themeBtn.textContent = currentTheme === "light" ? "🌙" : "☀️";
+    themeBtn.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      document.body.classList.toggle("light");
+      const theme = document.body.classList.contains("dark") ? "dark" : "light";
+      localStorage.setItem("theme", theme);
+      themeBtn.textContent = theme === "light" ? "🌙" : "☀️";
     });
 
-    // Share handlers
-    function shareWhatsApp() {
-      window.open(`https://wa.me/?text=Join%20me%20on%20TikTalk:%20${encodeURIComponent(window.location.href)}`, "_blank");
-    }
-    function shareTelegram() {
-      window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent("Join me on TikTalk")}`, "_blank");
-    }
-    function shareTwitter() {
-      window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent("Join me on TikTalk")}`, "_blank");
-    }
-    function shareFacebook() {
-      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, "_blank");
-    }
-    function copyLink() {
-      navigator.clipboard.writeText(window.location.href).then(()=>{
-        alert("Link copied!");
-      });
+    // ========== Share Button ==========
+    const shareBtn = document.getElementById("share-btn");
+    const shareMenu = document.getElementById("share-menu");
+    shareBtn.addEventListener("click", () => {
+      shareMenu.style.display = shareMenu.style.display === "block" ? "none" : "block";
+    });
+    window.addEventListener("click", (e) => {
+      if (!shareBtn.contains(e.target) && !shareMenu.contains(e.target)) {
+        shareMenu.style.display = "none";
+      }
+    });
+
+    // Copy Website Link
+    function copyWebsite() {
+      navigator.clipboard.writeText("https://tiktalkchat.github.io/TikTalk-client/");
+      alert("✅ Website link copied!");
     }
   </script>
 </body>
-</html>
+  </html>
