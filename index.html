@@ -6,67 +6,55 @@
   <title>TikTalk - Stranger Chat</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* ====== Dark/Light Theme ====== */
-    body.light {
-      background: #ffffff;
-      color: #0f172a;
-      transition: all 0.3s ease;
+    /* ===== Theme ===== */
+    :root { --card: #ffffff; --text: #0f172a; --muted:#e5e7eb; --muted2:#cbd5e1; }
+    body.light { background:#ffffff; color:#0f172a; transition:background .3s,color .3s; }
+    body.dark  { background:#0f172a; color:#f8fafc; transition:background .3s,color .3s; }
+    body.dark .share-menu{ background:#0b1220; border-color:#1f2937; }
+    body.dark .round-btn{ background:#1f2937; }
+    body.dark .round-btn:hover{ background:#334155; }
+
+    /* ===== Header (fixed layout safe) ===== */
+    header{
+      position:relative; /* so popup anchors to header */
+      display:flex; justify-content:space-between; align-items:center;
+      padding:8px 12px;
     }
-    body.dark {
-      background: #0f172a;
-      color: #f8fafc;
-      transition: all 0.3s ease;
+    .logo{ height:32px; }
+    .header-right{ display:flex; gap:8px; align-items:center; }
+
+    .round-btn{
+      width:34px; height:34px; border-radius:50%; border:none; cursor:pointer;
+      display:flex; justify-content:center; align-items:center; font-size:16px;
+      background:#e5e7eb; transition:background .2s, transform .08s;
     }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 15px;
+    .round-btn:active{ transform: scale(0.98); }
+    .round-btn:hover{ background:#cbd5e1; }
+
+    /* ===== Share popup ===== */
+    .share-menu{
+      position:absolute; top:50px; right:12px;
+      background:#fff; border:1px solid #ddd; border-radius:10px;
+      display:none; flex-direction:column; padding:10px; gap:8px;
+      box-shadow:0 8px 24px rgba(0,0,0,.18); z-index:100; min-width:190px;
     }
-    .header-right {
-      display: flex;
-      gap: 10px;
+    .share-item{
+      display:flex; align-items:center; gap:10px;
+      border:none; padding:10px 12px; border-radius:8px; cursor:pointer;
+      font-size:14px; font-weight:600; color:#fff;
     }
-    .round-btn {
-      width: 35px;
-      height: 35px;
-      border-radius: 50%;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 18px;
-      background: #e5e7eb;
-      transition: background 0.3s;
-    }
-    .round-btn:hover {
-      background: #cbd5e1;
-    }
-    /* Share menu */
-    .share-menu {
-      position: absolute;
-      top: 50px;
-      right: 15px;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      display: none;
-      flex-direction: column;
-      padding: 10px;
-      gap: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-    .share-menu button {
-      border: none;
-      background: #f1f5f9;
-      padding: 6px 10px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .share-menu button:hover {
-      background: #e2e8f0;
-    }
+    .share-item:hover{ filter:brightness(0.95); }
+    .share-icon{ width:18px; height:18px; display:inline-block; }
+
+    .wa{ background:#25D366; }
+    .tg{ background:#229ED9; }
+    .tw{ background:#0f1419; color:#fff; }      /* X (Twitter) black */
+    .fb{ background:#1877F2; }
+    .cp{ background:#6b7280; }
+
+    /* keep chat layout untouched */
+    main#chat{ }
+    footer textarea{ }
   </style>
 </head>
 <body>
@@ -74,20 +62,135 @@
     <div class="header-left">
       <img src="assets/logo.svg" alt="TikTalk Logo" class="logo" />
     </div>
+
     <div class="header-right">
-      <!-- 🌙 Theme Toggle -->
-      <button id="theme-toggle" class="round-btn">🌙</button>
-      <!-- 📤 Share Button -->
-      <button id="share-btn" class="round-btn">⤴️</button>
+      <!-- Theme Toggle -->
+      <button id="theme-toggle" class="round-btn" aria-label="Toggle theme">🌙</button>
+
+      <!-- Share Button -->
+      <button id="share-btn" class="round-btn" aria-label="Share">⤴️</button>
+
+      <!-- Share Menu with SVG icons -->
       <div id="share-menu" class="share-menu">
-        <button onclick="shareWhatsApp()">WhatsApp</button>
-        <button onclick="shareFacebook()">Facebook</button>
-        <button onclick="shareTelegram()">Telegram</button>
-        <button onclick="shareTwitter()">Twitter</button>
-        <button onclick="copyLink()">Copy Link</button>
+        <button class="share-item wa" onclick="shareWhatsApp()">
+          <span class="share-icon" aria-hidden="true">
+            <!-- WhatsApp SVG -->
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 2a10 10 0 0 0-8.61 15.1L2 22l4.99-1.31A9.99 9.99 0 1 0 12 2Z" fill="currentColor" opacity=".15"/><path d="M12 4a8 8 0 0 0-6.91 11.94l-.2.34-.77 2.94 2.98-.78.33-.19A8 8 0 1 0 12 4Zm4.42 9.69c-.22-.11-1.3-.64-1.5-.71-.2-.07-.35-.11-.5.11-.15.22-.57.71-.7.86-.13.15-.26.17-.48.06-.22-.11-.94-.35-1.79-1.11-.66-.59-1.1-1.31-1.23-1.53-.13-.22-.01-.34.1-.45.11-.11.22-.26.33-.39.11-.13.15-.22.22-.37.07-.15.04-.28-.02-.39-.06-.11-.5-1.2-.69-1.65-.18-.44-.37-.38-.5-.39-.13-.01-.28-.01-.43-.01-.15 0-.39.06-.59.28-.2.22-.77.75-.77 1.83 0 1.09.79 2.14.9 2.29.11.15 1.55 2.37 3.77 3.32 2.22.95 2.22.63 2.63.61.41-.02 1.3-.53 1.48-1.05.18-.52.18-.97.13-1.05-.05-.08-.2-.13-.42-.24Z" fill="currentColor"/></svg>
+          </span>
+          WhatsApp
+        </button>
+
+        <button class="share-item tg" onclick="shareTelegram()">
+          <span class="share-icon" aria-hidden="true">
+            <!-- Telegram SVG -->
+            <svg viewBox="0 0 24 24" fill="none"><path d="M22 3L2.9 10.2c-.8.32-.77 1.47.05 1.75l4.78 1.67 1.86 5.97c.24.78 1.25.98 1.79.35l2.7-3.14 4.56 3.35c.7.52 1.7.12 1.89-.76L23.9 4.24C24.11 3.27 23.05 2.58 22 3Z" fill="currentColor" opacity=".95"/></svg>
+          </span>
+          Telegram
+        </button>
+
+        <button class="share-item tw" onclick="shareTwitter()">
+          <span class="share-icon" aria-hidden="true">
+            <!-- X (Twitter) SVG -->
+            <svg viewBox="0 0 24 24" fill="none"><path d="M18.25 3h3.1l-6.78 7.75L22 21h-6.56l-4.7-6.16L5.29 21H2.18l7.3-8.35L2 3h6.7l4.22 5.6L18.25 3Zm-1.15 16.2h1.72L7.03 4.71H5.2l11.9 14.49Z" fill="currentColor"/></svg>
+          </span>
+          Twitter
+        </button>
+
+        <button class="share-item fb" onclick="shareFacebook()">
+          <span class="share-icon" aria-hidden="true">
+            <!-- Facebook SVG -->
+            <svg viewBox="0 0 24 24" fill="none"><path d="M22 12a10 10 0 1 0-11.56 9.9v-7H7.9V12h2.54V9.8c0-2.5 1.49-3.88 3.77-3.88 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56V12h2.78l-.44 2.9h-2.34v7A10 10 0 0 0 22 12Z" fill="currentColor"/></svg>
+          </span>
+          Facebook
+        </button>
+
+        <button class="share-item cp" onclick="copyLink()">
+          <span class="share-icon" aria-hidden="true">
+            <!-- Link SVG -->
+            <svg viewBox="0 0 24 24" fill="none"><path d="M10.59 13.41a5 5 0 0 0 7.07 0l2.12-2.12a5 5 0 1 0-7.07-7.07L11.6 5.33" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.41 10.59a5 5 0 0 0-7.07 0L4.22 12.7a5 5 0 1 0 7.07 7.07l1.12-1.12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          Copy Link
+        </button>
       </div>
     </div>
   </header>
+
   <main id="chat">
     <div id="messages"></div>
-    <div id="typingIndicator" style="display:none; font-size:13px; color:gray; margin:5px
+    <div id="typingIndicator" style="display:none; font-size:13px; color:gray; margin:5px 10px;">Stranger is typing...</div>
+  </main>
+
+  <p style="text-align:center; margin-top:20px;">Made in India ♥️</p>
+
+  <!-- === Chat Input Area (unchanged) === -->
+  <footer>
+    <textarea id="messageInput" placeholder="Type a message..."></textarea>
+    <button id="sendBtn">Send</button>
+    <button id="nextBtn">Next</button>
+  </footer>
+
+  <p style="text-align:center; margin-top:10px;">
+    &copy; Copyright 2025-
+    <script>document.write(new Date().getFullYear())</script> TikTalk. All rights reserved.
+  </p>
+
+  <!-- Backend + App -->
+  <script>window.TIKTALK_BACKEND = "https://tiktalk-server.onrender.com";</script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="app.js"></script>
+
+  <!-- Custom JS (safe load) -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Theme toggle
+      const themeBtn = document.getElementById("theme-toggle");
+      const saved = localStorage.getItem("theme") || "light";
+      document.body.classList.add(saved);
+      themeBtn.textContent = saved === "light" ? "🌙" : "☀️";
+
+      themeBtn.addEventListener("click", () => {
+        document.body.classList.toggle("dark");
+        document.body.classList.toggle("light");
+        const mode = document.body.classList.contains("dark") ? "dark" : "light";
+        localStorage.setItem("theme", mode);
+        themeBtn.textContent = mode === "light" ? "🌙" : "☀️";
+      });
+
+      // Share popup open/close
+      const shareBtn = document.getElementById("share-btn");
+      const shareMenu = document.getElementById("share-menu");
+
+      shareBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        shareMenu.style.display = shareMenu.style.display === "flex" ? "none" : "flex";
+      });
+
+      // Close on outside click
+      document.addEventListener("click", (e) => {
+        if (!shareMenu.contains(e.target) && e.target !== shareBtn) {
+          shareMenu.style.display = "none";
+        }
+      });
+    });
+
+    // Share handlers
+    function shareWhatsApp() {
+      window.open(`https://wa.me/?text=Join%20me%20on%20TikTalk:%20${encodeURIComponent(window.location.href)}`, "_blank");
+    }
+    function shareTelegram() {
+      window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent("Join me on TikTalk")}`, "_blank");
+    }
+    function shareTwitter() {
+      window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent("Join me on TikTalk")}`, "_blank");
+    }
+    function shareFacebook() {
+      window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`, "_blank");
+    }
+    function copyLink() {
+      navigator.clipboard.writeText(window.location.href).then(()=>{
+        alert("Link copied!");
+      });
+    }
+  </script>
+</body>
+</html>
