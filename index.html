@@ -6,7 +6,7 @@
   <title>TikTalk - Stranger Chat</title>
   <link rel="stylesheet" href="style.css" />
   <style>
-    /* ====== Dark/Light Theme ====== */
+    /* Dark/Light Theme */
     body.light {
       background: #ffffff;
       color: #0f172a;
@@ -17,53 +17,55 @@
       color: #f8fafc;
       transition: all 0.3s ease;
     }
+
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 15px;
+      padding: 8px 12px;
     }
     .header-right {
       display: flex;
-      gap: 10px;
+      gap: 8px;
     }
     .round-btn {
-      width: 35px;
-      height: 35px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       border: none;
       cursor: pointer;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 18px;
+      font-size: 16px;
       background: #e5e7eb;
-      transition: background 0.3s;
     }
     .round-btn:hover {
       background: #cbd5e1;
     }
 
-    /* Share menu */
+    /* Share popup */
     .share-menu {
       position: absolute;
       top: 50px;
-      right: 15px;
+      right: 12px;
       background: white;
       border: 1px solid #ddd;
-      border-radius: 10px;
+      border-radius: 8px;
       display: none;
       flex-direction: column;
-      padding: 10px;
-      gap: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      padding: 8px;
+      gap: 6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      z-index: 100;
     }
     .share-menu button {
       border: none;
       background: #f1f5f9;
-      padding: 6px 10px;
+      padding: 6px 8px;
       border-radius: 6px;
       cursor: pointer;
+      font-size: 14px;
     }
     .share-menu button:hover {
       background: #e2e8f0;
@@ -76,9 +78,9 @@
       <img src="assets/logo.svg" alt="TikTalk Logo" class="logo" />
     </div>
     <div class="header-right">
-      <!-- 🌙 Theme Toggle -->
+      <!-- Theme Toggle -->
       <button id="theme-toggle" class="round-btn">🌙</button>
-      <!-- 📤 Share Button -->
+      <!-- Share Button -->
       <button id="share-btn" class="round-btn">⤴️</button>
       <div id="share-menu" class="share-menu">
         <button onclick="shareWhatsApp()">WhatsApp</button>
@@ -96,6 +98,7 @@
 
   <p style="text-align: center; margin-top: 20px;">Made in India ♥️</p>
 
+  <!-- === Chat Input Area (unchanged) === -->
   <footer>
     <textarea id="messageInput" placeholder="Type a message..."></textarea>
     <button id="sendBtn">Send</button>
@@ -103,19 +106,18 @@
   </footer>
 
   <script>
-    // Backend
     window.TIKTALK_BACKEND = "https://tiktalk-server.onrender.com";
   </script>
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="app.js"></script>
 
-  <footer>
+  <footer style="text-align:center; margin-top:10px;">
     &copy; Copyright 2025-
     <script>document.write(new Date().getFullYear())</script> TikTalk. All rights reserved.
   </footer>
 
   <script>
-    // ========== Theme Toggle ==========
+    // Theme Toggle
     const themeBtn = document.getElementById("theme-toggle");
     const currentTheme = localStorage.getItem("theme") || "light";
 
@@ -131,7 +133,7 @@
       themeBtn.textContent = theme === "light" ? "🌙" : "☀️";
     });
 
-    // ========== Share Button ==========
+    // Share Button
     const shareBtn = document.getElementById("share-btn");
     const shareMenu = document.getElementById("share-menu");
 
