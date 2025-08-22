@@ -9,14 +9,21 @@
 <body>
   <header>
     <img src="assets/logo.svg" alt="TikTalk Logo" class="logo" />
-    <h1>Welcome to TikTalk</h1>
+    <h1></h1>
   </header>
-  <main>
-    <div class="chat-box" id="chat-box"></div>
-    <input type="text" id="message-input" placeholder="Type your message..." />
-    <button id="send-btn">Send</button>
+
+  <main id="chat">
+    <div id="messages"></div>
   </main>
-  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+  <footer>
+    <textarea id="messageInput" placeholder="Type a message..."></textarea>
+    <button id="sendBtn">Send</button>
+    <button id="nextBtn">Next</button>
+  </footer>
+
+  <script>window.TIKTALK_BACKEND = "https://tiktalk-server.onrender.com";</script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
