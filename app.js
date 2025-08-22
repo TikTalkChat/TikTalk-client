@@ -1,20 +1,31 @@
+const socket = io(window.TIKTALK_BACKEND);
 
-const socket = io("https://your-server-url.onrender.com");
+const messagesDiv = document.getElementById("messages");
+const input = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
+const nextBtn = document.getElementById("nextBtn");
 
-const chatBox = document.getElementById('chat-box');
-const input = document.getElementById('message-input');
-const sendBtn = document.getElementById('send-btn');
+function appendMessage(text, type) {
+  const div = document.createElement("div");
+  div.classList.add("message", type);
+  div.innerText = text;
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
 
-sendBtn.addEventListener('click', () => {
-  const msg = input.value;
-  if(msg.trim() !== '') {
-    socket.emit('message', msg);
-    input.value = '';
-  }
-});
+sendBtn.onclick = () => {
+  const text = input.value.trim();
+  if (!text) return;
+  appendMessage(text, "me");
+  socket.emit("message", text);
+  input.value = "";
+};
 
-socket.on('message', (data) => {
-  let div = document.createElement('div');
-  div.textContent = data;
-  chatBox.appendChild(div);
+nextBtn.onclick = () => {
+  socket.emit("next");
+  messagesDiv.innerHTML = "";
+};
+
+socket.on("message", (msg) => {
+  appendMessage(msg, "stranger");
 });
