@@ -1,46 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TikTalk Live Chat</title>
-<link rel="stylesheet" href="style.css">
-<script>
-  // Backend URL - Render.com server
-  window.TIKTALK_BACKEND = "https://tiktalk-server.onrender.com";
-  // GitHub Username Reference
-  window.GITHUB_USER = "TikTalkchat";
-</script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTalk - Stranger Chat</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Header -->
-  <div class="header">
-    <div class="logo">TikTalk</div>
-    <div class="share-header">
-      <button onclick="shareApp('whatsapp')">WA</button>
-      <button onclick="shareApp('facebook')">FB</button>
-      <button onclick="shareApp('copy')">🔗</button>
-    </div>
+  <header>
+    <img src="assets/logo.svg" alt="TikTalk Logo" class="logo" />
+    <h1></h1>
+  </header>
+
+  <main id="chat">
+<!-- Typing indicator (hidden by default) -->
+<div id="typingIndicator" style="text-align: left; margin: 5px 10px; font-style: italic; font-size: 0.9rem; color: gray; display: none;">
+  Stranger is typing...
+</div>
+    <div id="messages"></div>
+  </main>
+
+  <p style="text-align: center; margin-top: 20px;">Made in India ♥️</p>
   </div>
 
-  <!-- Video Section -->
-  <div class="video-container">
-    <video id="localVideo" autoplay muted></video>
-    <video id="remoteVideo" autoplay></video>
-  </div>
-
-  <!-- Chat Messages -->
-  <div id="chatArea"></div>
-
-  <!-- Chat Controls -->
-  <div class="chat-controls">
-    <button id="emojiBtn">😊</button>
-    <button id="photoBtn">📷</button>
-    <input type="text" id="messageInput" placeholder="Type a message">
+   <footer>
+    <textarea id="messageInput" placeholder="Type a message..."></textarea>
     <button id="sendBtn">Send</button>
-  </div>
+    <button id="nextBtn">Next</button>
+       </div>
+     
+  </footer>
 
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script src="app.js"></script>
+  <script>window.TIKTALK_BACKEND = "https://tiktalk-server.onrender.com";</script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="app.js"></script>
+<footer>
+  &copy; Copyright 2025-<script>document.write(new Date().getFullYear())</script> TikTalk. All rights reserved.
+  </footer>
+</div>
+  
+  <script>
+  function toggleMenu() {
+    var menu = document.getElementById("menu");
+    var menuToggle = document.getElementById("menuToggle");
+
+    if (menu.style.left === "0px") {
+      menu.style.left = "-300px";
+      menuToggle.innerHTML = "&#9776;";
+    } else {
+      menu.style.left = "0px";
+      menuToggle.innerHTML = "&#10006;";
+    }
+  }
+  </script>
 </body>
 </html>
