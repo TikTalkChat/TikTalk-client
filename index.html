@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,49 +10,14 @@
 <body>
   <header>
     <img src="assets/logo.svg" alt="TikTalk Logo" class="logo" />
-    <h1></h1>
-    <div class="header-actions">
-      <!-- Theme Toggle -->
-      <button id="theme-toggle" title="Toggle Theme">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M12 3a9 9 0 000 18 9 9 0 010-18zm0-2a11 11 0 110 22A11 11 0 0112 1z"/>
-        </svg>
-      </button>
-      <!-- Share -->
-      <button id="share-btn" title="Share Website">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
-          <path d="M4 12v-2h16v2H4z"/>
-        </svg>
-      </button>
-    </div>
+    <h1>Welcome to TikTalk</h1>
   </header>
-
-  <main id="chat">
-    <div id="messages"></div>
+  <main>
+    <div class="chat-box" id="chat-box"></div>
+    <input type="text" id="message-input" placeholder="Type your message..." />
+    <button id="send-btn">Send</button>
   </main>
-
-  <p style="text-align: center; margin-top: 20px;">Made in India ♥️</p>
-
-  <footer>
-    <button id="nextBtn" title="Next Stranger">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24">
-        <path d="M8 5v14l11-7z"/>
-      </svg>
-    </button>
-    <textarea id="messageInput" placeholder="Type a message..."></textarea>
-    <button id="sendBtn" title="Send Message">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24">
-        <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
-      </svg>
-    </button>
-  </footer>
-
-  <script>window.TIKTALK_BACKEND = "https://tiktalk-server.onrender.com";</script>
-  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
   <script src="app.js"></script>
-
-  <footer>
-    &copy; Copyright 2025-<script>document.write(new Date().getFullYear())</script> TikTalk. All rights reserved.
-  </footer>
 </body>
 </html>
