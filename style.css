@@ -19,19 +19,19 @@ header {
   padding: 10px 15px;
   background: rgba(255,255,255,0.8);
   backdrop-filter: blur(10px);
-  height: 80px;          /* Desktop header height */
+  height: 40px;          /* Desktop header height */
 }
 
 header .logo {
   height: 100%;           /* Logo follows header height */
   width: auto;            /* Maintain aspect ratio */
-  max-height: 80px;       /* Bigger logo */
+  max-height: 40px;       /* Bigger logo */
   margin-right: 10px;
 }
 
 header h1 {
   color: #333;
-  font-size: 24px;        /* Desktop title size */
+  font-size: 18px;        /* Desktop title size */
 }
 
 /* ===== Chat Main ===== */
