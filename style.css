@@ -101,26 +101,31 @@ footer button#nextBtn {
 /* ===== Responsive tweaks ===== */
 @media screen and (max-width: 600px) {
   header {
-    height: 50px;       /* Mobile header height chhota */
-    padding: 6px 10px;
+    height: 45px;       /* Mobile header aur chhota */
+    padding: 4px 8px;
   }
 
   header .logo {
-    height: 100%;       /* Logo follows mobile header height */
-    max-height: 50px;   /* Mobile logo chhota */
+    height: auto;        /* Logo auto height for smooth fit */
+    max-height: 35px;    /* Mobile me logo chhota */
+    width: auto;         /* Maintain aspect ratio */
   }
 
   header h1 {
-    font-size: 16px;    /* Mobile title size */
+    font-size: 14px;    /* Mobile title size */
+  }
+
+  footer {
+    padding: 4px;       /* Footer padding chhoti */
   }
 
   footer textarea {
-    height: 35px;
-    font-size: 13px;
+    height: 28px;       /* Chhoti input box */
+    font-size: 12px;
   }
 
   footer button {
-    padding: 6px 10px;
-    font-size: 13px;
+    padding: 4px 8px;   /* Chhote buttons */
+    font-size: 12px;
   }
 }
