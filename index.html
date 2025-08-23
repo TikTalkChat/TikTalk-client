@@ -22,28 +22,29 @@
     #chat {flex:1; overflow-y:auto; padding:70px 15px 70px;}
     #messages {display:flex; flex-direction:column; gap:8px;}
 
-    /* ===== Updated Chat Bubble Styling ===== */
+    /* ===== Chat Bubble Styling ===== */
     .msg {
-      max-width: 75%;
+      max-width: 70%;
       padding: 10px 14px;
-      border-radius: 15px;
+      border-radius: 20px;
       word-wrap: break-word;
       font-size: 15px;
-      transition: all 0.2s ease;
+      position: relative;
       display: inline-block;
     }
 
-    .me {
+    .msg.me {
       align-self: flex-end;
       background: #007bff;
       color: #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      border-bottom-right-radius: 2px; /* Tail effect */
     }
 
-    .stranger {
+    .msg.stranger {
       align-self: flex-start;
       background: #f1f1f1;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      color: #000;
+      border-bottom-left-radius: 2px; /* Tail effect */
     }
     /* =============================== */
 
@@ -146,7 +147,7 @@
       div.textContent = text;
       messagesDiv.appendChild(div);
 
-      // Smooth scroll to the latest message
+      // Smooth scroll to latest message
       div.scrollIntoView({behavior: "smooth", block: "end"});
     }
 
