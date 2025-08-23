@@ -21,7 +21,9 @@ header {
 }
 
 header .logo {
-  height: 36px;
+  height: 80%;      /* Responsive height for logo */
+  max-height: 60px; /* Maximum logo height */
+  width: auto;      /* Maintain aspect ratio */
   margin-right: 10px;
 }
 
