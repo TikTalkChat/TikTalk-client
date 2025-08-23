@@ -107,6 +107,8 @@ footer button#nextBtn {
 
   header .logo {
     max-height: 45px; /* Logo smaller */
+    height: 100%;     /* Ensure it follows header height */
+    width: auto;      /* Maintain aspect ratio */
   }
 
   header h1 {
