@@ -101,7 +101,7 @@ footer button#nextBtn {
 /* ===== Responsive tweaks ===== */
 @media screen and (max-width: 600px) {
   header {
-    height: 45px;       /* Mobile header aur chhota */
+    height: 45px;       /* Mobile header chhota */
     padding: 4px 8px;
   }
 
