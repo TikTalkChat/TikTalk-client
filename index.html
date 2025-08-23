@@ -22,10 +22,10 @@
     #chat {flex:1; overflow-y:auto; padding:70px 15px 70px;}
     #messages {display:flex; flex-direction:column; gap:8px;}
 
-    .msg {max-width:75%; padding:10px 14px; border-radius:15px; word-wrap:break-word; font-size:15px;}
-    .me {align-self:flex-end; background:#007bff; color:#fff;}
-    .stranger {align-self:flex-start; background:#f1f1f1;}
-
+    .msg {max-width:75%; padding:10px 14px; border-radius:15px; word-wrap:break-word; font-size:15px; transition: all 0.2s ease;}
+    .me {align-self:flex-end; background:#007bff; color:#fff; box-shadow: 0 2px 6px rgba(0,0,0,0.2);}
+    .stranger {align-self:flex-start; background:#f1f1f1; box-shadow: 0 2px 6px rgba(0,0,0,0.1);}
+    
     .popup {
       background:#f9f9f9; border:1px solid #ddd; border-radius:10px;
       padding:8px; text-align:center; color:#555;
@@ -125,7 +125,9 @@
       div.className = "msg " + who;
       div.textContent = text;
       messagesDiv.appendChild(div);
-      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      
+      // Smooth scroll
+      div.scrollIntoView({behavior: "smooth", block: "end"});
     }
 
     function showPopup(text){
@@ -173,7 +175,7 @@
       ws.onclose = () => {
         showPopup("❌ Disconnected from server");
         typingIndicator.style.display = "none";
-      };
+      }
     }
 
     sendBtn.addEventListener("click", ()=>{
