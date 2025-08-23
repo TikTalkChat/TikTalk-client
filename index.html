@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TikTalk - Stranger Chat</title>
 <style>
 * {margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif;}
 body {background:#fff; display:flex; flex-direction:column; height:100vh; transition: background .3s, color .3s; color:#0f172a;}
 body.dark-mode {background:#0b0f15; color:#e5e7eb;}
-header {
-  position:fixed; top:0; left:0; right:0;
-  display:flex; align-items:center; justify-content:space-between;
-  padding:8px 15px; background:#fff; border-bottom:1px solid #ddd; z-index:1000;
-}
+header {position:fixed; top:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; padding:8px 15px; background:#fff; border-bottom:1px solid #ddd; z-index:1000;}
 body.dark-mode header {background:#10161d; border-color:#374151;}
 header .left, header .right {display:flex; align-items:center; gap:8px;}
 header svg.logo {height:50px;}
+header h1 {font-size:18px; font-weight:bold; color:#007bff;}
 #chat {flex:1; overflow-y:auto; padding:70px 15px 70px;}
 #messages {display:flex; flex-direction:column; gap:8px;}
 .msg {max-width:75%; padding:10px 14px; border-radius:15px; word-wrap:break-word; font-size:15px;}
@@ -32,7 +29,6 @@ button {padding:0 14px; border:none; border-radius:20px; background:#007bff; col
 button#nextBtn {background:#ff3b30;}
 button:active {opacity:0.8;}
 p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin-bottom:50px;}
-/* Dark mode + share buttons */
 .icon-btn, .share-btn {border-radius:999px; height:36px; cursor:pointer; font-weight:600; transition: all .2s;}
 .icon-btn {width:36px; background:transparent; border:none; font-size:18px;}
 .icon-btn:active {transform:scale(.95);}
@@ -40,26 +36,19 @@ p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin
 .share-btn:hover {background:rgba(0,0,0,0.05);}
 body.dark-mode .share-btn {border-color:#374151;}
 body.dark-mode .share-btn:hover {background:rgba(255,255,255,0.08);}
-.share-sheet {
-  position:absolute;
-  top:45px; left:0;
-  background:#fff; padding:8px; border:1px solid #ddd;
-  border-radius:12px; display:none; flex-direction:column;
-  gap:6px; box-shadow:0 4px 12px rgba(0,0,0,0.15); min-width:140px; z-index:1000;
-}
+.share-sheet {position:absolute; top:45px; left:0; display:none; flex-direction:row; gap:6px; background:#fff; border:1px solid #ddd; border-radius:12px; padding:8px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:1000;}
 body.dark-mode .share-sheet {background:#10161d; border-color:#374151;}
-.share-sheet button {
-  background:#007bff; color:#fff; border:none; border-radius:12px;
-  padding:6px 10px; font-size:14px; cursor:pointer; transition:0.2s;
-}
-.share-sheet button:hover {opacity:0.85;}
+.share-sheet button{display:flex; align-items:center; justify-content:center; padding:6px; border-radius:50%; border:none; background:#007bff; cursor:pointer; transition:.2s;}
+body.dark-mode .share-sheet button{background:#1f2937;}
+.share-sheet button:hover{opacity:.85;}
+.share-sheet img{width:20px; height:20px;}
 </style>
 </head>
 <body>
+
 <header>
   <div class="left">
-    <!-- Original animated logo -->
-    <svg class="logo" width="auto" height="50" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TikTalk animated logo">
+    <svg class="logo" width="auto" height="50" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="gBubble" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#00eaff">
@@ -69,17 +58,6 @@ body.dark-mode .share-sheet {background:#10161d; border-color:#374151;}
             <animate attributeName="stop-color" dur="6s" values="#007bff;#6a00ff;#00eaff;#007bff" repeatCount="indefinite"/>
           </stop>
         </linearGradient>
-        <linearGradient id="gText" x1="0%" x2="100%">
-          <stop offset="0%" stop-color="#00eaff"/>
-          <stop offset="100%" stop-color="#6a00ff"/>
-        </linearGradient>
-        <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="6" result="b"/>
-          <feMerge>
-            <feMergeNode in="b"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
       </defs>
       <g transform="translate(60,70)">
         <g class="bubble">
@@ -88,24 +66,19 @@ body.dark-mode .share-sheet {background:#10161d; border-color:#374151;}
           <path class="eye right" d="M 8 -7 Q 12 -11 16 -7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
           <path class="smile" d="M -15 8 Q 0 22 15 8" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/>
         </g>
-        <text x="70" y="20" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="url(#gText)">
-          TikTalk
-        </text>
       </g>
     </svg>
+    <h1>TikTalk</h1>
   </div>
-  <div class="right" style="display:flex; align-items:center; gap:8px; position:relative;">
-    <!-- Dark mode button left of share -->
+  <div class="right" style="position:relative; display:flex; gap:8px; align-items:center;">
     <button id="themeToggle" class="icon-btn">🌑</button>
-    <!-- Share button -->
     <button id="shareBtn" class="share-btn">Share</button>
-    <!-- Share options -->
     <div class="share-sheet" id="shareSheet">
-      <button onclick="shareApp('whatsapp')">WhatsApp</button>
-      <button onclick="shareApp('instagram')">Instagram</button>
-      <button onclick="shareApp('facebook')">Facebook</button>
-      <button onclick="shareApp('x')">X</button>
-      <button onclick="shareApp('link')">Copy Link</button>
+      <button onclick="shareApp('whatsapp')"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"></button>
+      <button onclick="shareApp('instagram')"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png"></button>
+      <button onclick="shareApp('facebook')"><img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png"></button>
+      <button onclick="shareApp('x')"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4f/Twitter-logo.svg"></button>
+      <button onclick="shareApp('link')"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3d/Link_icon.svg"></button>
     </div>
   </div>
 </header>
@@ -124,30 +97,70 @@ body.dark-mode .share-sheet {background:#10161d; border-color:#374151;}
 <p class="footerNote">Made in India ♥️</p>
 
 <script>
-window.TIKTALK_BACKEND = "https://tiktalk-server-8dmz.onrender.com";
+// Dark mode toggle
+const themeToggle = document.getElementById("themeToggle");
+themeToggle.addEventListener("click", ()=>{document.body.classList.toggle("dark-mode");});
 
-// Chat WebSocket
+// Share sheet toggle
+const shareBtn = document.getElementById("shareBtn");
+const shareSheet = document.getElementById("shareSheet");
+shareBtn.addEventListener("click",(e)=>{
+  e.stopPropagation();
+  shareSheet.style.display = (shareSheet.style.display === "flex") ? "none" : "flex";
+});
+document.addEventListener("click",(e)=>{
+  if(!shareSheet.contains(e.target) && e.target!==shareBtn) shareSheet.style.display="none";
+});
+
+// Share functionality
+function shareApp(platform){
+  let url = encodeURIComponent(window.location.href);
+  if(platform==="whatsapp") window.open("https://api.whatsapp.com/send?text="+url,"_blank");
+  else if(platform==="instagram") window.open("https://www.instagram.com/","_blank");
+  else if(platform==="facebook") window.open("https://www.facebook.com/sharer/sharer.php?u="+url,"_blank");
+  else if(platform==="x") window.open("https://twitter.com/intent/tweet?url="+url,"_blank");
+  else if(platform==="link"){ navigator.clipboard.writeText(window.location.href); alert("Link copied!"); }
+}
+
+// Chat WebSocket + auto-scroll
+window.TIKTALK_BACKEND = "https://tiktalk-server-8dmz.onrender.com";
 const messagesDiv = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
 const nextBtn = document.getElementById("nextBtn");
 const typingIndicator = document.getElementById("typingIndicator");
 let ws, typingTimeout;
-function addMessage(text, who){
-  const div = document.createElement("div");
-  div.className = "msg " + who;
-  div.textContent = text;
-  messagesDiv.appendChild(div);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
-}
-function showPopup(text){
-  messagesDiv.innerHTML = `<div class="popup">${text}</div>`;
-}
+
+function addMessage(text, who){const div=document.createElement("div"); div.className="msg "+who; div.textContent=text; messagesDiv.appendChild(div); messagesDiv.scrollTop=messagesDiv.scrollHeight;}
+function showPopup(text){messagesDiv.innerHTML=`<div class="popup">${text}</div>`;}
+
 function connectStranger(){
   showPopup("🔍 Connecting to server...");
-  typingIndicator.style.display = "none";
-  ws = new WebSocket(window.TIKTALK_BACKEND.replace("http","ws") + "/ws");
-  ws.onmessage = (event) => {
-    try {
-      const data = JSON.parse(event.data);
-      if(data.type==="system
+  typingIndicator.style.display="none";
+  ws=new WebSocket(window.TIKTALK_BACKEND.replace("http","ws")+"/ws");
+  ws.onmessage=(event)=>{
+    try{
+      const data=JSON.parse(event.data);
+      if(data.type==="system"){
+        if(data.text==="waiting") showPopup("🔍 Searching for a stranger...");
+        else if(data.text==="connected") showPopup("✅ Connected! Say Hi 👋");
+        else if(data.text==="disconnected") showPopup("❌ Stranger disconnected");
+      }
+      if(data.type==="message"){ typingIndicator.style.display="none"; addMessage(data.text,"stranger"); }
+      if(data.type==="typing"){ typingIndicator.style.display="block"; clearTimeout(typingTimeout); typingTimeout=setTimeout(()=>{typingIndicator.style.display="none";},1500);}
+    }catch{}
+  };
+  ws.onclose=()=>{showPopup("❌ Disconnected from server"); typingIndicator.style.display="none";}
+}
+
+sendBtn.addEventListener("click", ()=>{
+  if(input.value.trim() && ws && ws.readyState===WebSocket.OPEN){ ws.send(JSON.stringify({type:"message", text:input.value})); addMessage(input.value,"me"); input.value=""; }
+});
+input.addEventListener("input", ()=>{if(ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:"typing"}));});
+nextBtn.addEventListener("click", ()=>{if(ws){ws.close();} connectStranger();});
+
+connectStranger();
+</script>
+
+</body>
+</html>
