@@ -20,31 +20,31 @@
     header h1 {font-size:18px; color:#007bff;}
 
     #chat {flex:1; overflow-y:auto; padding:70px 15px 70px;}
-    #messages {display:flex; flex-direction:column; gap:8px;}
+    #messages {padding: 10px;}
 
     /* ===== Chat Bubble Styling ===== */
     .msg {
-      max-width: 70%;
-      padding: 10px 14px;
-      border-radius: 20px;
-      word-wrap: break-word;
-      font-size: 15px;
-      position: relative;
       display: inline-block;
+      padding: 10px 15px;
+      border-radius: 20px;
+      margin: 5px 0;
+      max-width: 70%;
+      word-wrap: break-word;
+      clear: both;
     }
 
     .msg.me {
-      align-self: flex-end;
       background: #007bff;
       color: #fff;
-      border-bottom-right-radius: 2px; /* Tail effect */
+      float: right;
+      border-bottom-right-radius: 2px;
     }
 
     .msg.stranger {
-      align-self: flex-start;
       background: #f1f1f1;
       color: #000;
-      border-bottom-left-radius: 2px; /* Tail effect */
+      float: left;
+      border-bottom-left-radius: 2px;
     }
     /* =============================== */
 
@@ -147,8 +147,8 @@
       div.textContent = text;
       messagesDiv.appendChild(div);
 
-      // Smooth scroll to latest message
-      div.scrollIntoView({behavior: "smooth", block: "end"});
+      // Auto-scroll
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 
     function showPopup(text){
