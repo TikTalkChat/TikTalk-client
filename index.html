@@ -187,13 +187,25 @@
 
       ws = new WebSocket(window.TIKTALK_BACKEND.replace("http","ws") + "/ws");
 
+      // ⚠️ yaha pe fake connected popup hata diya
       ws.onopen = () => {
-        showPopup("✅ Connected! Say Hi 👋");
+        // abhi kuch nahi dikhana
       };
 
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
+
+          // ✅ new status handling
+          if(data.type === "status"){
+            if(data.text === "waiting"){
+              showPopup("🔍 Searching for a stranger...");
+            } else if(data.text === "connected"){
+              showPopup("✅ Connected! Say Hi 👋");
+            }
+            return;
+          }
+
           if(data.type === "message"){
             typingIndicator.style.display = "none";
             addMessage(data.text, "stranger");
