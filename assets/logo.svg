@@ -1,56 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120" viewBox="0 0 400 120">
+<svg width="420" height="140" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TikTalk animated logo">
+  <defs>
+    <!-- Bubble gradient -->
+    <linearGradient id="gBubble" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00eaff">
+        <animate attributeName="stop-color" dur="6s" values="#00eaff;#007bff;#6a00ff;#00eaff" repeatCount="indefinite"/>
+      </stop>
+      <stop offset="100%" stop-color="#007bff">
+        <animate attributeName="stop-color" dur="6s" values="#007bff;#6a00ff;#00eaff;#007bff" repeatCount="indefinite"/>
+      </stop>
+    </linearGradient>
+
+    <!-- Text gradient -->
+    <linearGradient id="gText" x1="0%" x2="100%">
+      <stop offset="0%" stop-color="#00eaff"/>
+      <stop offset="100%" stop-color="#6a00ff"/>
+    </linearGradient>
+
+    <!-- Glow -->
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="b"/>
+      <feMerge>
+        <feMergeNode in="b"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <g transform="translate(60,70)">
+    <!-- Smiley bubble -->
+    <g class="bubble">
+      <circle cx="0" cy="0" r="45" fill="url(#gBubble)"/>
+      <ellipse class="eye left" cx="-12" cy="-7" rx="4.5" ry="7" fill="#fff"/>
+      <path class="eye right" d="M 8 -7 Q 12 -11 16 -7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      <path class="smile" d="M -15 8 Q 0 22 15 8" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/>
+    </g>
+
+    <!-- Text close to bubble -->
+    <text x="70" y="20" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="url(#gText)">
+      TikTalk
+    </text>
+  </g>
+
   <style>
-    /* Eyes blink animation */
-    .eye {
-      animation: blink 4s infinite;
-      transform-origin: center;
-    }
-    @keyframes blink {
-      0%, 90%, 100% { transform: scaleY(1); }
-      95% { transform: scaleY(0.1); }
-    }
+    .bubble { transform-origin: 50% 50%; animation: bubblePulse 3.6s ease-in-out infinite, bubbleRotate 8s linear infinite; filter: url(#softGlow);}
+    .eye { transform-origin: center; animation: eyePop 2s ease-in-out infinite; }
+    .smile { animation: smileJelly 2.6s cubic-bezier(.25,.9,.3,1) infinite; }
 
-    /* Text wave animation */
-    .wave text {
-      font-family: Arial, sans-serif;
-      font-size: 44px;
-      font-weight: bold;
-      fill: #007BFF;
-      animation: wave 2s infinite;
-    }
-    @keyframes wave {
-      0%, 100% { transform: translateY(0); }
-      25% { transform: translateY(-4px); }
-      75% { transform: translateY(4px); }
-    }
-    .wave text:nth-child(1) { animation-delay: 0s; }
-    .wave text:nth-child(2) { animation-delay: 0.1s; }
-    .wave text:nth-child(3) { animation-delay: 0.2s; }
-    .wave text:nth-child(4) { animation-delay: 0.3s; }
-    .wave text:nth-child(5) { animation-delay: 0.4s; }
-    .wave text:nth-child(6) { animation-delay: 0.5s; }
-    .wave text:nth-child(7) { animation-delay: 0.6s; }
+    @keyframes bubblePulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.05);} }
+    @keyframes bubbleRotate { 0%{transform:rotate(-1deg);} 50%{transform:rotate(1deg);} 100%{transform:rotate(-1deg);} }
+    @keyframes eyePop { 0%,100%{transform:translateY(0);opacity:1;} 40%,60%{transform:translateY(-20px);opacity:0;} }
+    @keyframes smileJelly { 0%,100%{transform:translateY(0);} 40%{transform:translateY(2px) scaleY(.95);} 70%{transform:translateY(-1px) scaleY(1.05);} }
   </style>
-
-  <!-- Bubble icon (left side) -->
-  <g transform="translate(20,20) scale(0.5)">
-    <path d="M50 20c-20 0-35 15-35 35s15 35 35 35h3v10l20-15h25c20 0 35-15 35-35s-15-35-35-35H50z" 
-          fill="#007BFF"/>
-    <!-- Eyes -->
-    <circle class="eye" cx="70" cy="50" r="5" fill="#fff"/>
-    <circle class="eye" cx="95" cy="50" r="5" fill="#fff"/>
-    <!-- Smile -->
-    <path d="M73 60q12 12 24 0" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
-  </g>
-
-  <!-- TikTalk text (right side, same line as bubble) -->
-  <g class="wave" transform="translate(110,65)">
-    <text x="0"   y="0">T</text>
-    <text x="32"  y="0">i</text>
-    <text x="50"  y="0">k</text>
-    <text x="95"  y="0">T</text>
-    <text x="130" y="0">a</text>
-    <text x="160" y="0">l</text>
-    <text x="180" y="0">k</text>
-  </g>
 </svg>
