@@ -11,7 +11,7 @@ body.dark-mode {background:#0b0f15; color:#e5e7eb;}
 header {position:fixed; top:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; padding:8px 15px; background:#fff; border-bottom:1px solid #ddd; z-index:1000;}
 body.dark-mode header {background:#10161d; border-color:#374151;}
 header .left, header .right {display:flex; align-items:center; gap:8px;}
-header svg.logo {height:50px;}
+header svg.logo {height:50px; width:auto; display:block;}
 #chat {flex:1; overflow-y:auto; padding:70px 15px 70px;}
 #messages {display:flex; flex-direction:column; gap:8px;}
 .msg {max-width:75%; padding:10px 14px; border-radius:15px; word-wrap:break-word; font-size:15px;}
@@ -24,35 +24,223 @@ footer {position:fixed; bottom:0; left:0; right:0; display:flex; padding:8px; bo
 body.dark-mode footer {background:#10161d; border-color:#374151;}
 textarea {flex:1; resize:none; padding:10px; border:1px solid #ccc; border-radius:20px; font-size:15px; outline:none; height:40px; background:#fff; color:#0f172a;}
 body.dark-mode textarea {background:#1f2937; color:#e5e7eb; border-color:#374151;}
-button {padding:0 14px; border:none; border-radius:20px; background:#007bff; color:#fff; font-weight:bold; cursor:pointer; font-size:14px; white-space:nowrap;}
+button {
+  padding:0 14px; 
+  border:none; 
+  border-radius:20px; 
+  background:#007bff; 
+  color:#fff; 
+  font-weight:bold; 
+  cursor:pointer; 
+  font-size:14px; 
+  white-space:nowrap;
+  -webkit-tap-highlight-color: transparent !important;
+}
 button#nextBtn {background:#ff3b30;}
 button:active {opacity:0.8;}
 p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin-bottom:50px;}
-.icon-btn, .share-btn {border-radius:999px; height:36px; cursor:pointer; font-weight:600; transition: all .2s;}
-.icon-btn {width:36px; background:transparent; border:none; font-size:18px;}
+.icon-btn, .share-btn {
+  border-radius:999px; 
+  height:36px; 
+  cursor:pointer; 
+  font-weight:600; 
+  transition: all .2s;
+  -webkit-tap-highlight-color: transparent !important;
+}
+.icon-btn {
+  width:36px; 
+  background:transparent; 
+  border:none; 
+  font-size:18px;
+  -webkit-tap-highlight-color: transparent !important;
+}
 .icon-btn:active {transform:scale(.95);}
-.share-btn {padding:0 14px; background:transparent; border:1px solid #ccc; flex-shrink:0; min-width:60px; position:relative;}
+.share-btn {
+  padding:0 14px; 
+  background:transparent; 
+  border:1px solid #ccc; 
+  flex-shrink:0; 
+  min-width:60px; 
+  position:relative;
+  -webkit-tap-highlight-color: transparent !important;
+}
 .share-btn:hover {background:rgba(0,0,0,0.05);}
 body.dark-mode .share-btn {border-color:#374151;}
 body.dark-mode .share-btn:hover {background:rgba(255,255,255,0.08);}
-.share-sheet {position:absolute; top:45px; left:0; background:#fff; padding:8px; border:1px solid #ddd; border-radius:12px; display:none; flex-direction:column; gap:6px; box-shadow:0 4px 12px rgba(0,0,0,0.15); min-width:140px; z-index:1000;}
-body.dark-mode .share-sheet {background:#10161d; border-color:#374151;}
-.share-sheet button {background:#fff; border:none; border-radius:50%; padding:6px; width:36px; height:36px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:0.2s;}
-.share-sheet button img{width:20px; height:20px;}
-.share-sheet .copy-link {border-radius:12px; width:auto; padding:6px 10px; font-size:14px; background:#007bff; color:#fff;}
+
+/* ✅ UPDATED SHARE SHEET - COMPLETE TRANSPARENT BACKGROUND */
+.share-sheet {
+  position: absolute;
+  top: 45px;
+  left: 0;
+  background: transparent !important;
+  padding: 12px;
+  border: none !important;
+  border-radius: 0;
+  display: none;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: none !important;
+  min-width: 160px;
+  z-index: 1000;
+  transform: translateY(-10px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .share-sheet {
+  background: transparent !important;
+  border: none !important;
+}
+
+.share-sheet.show {
+  display: flex;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.share-sheet button {
+  background: #f8f9fa !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 50%;
+  padding: 8px;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.share-sheet button:hover {
+  background: #e9ecef !important;
+  transform: scale(1.05);
+}
+
+body.dark-mode .share-sheet button {
+  background: #2d3748 !important;
+  border-color: #4a5568 !important;
+}
+
+body.dark-mode .share-sheet button:hover {
+  background: #4a5568 !important;
+}
+
+.share-sheet button img {
+  width: 24px;
+  height: 24px;
+}
+
+.share-sheet button svg {
+  display: block;
+}
+
+.share-sheet .copy-link {
+  background: #007bff !important;
+  border: 1px solid #007bff !important;
+  border-radius: 20px;
+  width: auto;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: white !important;
+  font-weight: 600;
+  -webkit-tap-highlight-color: transparent !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.share-sheet .copy-link:hover {
+  background: #0056b3 !important;
+  border-color: #0056b3 !important;
+  transform: scale(1.02);
+}
+
+.copy-link::before {
+  content: "📋";
+  font-size: 16px;
+}
+
+/* REMOVE BLUE FOCUS/OUTLINE COMPLETELY */
+button:focus, button:active,
+.icon-btn:focus, .icon-btn:active,
+.share-btn:focus, .share-btn:active,
+.share-sheet button:focus, .share-sheet button:active,
+button:focus-visible, .icon-btn:focus-visible,
+.share-btn:focus-visible, .share-sheet button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ✅ ADDED ANIMATIONS FROM FIRST HTML */
+.bubble {
+  transform-origin: 50% 50%;
+  animation: bubblePulse 3.6s ease-in-out infinite, bubbleRotate 8s linear infinite;
+}
+
+.eye {
+  transform-origin: center;
+  animation: eyePop 2s ease-in-out infinite;
+}
+
+.smile {
+  animation: smileJelly 2.6s cubic-bezier(.25,.9,.3,1) infinite;
+}
+
+@keyframes bubblePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes bubbleRotate {
+  0% { transform: rotate(-1deg); }
+  50% { transform: rotate(1deg); }
+  100% { transform: rotate(-1deg); }
+}
+
+@keyframes eyePop {
+  0%, 100% { transform: translateY(0); opacity: 1; }
+  40% { transform: translateY(-20px); opacity: 0; }
+  60% { transform: translateY(-20px); opacity: 0; }
+}
+
+@keyframes smileJelly {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(2px) scaleY(.95); }
+  70% { transform: translateY(-1px) scaleY(1.05); }
+}
 </style>
 </head>
 <body>
 <header>
   <div class="left">
-    <!-- Original animated logo -->
+    <!-- ✅ COPIED ANIMATED SVG LOGO FROM FIRST HTML -->
     <svg class="logo" width="auto" height="50" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TikTalk animated logo">
       <defs>
         <linearGradient id="gBubble" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#00eaff"><animate attributeName="stop-color" dur="6s" values="#00eaff;#007bff;#6a00ff;#00eaff" repeatCount="indefinite"/></stop>
-          <stop offset="100%" stop-color="#007bff"><animate attributeName="stop-color" dur="6s" values="#007bff;#6a00ff;#00eaff;#007bff" repeatCount="indefinite"/></stop>
+          <stop offset="0%" stop-color="#00eaff">
+            <animate attributeName="stop-color" dur="6s" values="#00eaff;#007bff;#6a00ff;#00eaff" repeatCount="indefinite"/>
+          </stop>
+          <stop offset="100%" stop-color="#007bff">
+            <animate attributeName="stop-color" dur="6s" values="#007bff;#6a00ff;#00eaff;#007bff" repeatCount="indefinite"/>
+          </stop>
         </linearGradient>
+        <linearGradient id="gText" x1="0%" x2="100%">
+          <stop offset="0%" stop-color="#00eaff"/>
+          <stop offset="100%" stop-color="#6a00ff"/>
+        </linearGradient>
+        <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="6" result="b"/>
+          <feMerge>
+            <feMergeNode in="b"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
+
       <g transform="translate(60,70)">
         <g class="bubble">
           <circle cx="0" cy="0" r="45" fill="url(#gBubble)"/>
@@ -60,6 +248,9 @@ body.dark-mode .share-sheet {background:#10161d; border-color:#374151;}
           <path class="eye right" d="M 8 -7 Q 12 -11 16 -7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
           <path class="smile" d="M -15 8 Q 0 22 15 8" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/>
         </g>
+        <text x="70" y="20" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="url(#gText)">
+          TikTalk
+        </text>
       </g>
     </svg>
   </div>
@@ -70,7 +261,12 @@ body.dark-mode .share-sheet {background:#10161d; border-color:#374151;}
       <button onclick="shareApp('whatsapp')"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></button>
       <button onclick="shareApp('instagram')"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram"></button>
       <button onclick="shareApp('facebook')"><img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Facebook"></button>
-      <button onclick="shareApp('x')"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4f/Twitter-logo.svg" alt="X"></button>
+      <button onclick="shareApp('x')" aria-label="Share on X">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20">
+          <circle cx="50" cy="50" r="50" fill="#1DA1F2"/>
+          <path d="M30,30 L70,70 M70,30 L30,70" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+        </svg>
+      </button>
       <button class="copy-link" onclick="shareApp('link')">Copy Link</button>
     </div>
   </div>
@@ -94,15 +290,31 @@ body.dark-mode .share-sheet {background:#10161d; border-color:#374151;}
 const themeToggle = document.getElementById("themeToggle");
 themeToggle.addEventListener("click", ()=>{document.body.classList.toggle("dark-mode");});
 
-// Share sheet toggle
+// Share sheet toggle with animation
 const shareBtn = document.getElementById("shareBtn");
 const shareSheet = document.getElementById("shareSheet");
 shareBtn.addEventListener("click",(e)=>{
   e.stopPropagation();
-  shareSheet.style.display = (shareSheet.style.display === "flex") ? "none" : "flex";
+  if (shareSheet.classList.contains('show')) {
+    shareSheet.classList.remove('show');
+    setTimeout(() => {
+      shareSheet.style.display = 'none';
+    }, 300);
+  } else {
+    shareSheet.style.display = 'flex';
+    setTimeout(() => {
+      shareSheet.classList.add('show');
+    }, 10);
+  }
 });
+
 document.addEventListener("click",(e)=>{
-  if(!shareSheet.contains(e.target) && e.target!==shareBtn) shareSheet.style.display="none";
+  if(!shareSheet.contains(e.target) && e.target!==shareBtn && shareSheet.classList.contains('show')) {
+    shareSheet.classList.remove('show');
+    setTimeout(() => {
+      shareSheet.style.display = 'none';
+    }, 300);
+  }
 });
 
 // Share functionality
@@ -112,7 +324,19 @@ function shareApp(platform){
   else if(platform==="instagram") window.open("https://www.instagram.com/","_blank");
   else if(platform==="facebook") window.open("https://www.facebook.com/sharer/sharer.php?u="+url,"_blank");
   else if(platform==="x") window.open("https://twitter.com/intent/tweet?url="+url,"_blank");
-  else if(platform==="link"){ navigator.clipboard.writeText(window.location.href); alert("Link copied!"); }
+  else if(platform==="link"){ 
+    navigator.clipboard.writeText(window.location.href); 
+    alert("Link copied to clipboard! 📋");
+    
+    // Copy link button text change temporarily
+    const copyBtn = document.querySelector('.copy-link');
+    const originalText = copyBtn.innerHTML;
+    copyBtn.innerHTML = '✅ Copied!';
+    
+    setTimeout(() => {
+      copyBtn.innerHTML = originalText;
+    }, 2000);
+  }
 }
 
 // Chat WebSocket + auto-scroll
