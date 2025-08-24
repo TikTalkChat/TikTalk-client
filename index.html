@@ -63,7 +63,7 @@ p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin
   min-width:60px; 
   position:relative;
   color:#fff;
-  font-weight:600;
+  font-weight:600; 
   cursor:pointer;
 }
 .share-btn:hover {opacity:0.85;}
@@ -169,7 +169,7 @@ button:focus-visible, .icon-btn:focus-visible,
     </svg>
   </div>
   <div class="right" style="display:flex; align-items:center; gap:8px; position:relative;">
-    <button id="themeToggle" class="icon-btn">🌑</button>
+    <button id="themeToggle" class="icon-btn">🌙</button>
     <button id="shareBtn" class="share-btn">Share</button>
     <div class="share-sheet" id="shareSheet">
       <button onclick="shareApp('whatsapp')"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></button>
@@ -200,9 +200,16 @@ button:focus-visible, .icon-btn:focus-visible,
 <p class="footerNote">Made in India ♥️</p>
 
 <script>
-// Dark mode toggle
+// Dark mode toggle without localStorage
 const themeToggle = document.getElementById("themeToggle");
-themeToggle.addEventListener("click", ()=>{document.body.classList.toggle("dark-mode");});
+themeToggle.addEventListener("click", () => {
+  document.body.classList.toggle("dark-mode");
+  if (document.body.classList.contains("dark-mode")) {
+    themeToggle.textContent = "☀️"; // Sun for dark mode active
+  } else {
+    themeToggle.textContent = "🌙"; // Moon for light mode active
+  }
+});
 
 // Share sheet toggle
 const shareBtn = document.getElementById("shareBtn");
