@@ -57,18 +57,18 @@ p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin
 .icon-btn:active {transform:scale(.95);}
 .share-btn {
   padding:0 14px; 
-  background:transparent; 
-  border:1px solid #ccc; 
+  background:green; /* GREEN BUTTON */
+  border:none; 
   flex-shrink:0; 
   min-width:60px; 
   position:relative;
-  -webkit-tap-highlight-color: transparent !important;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
 }
-.share-btn:hover {background:rgba(0,0,0,0.05);}
-body.dark-mode .share-btn {border-color:#374151;}
-body.dark-mode .share-btn:hover {background:rgba(255,255,255,0.08);}
+.share-btn:hover {opacity:0.85;}
 
-/* ✅ UPDATED SHARE SHEET - COMPLETE TRANSPARENT BACKGROUND */
+/* SHARE SHEET */
 .share-sheet {
   position: absolute;
   top: 45px;
@@ -87,18 +87,11 @@ body.dark-mode .share-btn:hover {background:rgba(255,255,255,0.08);}
   opacity: 0;
   transition: all 0.3s ease;
 }
-
-body.dark-mode .share-sheet {
-  background: transparent !important;
-  border: none !important;
-}
-
 .share-sheet.show {
   display: flex;
   transform: translateY(0);
   opacity: 1;
 }
-
 .share-sheet button {
   background: #f8f9fa !important;
   border: 1px solid #dee2e6 !important;
@@ -113,111 +106,35 @@ body.dark-mode .share-sheet {
   transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent !important;
 }
+.share-sheet button:hover { background: #e9ecef !important; transform: scale(1.05);}
+body.dark-mode .share-sheet button {background: #2d3748 !important; border-color: #4a5568 !important;}
+body.dark-mode .share-sheet button:hover {background: #4a5568 !important;}
+.share-sheet button img { width:24px; height:24px;}
+.share-sheet button svg { display:block;}
+.share-sheet .link { border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; background:#f8f9fa !important; border:1px solid #dee2e6 !important; color:#007bff !important; font-weight:600; cursor:pointer; transition: all 0.2s ease;}
+.share-sheet .link:hover { background:#e9ecef !important; transform:scale(1.05); }
 
-.share-sheet button:hover {
-  background: #e9ecef !important;
-  transform: scale(1.05);
-}
-
-body.dark-mode .share-sheet button {
-  background: #2d3748 !important;
-  border-color: #4a5568 !important;
-}
-
-body.dark-mode .share-sheet button:hover {
-  background: #4a5568 !important;
-}
-
-.share-sheet button img {
-  width: 24px;
-  height: 24px;
-}
-
-.share-sheet button svg {
-  display: block;
-}
-
-.share-sheet .copy-link {
-  background: #007bff !important;
-  border: 1px solid #007bff !important;
-  border-radius: 20px;
-  width: auto;
-  padding: 10px 16px;
-  font-size: 14px;
-  color: white !important;
-  font-weight: 600;
-  -webkit-tap-highlight-color: transparent !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.share-sheet .copy-link:hover {
-  background: #0056b3 !important;
-  border-color: #0056b3 !important;
-  transform: scale(1.02);
-}
-
-.copy-link::before {
-  content: "📋";
-  font-size: 16px;
-}
-
-/* REMOVE BLUE FOCUS/OUTLINE COMPLETELY */
+/* REMOVE FOCUS */
 button:focus, button:active,
 .icon-btn:focus, .icon-btn:active,
 .share-btn:focus, .share-btn:active,
 .share-sheet button:focus, .share-sheet button:active,
 button:focus-visible, .icon-btn:focus-visible,
-.share-btn:focus-visible, .share-sheet button:focus-visible {
-  outline: none !important;
-  box-shadow: none !important;
-}
+.share-btn:focus-visible, .share-sheet button:focus-visible { outline:none !important; box-shadow:none !important; }
 
-/* ✅ ADDED ANIMATIONS FROM FIRST HTML */
-.bubble {
-  transform-origin: 50% 50%;
-  animation: bubblePulse 3.6s ease-in-out infinite, bubbleRotate 8s linear infinite;
-}
-
-.eye {
-  transform-origin: center;
-  animation: eyePop 2s ease-in-out infinite;
-}
-
-.smile {
-  animation: smileJelly 2.6s cubic-bezier(.25,.9,.3,1) infinite;
-}
-
-@keyframes bubblePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-}
-
-@keyframes bubbleRotate {
-  0% { transform: rotate(-1deg); }
-  50% { transform: rotate(1deg); }
-  100% { transform: rotate(-1deg); }
-}
-
-@keyframes eyePop {
-  0%, 100% { transform: translateY(0); opacity: 1; }
-  40% { transform: translateY(-20px); opacity: 0; }
-  60% { transform: translateY(-20px); opacity: 0; }
-}
-
-@keyframes smileJelly {
-  0%, 100% { transform: translateY(0); }
-  40% { transform: translateY(2px) scaleY(.95); }
-  70% { transform: translateY(-1px) scaleY(1.05); }
-}
+/* ANIMATIONS */
+.bubble {transform-origin:50% 50%; animation:bubblePulse 3.6s ease-in-out infinite, bubbleRotate 8s linear infinite;}
+.eye {transform-origin:center; animation:eyePop 2s ease-in-out infinite;}
+.smile {animation:smileJelly 2.6s cubic-bezier(.25,.9,.3,1) infinite;}
+@keyframes bubblePulse {0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+@keyframes bubbleRotate {0%{transform:rotate(-1deg);}50%{transform:rotate(1deg);}100%{transform:rotate(-1deg);}}
+@keyframes eyePop {0%,100%{transform:translateY(0);opacity:1;}40%,60%{transform:translateY(-20px);opacity:0;}}
+@keyframes smileJelly {0%,100%{transform:translateY(0);}40%{transform:translateY(2px) scaleY(.95);}70%{transform:translateY(-1px) scaleY(1.05);}}
 </style>
 </head>
 <body>
 <header>
   <div class="left">
-    <!-- ✅ COPIED ANIMATED SVG LOGO FROM FIRST HTML -->
     <svg class="logo" width="auto" height="50" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TikTalk animated logo">
       <defs>
         <linearGradient id="gBubble" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -240,7 +157,6 @@ button:focus-visible, .icon-btn:focus-visible,
           </feMerge>
         </filter>
       </defs>
-
       <g transform="translate(60,70)">
         <g class="bubble">
           <circle cx="0" cy="0" r="45" fill="url(#gBubble)"/>
@@ -248,9 +164,7 @@ button:focus-visible, .icon-btn:focus-visible,
           <path class="eye right" d="M 8 -7 Q 12 -11 16 -7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
           <path class="smile" d="M -15 8 Q 0 22 15 8" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/>
         </g>
-        <text x="70" y="20" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="url(#gText)">
-          TikTalk
-        </text>
+        <text x="70" y="20" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="url(#gText)">TikTalk</text>
       </g>
     </svg>
   </div>
@@ -290,30 +204,24 @@ button:focus-visible, .icon-btn:focus-visible,
 const themeToggle = document.getElementById("themeToggle");
 themeToggle.addEventListener("click", ()=>{document.body.classList.toggle("dark-mode");});
 
-// Share sheet toggle with animation
+// Share sheet toggle
 const shareBtn = document.getElementById("shareBtn");
 const shareSheet = document.getElementById("shareSheet");
 shareBtn.addEventListener("click",(e)=>{
   e.stopPropagation();
   if (shareSheet.classList.contains('show')) {
     shareSheet.classList.remove('show');
-    setTimeout(() => {
-      shareSheet.style.display = 'none';
-    }, 300);
+    setTimeout(() => {shareSheet.style.display = 'none';}, 300);
   } else {
     shareSheet.style.display = 'flex';
-    setTimeout(() => {
-      shareSheet.classList.add('show');
-    }, 10);
+    setTimeout(() => {shareSheet.classList.add('show');}, 10);
   }
 });
 
 document.addEventListener("click",(e)=>{
   if(!shareSheet.contains(e.target) && e.target!==shareBtn && shareSheet.classList.contains('show')) {
     shareSheet.classList.remove('show');
-    setTimeout(() => {
-      shareSheet.style.display = 'none';
-    }, 300);
+    setTimeout(() => {shareSheet.style.display = 'none';}, 300);
   }
 });
 
@@ -327,15 +235,10 @@ function shareApp(platform){
   else if(platform==="link"){ 
     navigator.clipboard.writeText(window.location.href); 
     alert("Link copied to clipboard! 📋");
-    
-    // Copy link button text change temporarily
     const copyBtn = document.querySelector('.link');
     const originalText = copyBtn.innerHTML;
-    copyBtn.innerHTML = '✅ Copied!';
-    
-    setTimeout(() => {
-      copyBtn.innerHTML = originalText;
-    }, 2000);
+    copyBtn.innerHTML = '✅';
+    setTimeout(() => {copyBtn.innerHTML = originalText;}, 2000);
   }
 }
 
