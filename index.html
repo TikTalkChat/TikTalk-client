@@ -68,8 +68,8 @@ p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin
 }
 .share-btn:hover {opacity:0.85;}
 
-/* SHARE SHEET */
-.right { position:relative; display: flex; align-items: center; gap: 8px; }
+/* SHARE SHEET - ORIGINAL POSITIONING RESTORED */
+.right { position:relative; }
 .share-sheet {
   position: absolute;
   background: transparent !important;
@@ -84,8 +84,6 @@ p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin
   transform: translateY(-10px);
   opacity: 0;
   transition: all 0.3s ease;
-  top: 100%;
-  right: 0;
 }
 .share-sheet.show {
   transform: translateY(0);
@@ -153,27 +151,35 @@ body.dark-mode #copyLinkPopup {
 @keyframes eyePop {0%,100%{transform:translateY(0);opacity:1;}40%,60%{transform:translateY(-20px);opacity:0;}}
 @keyframes smileJelly {0%,100%{transform:translateY(0);}40%{transform:translateY(2px) scaleY(.95);}70%{transform:translateY(-1px) scaleY(1.05);}}
 
-/* THEME TOGGLE FIX */
+/* THEME TOGGLE - IMPROVED WITH VISIBLE BACKGROUND */
 #themeToggle {
   display: flex !important;
   align-items: center;
   justify-content: center;
   font-size: 20px;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: transparent;
-  border: none;
   cursor: pointer;
   transition: all 0.3s ease;
+  background: rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 #themeToggle:hover {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.12);
+  transform: scale(1.05);
+}
+
+body.dark-mode #themeToggle {
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode #themeToggle:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.18);
 }
 </style>
 </head>
@@ -252,12 +258,18 @@ themeToggle.addEventListener("click", () => {
   themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
 });
 
-// Share sheet toggle
+// Share sheet toggle - ORIGINAL POSITIONING RESTORED
 const shareBtn = document.getElementById("shareBtn");
 const shareSheet = document.getElementById("shareSheet");
 
 shareBtn.addEventListener("click", (e) => {
   e.stopPropagation();
+  const btnOffsetTop = shareBtn.offsetTop + shareBtn.offsetHeight;
+  const btnOffsetLeft = shareBtn.offsetLeft;
+
+  shareSheet.style.top = btnOffsetTop + "px";
+  shareSheet.style.left = btnOffsetLeft + "px";
+
   shareSheet.classList.toggle('show');
   if(shareSheet.classList.contains('show')){
     shareSheet.style.display = 'flex';
