@@ -69,7 +69,7 @@ p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin
 .share-btn:hover {opacity:0.85;}
 
 /* SHARE SHEET */
-.right { position:relative; }
+.right { position:relative; display: flex; align-items: center; gap: 8px; }
 .share-sheet {
   position: absolute;
   background: transparent !important;
@@ -84,6 +84,8 @@ p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin
   transform: translateY(-10px);
   opacity: 0;
   transition: all 0.3s ease;
+  top: 100%;
+  right: 0;
 }
 .share-sheet.show {
   transform: translateY(0);
@@ -150,6 +152,29 @@ body.dark-mode #copyLinkPopup {
 @keyframes bubbleRotate {0%{transform:rotate(-1deg);}50%{transform:rotate(1deg);}100%{transform:rotate(-1deg);}}
 @keyframes eyePop {0%,100%{transform:translateY(0);opacity:1;}40%,60%{transform:translateY(-20px);opacity:0;}}
 @keyframes smileJelly {0%,100%{transform:translateY(0);}40%{transform:translateY(2px) scaleY(.95);}70%{transform:translateY(-1px) scaleY(1.05);}}
+
+/* THEME TOGGLE FIX */
+#themeToggle {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#themeToggle:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+body.dark-mode #themeToggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
 </style>
 </head>
 <body>
@@ -188,7 +213,7 @@ body.dark-mode #copyLinkPopup {
       </g>
     </svg>
   </div>
-  <div class="right" style="display:flex; align-items:center; gap:8px;">
+  <div class="right">
     <button id="themeToggle" class="icon-btn">🌙</button>
     <button id="shareBtn" class="share-btn">Share</button>
     <div class="share-sheet" id="shareSheet">
@@ -233,12 +258,6 @@ const shareSheet = document.getElementById("shareSheet");
 
 shareBtn.addEventListener("click", (e) => {
   e.stopPropagation();
-  const btnOffsetTop = shareBtn.offsetTop + shareBtn.offsetHeight;
-  const btnOffsetLeft = shareBtn.offsetLeft;
-
-  shareSheet.style.top = btnOffsetTop + "px";
-  shareSheet.style.left = btnOffsetLeft + "px";
-
   shareSheet.classList.toggle('show');
   if(shareSheet.classList.contains('show')){
     shareSheet.style.display = 'flex';
