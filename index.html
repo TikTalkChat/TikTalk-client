@@ -17,7 +17,7 @@ header svg.logo {height:50px; width:auto; display:block;}
 .msg {max-width:75%; padding:10px 14px; border-radius:15px; word-wrap:break-word; font-size:15px;}
 .me {align-self:flex-end; background:#007bff; color:#fff;}
 .stranger {align-self:flex-start; background:#f1f1f1;}
-.popup {background:#f9f9f9; border:1px solid #ddd; border-radius:10px; padding:8px; text-align:center; color:#555; max-width:220px; margin:15px auto; box-shadow:0 4px 8px rgba(0,0,0,0.1); font-size:14px;}
+.popup {background:#f9f9f9; border:1px solid #ddd; border-radius:10px; padding:8px; text-align:center; color:#555; max-width:220px; margin:8px auto; box-shadow:0 4px 8px rgba(0,0,0,0.1); font-size:14px;}
 body.dark-mode .popup {background:#1f2937; color:#e5e7eb; border-color:#374151;}
 #typingIndicator {font-size:13px; color:#888; margin-top:5px; text-align:left; font-style:italic;}
 footer {position:fixed; bottom:0; left:0; right:0; display:flex; padding:8px; border-top:1px solid #ddd; gap:6px; background:#fff; z-index:1000;}
@@ -57,7 +57,7 @@ p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin
 .icon-btn:active {transform:scale(.95);}
 .share-btn {
   padding:0 14px; 
-  background:green; /* GREEN BUTTON */
+  background:green; 
   border:none; 
   flex-shrink:0; 
   min-width:60px; 
@@ -69,10 +69,9 @@ p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin
 .share-btn:hover {opacity:0.85;}
 
 /* SHARE SHEET */
+.right { position:relative; }
 .share-sheet {
   position: absolute;
-  top: 45px;
-  left: 0;
   background: transparent !important;
   padding: 12px;
   border: none !important;
@@ -80,7 +79,6 @@ p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin
   display: none;
   flex-direction: column;
   gap: 10px;
-  box-shadow: none !important;
   min-width: 160px;
   z-index: 1000;
   transform: translateY(-10px);
@@ -88,7 +86,6 @@ p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin
   transition: all 0.3s ease;
 }
 .share-sheet.show {
-  display: flex;
   transform: translateY(0);
   opacity: 1;
 }
@@ -121,6 +118,29 @@ button:focus, button:active,
 .share-sheet button:focus, .share-sheet button:active,
 button:focus-visible, .icon-btn:focus-visible,
 .share-btn:focus-visible, .share-sheet button:focus-visible { outline:none !important; box-shadow:none !important; }
+
+/* COPY LINK POPUP */
+#copyLinkPopup {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 18px;
+  border-radius: 25px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 2000;
+  pointer-events: none;
+  color: #fff;
+  background: #007bff;
+}
+body.dark-mode #copyLinkPopup {
+  background: #1d4ed8;
+  color: #fff;
+}
 
 /* ANIMATIONS */
 .bubble {transform-origin:50% 50%; animation:bubblePulse 3.6s ease-in-out infinite, bubbleRotate 8s linear infinite;}
@@ -168,7 +188,7 @@ button:focus-visible, .icon-btn:focus-visible,
       </g>
     </svg>
   </div>
-  <div class="right" style="display:flex; align-items:center; gap:8px; position:relative;">
+  <div class="right" style="display:flex; align-items:center; gap:8px;">
     <button id="themeToggle" class="icon-btn">🌙</button>
     <button id="shareBtn" class="share-btn">Share</button>
     <div class="share-sheet" id="shareSheet">
@@ -181,7 +201,7 @@ button:focus-visible, .icon-btn:focus-visible,
           <path d="M30,30 L70,70 M70,30 L30,70" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
         </svg>
       </button>
-      <button class="link" onclick="shareApp('link')">Link</button>
+      <button class="link" onclick="shareApp('link')">🔗</button>
     </div>
   </div>
 </header>
@@ -200,56 +220,79 @@ button:focus-visible, .icon-btn:focus-visible,
 <p class="footerNote">Made in India ♥️</p>
 
 <script>
-// Dark mode toggle without localStorage
+// Dark mode toggle
 const themeToggle = document.getElementById("themeToggle");
 themeToggle.addEventListener("click", () => {
   document.body.classList.toggle("dark-mode");
-  if (document.body.classList.contains("dark-mode")) {
-    themeToggle.textContent = "☀️"; // Sun for dark mode active
-  } else {
-    themeToggle.textContent = "🌙"; // Moon for light mode active
-  }
+  themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
 });
 
 // Share sheet toggle
 const shareBtn = document.getElementById("shareBtn");
 const shareSheet = document.getElementById("shareSheet");
-shareBtn.addEventListener("click",(e)=>{
+
+shareBtn.addEventListener("click", (e) => {
   e.stopPropagation();
-  if (shareSheet.classList.contains('show')) {
-    shareSheet.classList.remove('show');
-    setTimeout(() => {shareSheet.style.display = 'none';}, 300);
-  } else {
+  const btnOffsetTop = shareBtn.offsetTop + shareBtn.offsetHeight;
+  const btnOffsetLeft = shareBtn.offsetLeft;
+
+  shareSheet.style.top = btnOffsetTop + "px";
+  shareSheet.style.left = btnOffsetLeft + "px";
+
+  shareSheet.classList.toggle('show');
+  if(shareSheet.classList.contains('show')){
     shareSheet.style.display = 'flex';
-    setTimeout(() => {shareSheet.classList.add('show');}, 10);
+  } else {
+    setTimeout(()=>{shareSheet.style.display='none';},300);
   }
 });
 
-document.addEventListener("click",(e)=>{
-  if(!shareSheet.contains(e.target) && e.target!==shareBtn && shareSheet.classList.contains('show')) {
+document.addEventListener("click", (e) => {
+  if(!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')){
     shareSheet.classList.remove('show');
-    setTimeout(() => {shareSheet.style.display = 'none';}, 300);
+    setTimeout(()=>{shareSheet.style.display='none';},300);
   }
 });
 
-// Share functionality
+// Share functionality with modern popup
 function shareApp(platform){
-  let url = encodeURIComponent(window.location.href);
-  if(platform==="whatsapp") window.open("https://api.whatsapp.com/send?text="+url,"_blank");
+  let url = window.location.href;
+  if(platform==="whatsapp") window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(url),"_blank");
   else if(platform==="instagram") window.open("https://www.instagram.com/","_blank");
-  else if(platform==="facebook") window.open("https://www.facebook.com/sharer/sharer.php?u="+url,"_blank");
-  else if(platform==="x") window.open("https://twitter.com/intent/tweet?url="+url,"_blank");
+  else if(platform==="facebook") window.open("https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(url),"_blank");
+  else if(platform==="x") window.open("https://twitter.com/intent/tweet?url="+encodeURIComponent(url),"_blank");
   else if(platform==="link"){ 
-    navigator.clipboard.writeText(window.location.href); 
-    alert("Link copied to clipboard! 📋");
-    const copyBtn = document.querySelector('.link');
-    const originalText = copyBtn.innerHTML;
-    copyBtn.innerHTML = '✅';
-    setTimeout(() => {copyBtn.innerHTML = originalText;}, 2000);
+    const tempInput=document.createElement('input');
+    tempInput.value=url;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+
+    showCopyPopup("✅ Link copied!");
   }
 }
 
-// Chat WebSocket + auto-scroll
+// Custom popup function
+function showCopyPopup(message){
+  let existing = document.getElementById("copyLinkPopup");
+  if(existing) existing.remove();
+
+  const popup = document.createElement("div");
+  popup.id = "copyLinkPopup";
+  popup.textContent = message;
+  document.body.appendChild(popup);
+
+  void popup.offsetWidth;
+  popup.style.opacity = "1";
+
+  setTimeout(()=>{
+    popup.style.opacity="0";
+    setTimeout(()=>{popup.remove();},300);
+  },2000);
+}
+
+// Chat WebSocket
 window.TIKTALK_BACKEND = "https://tiktalk-server-8dmz.onrender.com";
 const messagesDiv = document.getElementById("messages");
 const input = document.getElementById("messageInput");
@@ -258,7 +301,13 @@ const nextBtn = document.getElementById("nextBtn");
 const typingIndicator = document.getElementById("typingIndicator");
 let ws, typingTimeout;
 
-function addMessage(text, who){const div=document.createElement("div"); div.className="msg "+who; div.textContent=text; messagesDiv.appendChild(div); messagesDiv.scrollTop=messagesDiv.scrollHeight;}
+function addMessage(text, who){
+  const div = document.createElement("div");
+  div.className="msg "+who;
+  div.textContent = text;
+  messagesDiv.appendChild(div);
+  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+}
 function showPopup(text){messagesDiv.innerHTML=`<div class="popup">${text}</div>`;}
 
 function connectStranger(){
@@ -266,7 +315,8 @@ function connectStranger(){
   typingIndicator.style.display="none";
   ws=new WebSocket(window.TIKTALK_BACKEND.replace("http","ws")+"/ws");
   ws.onmessage=(event)=>{
-    try{const data=JSON.parse(event.data);
+    try{
+      const data=JSON.parse(event.data);
       if(data.type==="system"){
         if(data.text==="waiting") showPopup("🔍 Searching for a stranger...");
         else if(data.text==="connected") showPopup("✅ Connected! Say Hi 👋");
@@ -279,9 +329,17 @@ function connectStranger(){
   ws.onclose=()=>{showPopup("❌ Disconnected from server"); typingIndicator.style.display="none";}
 }
 
-sendBtn.addEventListener("click", ()=>{if(input.value.trim() && ws && ws.readyState===WebSocket.OPEN){ ws.send(JSON.stringify({type:"message", text:input.value})); addMessage(input.value,"me"); input.value="";}});
-input.addEventListener("input", ()=>{if(ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:"typing"}));});
-nextBtn.addEventListener("click", ()=>{if(ws){ws.close();} connectStranger();});
+sendBtn.addEventListener("click", ()=>{
+  if(input.value.trim() && ws && ws.readyState===WebSocket.OPEN){
+    ws.send(JSON.stringify({type:"message", text:input.value}));
+    addMessage(input.value,"me");
+    input.value="";
+  }
+});
+input.addEventListener("input", ()=>{
+  if(ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:"typing"}));
+});
+nextBtn.addEventListener("click", ()=>{if(ws) ws.close(); connectStranger();});
 
 connectStranger();
 </script>
