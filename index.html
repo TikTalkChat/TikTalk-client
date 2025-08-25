@@ -128,6 +128,19 @@ button:active {opacity: 0.85;}
   background: #fff;
   border-top: 1px solid #ddd;
 }
+@media (min-width: 768px) {
+  #emojiPicker {
+    position: absolute;
+    bottom: 60px; /* Adjust as needed */
+    right: 15px; /* Change to right for desktop */
+    width: 350px; /* Set a specific width for desktop */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-10px);
+    transition: transform 0.3s ease-in-out;
+  }
+}
 body.dark-mode #emojiPicker {
   background: #1f2937;
   border-top-color: #374151;
@@ -507,7 +520,9 @@ emojiToggle.addEventListener("click", (e) => {
     input.focus();
   } else {
     input.blur();
-    emojiPicker.style.height = "300px";
+    // Use fixed height for desktop for better layout
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+    emojiPicker.style.height = isDesktop ? "350px" : "300px";
     emojiPicker.style.display = "block";
     emojiToggle.textContent = "⌨️";
   }
