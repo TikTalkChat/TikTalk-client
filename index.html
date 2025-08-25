@@ -4,6 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>TikTalk - Stranger Chat</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css" />
+
 <style>
 * {margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif;}
 body {background:#fff; display:flex; flex-direction:column; height:100vh; transition: background .3s, color .3s; color:#0f172a;}
@@ -12,175 +15,168 @@ header {position:fixed; top:0; left:0; right:0; display:flex; align-items:center
 body.dark-mode header {background:#10161d; border-color:#374151;}
 header .left, header .right {display:flex; align-items:center; gap:8px;}
 header svg.logo {height:50px; width:auto; display:block;}
-#chat {flex:1; overflow-y:auto; padding:70px 15px 70px;}
+#chat {flex:1; overflow-y:auto; padding:70px 15px 100px;}
 #messages {display:flex; flex-direction:column; gap:8px;}
-.msg {max-width:75%; padding:10px 14px; border-radius:15px; word-wrap:break-word; font-size:15px;}
-.me {align-self:flex-end; background:#007bff; color:#fff;}
-.stranger {align-self:flex-start; background:#f1f1f1;}
-.popup {background:#f9f9f9; border:1px solid #ddd; border-radius:10px; padding:8px; text-align:center; color:#555; max-width:220px; margin:8px auto; box-shadow:0 4px 8px rgba(0,0,0,0.1); font-size:14px;}
-body.dark-mode .popup {background:#1f2937; color:#e5e7eb; border-color:#374151;}
-#typingIndicator {font-size:13px; color:#888; margin-top:5px; text-align:left; font-style:italic;}
-footer {position:fixed; bottom:0; left:0; right:0; display:flex; padding:8px; border-top:1px solid #ddd; gap:6px; background:#fff; z-index:1000;}
-body.dark-mode footer {background:#10161d; border-color:#374151;}
-textarea {flex:1; resize:none; padding:10px; border:1px solid #ccc; border-radius:20px; font-size:15px; outline:none; height:40px; background:#fff; color:#0f172a;}
-body.dark-mode textarea {background:#1f2937; color:#e5e7eb; border-color:#374151;}
-button {
-  padding:0 14px; 
-  border:none; 
-  border-radius:20px; 
-  background:#007bff; 
-  color:#fff; 
-  font-weight:bold; 
-  cursor:pointer; 
-  font-size:14px; 
-  white-space:nowrap;
-  -webkit-tap-highlight-color: transparent !important;
-}
-button#nextBtn {background:#ff3b30;}
-button:active {opacity:0.8;}
-p.footerNote {text-align:center; padding:5px; font-size:13px; color:#666; margin-bottom:50px;}
-.icon-btn, .share-btn {
-  border-radius:999px; 
-  height:36px; 
-  cursor:pointer; 
-  font-weight:600; 
-  transition: all .2s;
-  -webkit-tap-highlight-color: transparent !important;
-}
-.icon-btn {
-  width:36px; 
-  background:transparent; 
-  border:none; 
-  font-size:18px;
-  -webkit-tap-highlight-color: transparent !important;
-}
-.icon-btn:active {transform:scale(.95);}
-.share-btn {
-  padding:0 14px; 
-  background:green; 
-  border:none; 
-  flex-shrink:0; 
-  min-width:60px; 
-  position:relative;
-  color:#fff;
-  font-weight:600; 
-  cursor:pointer;
-}
-.share-btn:hover {opacity:0.85;}
 
-/* SHARE SHEET - ORIGINAL POSITIONING RESTORED */
-.right { position:relative; }
-.share-sheet {
-  position: absolute;
-  background: transparent !important;
-  padding: 12px;
-  border: none !important;
-  border-radius: 0;
-  display: none;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 160px;
-  z-index: 1000;
-  transform: translateY(-10px);
-  opacity: 0;
-  transition: all 0.3s ease;
-}
-.share-sheet.show {
-  transform: translateY(0);
-  opacity: 1;
-}
-.share-sheet button {
-  background: #f8f9fa !important;
-  border: 1px solid #dee2e6 !important;
-  border-radius: 50%;
+/* WhatsApp-style bubbles */
+.msg {max-width:75%; padding:10px 14px; border-radius:18px; word-wrap:break-word; font-size:15px; line-height:1.4; box-shadow:0 1px 2px rgba(0,0,0,.06);}
+.me {align-self:flex-end; background:#007bff; color:#fff; border-bottom-right-radius:6px;}
+.stranger {align-self:flex-start; background:#e5e5ea; color:#0f172a; border-bottom-left-radius:6px;}
+
+.popup {background:transparent; border:none; padding:8px; text-align:center; color:#555; max-width:220px; margin:8px auto; font-size:14px;}
+body.dark-mode .popup {background:transparent; color:#e5e7eb;}
+#typingIndicator {font-size:13px; color:#888; margin-top:5px; text-align:left; font-style:italic;}
+
+/* Footer layout */
+footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
   padding: 8px;
-  width: 44px;
-  height: 44px;
+  border-top: 1px solid #ddd;
+  gap: 6px;
+  background: #fff;
+  z-index: 1400;
+  transition: bottom 0.3s ease;
+  min-height: 50px;
+  will-change: bottom;
+  overflow: hidden;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+body.dark-mode footer {background:#10161d; border-color:#374151;}
+
+/* Footer note (Made in India) */
+.footerNote {position: fixed; bottom: 60px; left: 0; right: 0; text-align: center; font-size: 14px; color: #555; z-index: 999;}
+body.dark-mode .footerNote {color: #e5e7eb;}
+
+/* Input wrapper with WhatsApp-style toggle inside textarea */
+.inputWrapper {flex: 1; position: relative; display: flex; align-items: center;}
+textarea {width: 100%; resize: none; padding: 10px 44px 10px 44px; border: 1px solid #ccc; border-radius: 20px; font-size: 15px; outline: none; height: 40px; background: #fff; color: #0f172a;}
+body.dark-mode textarea {background: #1f2937; color: #e5e7eb; border-color: #374151;}
+
+/* Emoji/Keyboard toggle inside textarea (left) */
+#emojiToggle {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  font-size: 20px;
   cursor: pointer;
+  line-height: 1;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s ease;
   -webkit-tap-highlight-color: transparent !important;
 }
+
+/* Send / Next buttons */
+button {
+  padding: 0 14px;
+  border: none;
+  border-radius: 20px;
+  background: #007bff;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+button:active {opacity: 0.85;}
+#sendBtn, #nextBtn {width: 40px; height: 40px; border-radius: 50%; padding: 0;}
+#sendBtn {order: 3;}
+#nextBtn {order: 0; background: #ff3b30; margin-right: auto;}
+
+/* Emoji picker popup */
+#emojiPicker {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000;
+  display: none;
+  background: #fff;
+  border-top: 1px solid #ddd;
+}
+body.dark-mode #emojiPicker {
+  background: #1f2937;
+  border-top-color: #374151;
+}
+
+/* Header right actions */
+.icon-btn, .share-btn {border-radius: 999px; height: 36px; cursor: pointer; font-weight: 600; transition: all .2s; display: flex; align-items: center; justify-content: center;}
+.icon-btn {width: 36px; background: transparent; border: none; font-size: 18px;}
+.icon-btn:active {transform: scale(.95);}
+.share-btn {padding: 0; background: green; border: none; width: 36px; height: 36px; position: relative; color: #fff;}
+.share-btn:hover {opacity: 0.85;}
+
+/* Share sheet */
+.right { position: relative; }
+.share-sheet { position: absolute; top: 100%; right: 0; background: #fff !important; border-radius: 12px; padding: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); display: none; flex-direction: row; gap: 12px; z-index: 1000; margin-top: 5px; transform: translateY(-10px); opacity: 0; transition: all 0.3s ease;}
+body.dark-mode .share-sheet { background: #1f2937 !important; box-shadow: 0 4px 20px rgba(0,0,0,0.4);}
+.share-sheet.show { transform: translateY(0); opacity: 1;}
+.share-sheet button { background: #f8f9fa !important; border: 1px solid #dee2e6 !important; border-radius: 50%; padding: 8px; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;}
 .share-sheet button:hover { background: #e9ecef !important; transform: scale(1.05);}
 body.dark-mode .share-sheet button {background: #2d3748 !important; border-color: #4a5568 !important;}
 body.dark-mode .share-sheet button:hover {background: #4a5568 !important;}
-.share-sheet button img { width:24px; height:24px;}
-.share-sheet button svg { display:block;}
-.share-sheet .link { border-radius:50%; width:44px; height:44px; display:flex; align-items:center; justify-content:center; background:#f8f9fa !important; border:1px solid #dee2e6 !important; color:#007bff !important; font-weight:600; cursor:pointer; transition: all 0.2s ease;}
-.share-sheet .link:hover { background:#e9ecef !important; transform:scale(1.05); }
+.share-sheet button img { width: 24px; height: 24px;}
+.share-sheet button svg { display: block;}
+.share-sheet .link { border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #f8f9fa !important; border: 1px solid #dee2e6 !important; color: #007bff !important; font-weight: 600; cursor: pointer; transition: all 0.2s ease;}
+.share-sheet .link:hover { background: #e9ecef !important; transform: scale(1.05); }
 
-/* REMOVE FOCUS */
+/* Remove focus glow */
 button:focus, button:active,
 .icon-btn:focus, .icon-btn:active,
 .share-btn:focus, .share-btn:active,
 .share-sheet button:focus, .share-sheet button:active,
 button:focus-visible, .icon-btn:focus-visible,
-.share-btn:focus-visible, .share-sheet button:focus-visible { outline:none !important; box-shadow:none !important; }
+.share-btn:focus-visible, .share-sheet button:focus-visible { outline: none !important; box-shadow: none !important; }
 
-/* COPY LINK POPUP */
-#copyLinkPopup {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px 18px;
-  border-radius: 25px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  font-size: 14px;
-  font-weight: 600;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  z-index: 2000;
-  pointer-events: none;
-  color: #fff;
-  background: #007bff;
-}
-body.dark-mode #copyLinkPopup {
-  background: #1d4ed8;
-  color: #fff;
-}
+/* Copy popup */
+#copyLinkPopup { position: fixed; top: 130px; right: 15px; padding: 12px 20px; border-radius: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 0.3s ease; z-index: 2000; pointer-events: none; color: #fff; background: #007bff;}
+body.dark-mode #copyLinkPopup { background: #1d4ed8; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.4);}
 
-/* ANIMATIONS */
-.bubble {transform-origin:50% 50%; animation:bubblePulse 3.6s ease-in-out infinite, bubbleRotate 8s linear infinite;}
-.eye {transform-origin:center; animation:eyePop 2s ease-in-out infinite;}
-.smile {animation:smileJelly 2.6s cubic-bezier(.25,.9,.3,1) infinite;}
-@keyframes bubblePulse {0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
-@keyframes bubbleRotate {0%{transform:rotate(-1deg);}50%{transform:rotate(1deg);}100%{transform:rotate(-1deg);}}
-@keyframes eyePop {0%,100%{transform:translateY(0);opacity:1;}40%,60%{transform:translateY(-20px);opacity:0;}}
-@keyframes smileJelly {0%,100%{transform:translateY(0);}40%{transform:translateY(2px) scaleY(.95);}70%{transform:translateY(-1px) scaleY(1.05);}}
+/* Animations (logo/search/connected) */
+.bubble {transform-origin: 50% 50%; animation: bubblePulse 3.6s ease-in-out infinite, bubbleRotate 8s linear infinite;}
+.eye {transform-origin: center; animation: eyePop 2s ease-in-out infinite;}
+.smile {animation: smileJelly 2.6s cubic-bezier(.25,.9,.3,1) infinite;}
+@keyframes bubblePulse {0%,100%{transform: scale(1);}50%{transform: scale(1.05);}}
+@keyframes bubbleRotate {0%{transform: rotate(-1deg);}50%{transform: rotate(1deg);}100%{transform: rotate(-1deg);}}
+@keyframes eyePop {0%,100%{transform: translateY(0);opacity: 1;}40%,60%{transform: translateY(-20px);opacity: 0;}}
+@keyframes smileJelly {0%,100%{transform: translateY(0);}40%{transform: translateY(2px) scaleY(.95);}70%{transform: translateY(-1px) scaleY(1.05);}}
 
-/* THEME TOGGLE - IMPROVED WITH VISIBLE BACKGROUND */
-#themeToggle {
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: rgba(0, 0, 0, 0.08);
-  border: 2px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
+.searching-container{display: flex;justify-content: center;align-items: center;padding: 15px 0;}
+.pulse-dots{display: flex;align-items: center;justify-content: center;gap: 4px;}
+.pulse-dot{width: 10px;height: 10px;border-radius: 50%;background: linear-gradient(45deg,#00eaff,#6a00ff);animation: pulse 1.5s ease-in-out infinite;}
+.pulse-dot:nth-child(1){animation-delay: 0s;} .pulse-dot:nth-child(2){animation-delay: .2s;} .pulse-dot:nth-child(3){animation-delay: .4s;}
+@keyframes pulse{0%,100%{transform: scale(.8);opacity: .7;}50%{transform: scale(1.2);opacity: 1;}}
+.searching-text{margin-left: 10px;font-weight: 500;color: #555;white-space: nowrap;}
+body.dark-mode .searching-text{color: #e5e7eb;}
+.connected-checkmark{display: inline-block;width: 20px;height: 20px;margin-right: 8px;}
+.connected-checkmark::after{content: "";display: block;width: 8px;height: 14px;border: solid #00c853;border-width: 0 3px 3px 0;transform: rotate(45deg);animation: checkmark-appear .5s ease-in-out;}
+@keyframes checkmark-appear{0%{opacity: 0;transform: rotate(45deg) scale(0);}50%{transform: rotate(45deg) scale(1.2);}100%{opacity: 1;transform: rotate(45deg) scale(1);}}
 
-#themeToggle:hover {
-  background: rgba(0, 0, 0, 0.12);
-  transform: scale(1.05);
-}
+.start-chatting-btn{position: fixed;bottom: 90px;left: 50%;transform: translateX(-50%);padding: 12px 24px;background: #007bff;color: #fff;border: none;border-radius: 25px;font-weight: bold;font-size: 16px;cursor: pointer;box-shadow: 0 4px 15px rgba(0,0,0,0.2);z-index: 999;animation: pulse-glow 2s infinite;display: none;}
+body.dark-mode .start-chatting-btn{background: #007bff;box-shadow: 0 4px 15px rgba(0,123,255,0.4);}
+@keyframes pulse-glow{0%{box-shadow: 0 4px 15px rgba(0,123,255,0.4);transform: translateX(-50%) scale(1);}50%{box-shadow: 0 4px 20px rgba(0,123,255,0.7);transform: translateX(-50%) scale(1.05);}100%{box-shadow: 0 4px 15px rgba(0,123,255,0.4);transform: translateX(-50%) scale(1);}}
+.start-chatting-btn:hover{animation: none;box-shadow: 0 4px 20px rgba(0,123,255,0.8);transform: translateX(-50%) scale(1.05);}
 
-body.dark-mode #themeToggle {
-  background: rgba(255, 255, 255, 0.12);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-}
+/* Button icons */
+.button-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
 
-body.dark-mode #themeToggle:hover {
-  background: rgba(255, 255, 255, 0.18);
-}
+/* Smooth scroll for new messages */
+.auto-scroll-enabled #messages { scroll-behavior: smooth; }
 </style>
 </head>
 <body>
@@ -196,16 +192,9 @@ body.dark-mode #themeToggle:hover {
             <animate attributeName="stop-color" dur="6s" values="#007bff;#6a00ff;#00eaff;#007bff" repeatCount="indefinite"/>
           </stop>
         </linearGradient>
-        <linearGradient id="gText" x1="0%" x2="100%">
-          <stop offset="0%" stop-color="#00eaff"/>
-          <stop offset="100%" stop-color="#6a00ff"/>
-        </linearGradient>
         <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="6" result="b"/>
-          <feMerge>
-            <feMergeNode in="b"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
       <g transform="translate(60,70)">
@@ -215,13 +204,17 @@ body.dark-mode #themeToggle:hover {
           <path class="eye right" d="M 8 -7 Q 12 -11 16 -7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
           <path class="smile" d="M -15 8 Q 0 22 15 8" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/>
         </g>
-        <text x="70" y="20" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="url(#gText)">TikTalk</text>
+        <text x="70" y="20" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="#007bff">TikTalk</text>
       </g>
     </svg>
   </div>
   <div class="right">
     <button id="themeToggle" class="icon-btn">🌙</button>
-    <button id="shareBtn" class="share-btn">Share</button>
+    <button id="shareBtn" class="share-btn">
+      <svg class="button-icon" viewBox="0 0 24 24" fill="white">
+        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.70s-.04-.47-.09-.70l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.70L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+      </svg>
+    </button>
     <div class="share-sheet" id="shareSheet">
       <button onclick="shareApp('whatsapp')"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></button>
       <button onclick="shareApp('instagram')"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram"></button>
@@ -242,42 +235,60 @@ body.dark-mode #themeToggle:hover {
   <div id="typingIndicator" style="display:none;">Stranger is typing...</div>
 </main>
 
-<footer>
-  <textarea id="messageInput" placeholder="Type a message..."></textarea>
-  <button id="sendBtn">Send</button>
-  <button id="nextBtn">Next</button>
-</footer>
+<button id="startChattingBtn" class="start-chatting-btn">Start Chat</button>
 
 <p class="footerNote">Made in India ♥️</p>
 
+<footer>
+  <button id="nextBtn" title="Next">
+    <svg class="button-icon" viewBox="0 0 24 24" fill="white">
+      <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
+    </svg>
+  </button>
+
+  <div class="inputWrapper">
+    <button id="emojiToggle" aria-label="Emoji">😊</button>
+    <textarea id="messageInput" placeholder="Type a message..."></textarea>
+  </div>
+
+  <button id="sendBtn" title="Send">
+    <svg class="button-icon" viewBox="0 0 24 24" fill="white">
+      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+    </svg>
+  </button>
+</footer>
+
+<div id="emojiPicker" aria-hidden="true"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
+
 <script>
-// Dark mode toggle
+// Theme toggle
 const themeToggle = document.getElementById("themeToggle");
 themeToggle.addEventListener("click", () => {
   document.body.classList.toggle("dark-mode");
   themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
-});
-
-// Share sheet toggle - ORIGINAL POSITIONING RESTORED
-const shareBtn = document.getElementById("shareBtn");
-const shareSheet = document.getElementById("shareSheet");
-
-shareBtn.addEventListener("click", (e) => {
-  e.stopPropagation();
-  const btnOffsetTop = shareBtn.offsetTop + shareBtn.offsetHeight;
-  const btnOffsetLeft = shareBtn.offsetLeft;
-
-  shareSheet.style.top = btnOffsetTop + "px";
-  shareSheet.style.left = btnOffsetLeft + "px";
-
-  shareSheet.classList.toggle('show');
-  if(shareSheet.classList.contains('show')){
-    shareSheet.style.display = 'flex';
-  } else {
-    setTimeout(()=>{shareSheet.style.display='none';},300);
+  if (window._emojiPickerInstance) {
+    window._emojiPickerInstance.setOptions({
+      theme: document.body.classList.contains("dark-mode") ? "dark" : "light"
+    });
   }
 });
 
+// Share sheet
+const shareBtn = document.getElementById("shareBtn");
+const shareSheet = document.getElementById("shareSheet");
+const startChattingBtn = document.getElementById("startChattingBtn");
+
+shareBtn.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const btnRect = shareBtn.getBoundingClientRect();
+  shareSheet.style.top = (btnRect.bottom + window.scrollY) + "px";
+  shareSheet.style.right = (window.innerWidth - btnRect.right) + "px";
+  shareSheet.classList.toggle('show');
+  if(shareSheet.classList.contains('show')) shareSheet.style.display = 'flex';
+  else setTimeout(()=>{shareSheet.style.display='none';},300);
+});
 document.addEventListener("click", (e) => {
   if(!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')){
     shareSheet.classList.remove('show');
@@ -285,51 +296,55 @@ document.addEventListener("click", (e) => {
   }
 });
 
-// Share functionality with modern popup
+startChattingBtn.addEventListener("click", () => {
+  if(ws) ws.close();
+  connectStranger();
+});
+
 function shareApp(platform){
   let url = window.location.href;
   if(platform==="whatsapp") window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(url),"_blank");
   else if(platform==="instagram") window.open("https://www.instagram.com/","_blank");
   else if(platform==="facebook") window.open("https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(url),"_blank");
   else if(platform==="x") window.open("https://twitter.com/intent/tweet?url="+encodeURIComponent(url),"_blank");
-  else if(platform==="link"){ 
+  else if(platform==="link"){
     const tempInput=document.createElement('input');
-    tempInput.value=url;
-    document.body.appendChild(tempInput);
-    tempInput.select();
-    document.execCommand('copy');
-    document.body.removeChild(tempInput);
-
-    showCopyPopup("✅ Link copied!");
+    tempInput.value=url; document.body.appendChild(tempInput); tempInput.select(); document.execCommand('copy'); document.body.removeChild(tempInput);
+    showCopyPopup("✅ Copied!");
   }
 }
-
-// Custom popup function
 function showCopyPopup(message){
   let existing = document.getElementById("copyLinkPopup");
   if(existing) existing.remove();
-
   const popup = document.createElement("div");
   popup.id = "copyLinkPopup";
   popup.textContent = message;
   document.body.appendChild(popup);
-
+  const shareBtnRect = shareBtn.getBoundingClientRect();
+  popup.style.top = (shareBtnRect.bottom + window.scrollY + 10) + "px";
+  popup.style.right = (window.innerWidth - shareBtnRect.right) + "px";
   void popup.offsetWidth;
   popup.style.opacity = "1";
-
-  setTimeout(()=>{
-    popup.style.opacity="0";
-    setTimeout(()=>{popup.remove();},300);
-  },2000);
+  setTimeout(()=>{ popup.style.opacity="0"; setTimeout(()=>popup.remove(),300); },2000);
 }
 
-// Chat WebSocket
+// Auto scroll helper
+function scrollToBottom() {
+  const chatDiv = document.getElementById("chat");
+  const isNearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 100;
+  if (isNearBottom && messagesDiv.children.length > 0) {
+    chatDiv.scrollTop = chatDiv.scrollHeight;
+  }
+}
+
+// WebSocket chat
 window.TIKTALK_BACKEND = "https://tiktalk-server-8dmz.onrender.com";
 const messagesDiv = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
 const nextBtn = document.getElementById("nextBtn");
 const typingIndicator = document.getElementById("typingIndicator");
+const footer = document.querySelector("footer");
 let ws, typingTimeout;
 
 function addMessage(text, who){
@@ -337,12 +352,34 @@ function addMessage(text, who){
   div.className="msg "+who;
   div.textContent = text;
   messagesDiv.appendChild(div);
-  messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  scrollToBottom();
+  startChattingBtn.style.display = 'none';
 }
-function showPopup(text){messagesDiv.innerHTML=`<div class="popup">${text}</div>`;}
+
+function showPopup(text){
+  if (text.includes("Searching")) {
+    messagesDiv.innerHTML = `
+      <div class="popup">
+        <div class="searching-container">
+          <div class="pulse-dots"><div class="pulse-dot"></div><div class="pulse-dot"></div><div class="pulse-dot"></div></div>
+          <div class="searching-text">Searching for a stranger...</div>
+        </div>
+      </div>`;
+    startChattingBtn.style.display = 'block';
+  } else if (text.includes("Connected")) {
+    messagesDiv.innerHTML = `
+      <div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
+    startChattingBtn.style.display = 'none';
+    setTimeout(() => { if (messagesDiv.innerHTML.includes("Connected")) messagesDiv.innerHTML = ''; }, 3000);
+  } else {
+    messagesDiv.innerHTML = `<div class="popup">${text}</div>`;
+    if (text.includes("disconnected")) startChattingBtn.style.display = 'block';
+  }
+  scrollToBottom();
+}
 
 function connectStranger(){
-  showPopup("🔍 Connecting to server...");
+  showPopup("🔍 Searching for a stranger...");
   typingIndicator.style.display="none";
   ws=new WebSocket(window.TIKTALK_BACKEND.replace("http","ws")+"/ws");
   ws.onmessage=(event)=>{
@@ -365,6 +402,14 @@ sendBtn.addEventListener("click", ()=>{
     ws.send(JSON.stringify({type:"message", text:input.value}));
     addMessage(input.value,"me");
     input.value="";
+    emojiPicker.style.display = "none";
+    emojiToggle.textContent = "😊";
+    updateKeyboardHeight(true);
+    setTimeout(() => {
+      input.focus();
+      updateKeyboardHeight(true);
+      setTimeout(() => updateKeyboardHeight(true), 50); // Forced update for late height
+    }, 150);
   }
 });
 input.addEventListener("input", ()=>{
@@ -372,7 +417,158 @@ input.addEventListener("input", ()=>{
 });
 nextBtn.addEventListener("click", ()=>{if(ws) ws.close(); connectStranger();});
 
+// Enable smooth auto scroll for chat content only
+document.body.classList.add('auto-scroll-enabled');
+
+// Auto scroll on message div changes
+const observer = new MutationObserver(() => {
+  scrollToBottom();
+});
+observer.observe(messagesDiv, { childList: true, subtree: true });
+
+// Prevent footer from scrolling with chat
+document.getElementById("chat").addEventListener("scroll", (e) => {
+  footer.style.bottom = emojiPicker.style.display === "block" ? 
+    `${virtualKeyboardHeight > 0 ? virtualKeyboardHeight : 300}px` : 
+    `${virtualKeyboardHeight > 0 ? virtualKeyboardHeight : 0}px`;
+});
+
+// Connect on load
 connectStranger();
+
+// Emoji picker with dynamic keyboard-sized height
+const emojiPicker = document.getElementById("emojiPicker");
+const emojiToggle = document.getElementById("emojiToggle");
+
+let virtualKeyboardHeight = 0;
+const initialViewportHeight = window.innerHeight;
+let updateTimeout = null;
+let pollTimeout = null;
+
+function updateKeyboardHeight(immediate = false) {
+  if (updateTimeout) clearTimeout(updateTimeout);
+  if (pollTimeout) clearTimeout(pollTimeout);
+
+  const update = () => {
+    if (window.visualViewport) {
+      const keyboardHeight = Math.max(0, initialViewportHeight - window.visualViewport.height);
+      virtualKeyboardHeight = keyboardHeight > 30 ? keyboardHeight : 0;
+      footer.style.bottom = Math.max(0, emojiPicker.style.display === "block" ? 
+        (virtualKeyboardHeight > 0 ? virtualKeyboardHeight : 300) : 
+        virtualKeyboardHeight);
+      const chatDiv = document.getElementById("chat");
+      if (chatDiv.scrollTop > 0) {
+        chatDiv.scrollTop = chatDiv.scrollHeight; // Reset scroll if drifted
+      }
+    } else {
+      footer.style.bottom = emojiPicker.style.display === "block" ? "300px" : "0";
+    }
+  };
+
+  if (immediate) {
+    update();
+    // Short-lived polling to catch rapid keyboard height changes
+    let pollCount = 0;
+    pollTimeout = setInterval(() => {
+      update();
+      pollCount++;
+      if (pollCount >= 33) clearInterval(pollTimeout); // Stop after ~1s
+    }, 30);
+  } else {
+    updateTimeout = setTimeout(update, 150);
+  }
+}
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', () => {
+    updateKeyboardHeight(true); // Immediate update on resize
+  });
+}
+
+window.addEventListener('resize', () => {
+  updateKeyboardHeight(true); // Fallback for devices with partial visualViewport support
+});
+
+input.addEventListener('mousedown', () => {
+  updateKeyboardHeight(true); // Pre-focus update
+  setTimeout(() => updateKeyboardHeight(true), 0); // Queue before reflow
+});
+
+input.addEventListener('touchstart', () => {
+  updateKeyboardHeight(true); // Pre-focus update
+  setTimeout(() => updateKeyboardHeight(true), 0); // Queue before reflow
+});
+
+input.addEventListener('focusin', () => {
+  updateKeyboardHeight(true); // Immediate update on focus
+  setTimeout(() => updateKeyboardHeight(true), 50); // Forced update for late height
+  setTimeout(() => updateKeyboardHeight(true), 150); // Final correction
+});
+
+input.addEventListener('focusout', () => {
+  updateKeyboardHeight(true); // Immediate update on focus out
+});
+
+// Init EmojiMart
+const picker = new EmojiMart.Picker({
+  onEmojiSelect: e => {
+    input.value += e.native;
+    updateKeyboardHeight(); // Ensure footer stays in place
+  },
+  theme: document.body.classList.contains("dark-mode") ? "dark" : "light",
+  previewPosition: "none",
+  skinTonePosition: "none",
+  categories: ["frequent","people","nature","foods","activity","places","objects","symbols","flags"]
+});
+emojiPicker.appendChild(picker);
+window._emojiPickerInstance = picker;
+
+emojiToggle.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const open = emojiPicker.style.display === "block";
+  if (open) {
+    emojiPicker.style.display = "none";
+    emojiToggle.textContent = "😊";
+    updateKeyboardHeight(true);
+    setTimeout(() => {
+      input.focus();
+      updateKeyboardHeight(true);
+      setTimeout(() => updateKeyboardHeight(true), 50); // Forced update
+    }, 150);
+  } else {
+    input.blur();
+    emojiPicker.style.height = virtualKeyboardHeight > 0 ? `${virtualKeyboardHeight}px` : "300px";
+    emojiPicker.style.display = "block";
+    emojiToggle.textContent = "⌨️";
+    footer.style.bottom = virtualKeyboardHeight > 0 ? `${virtualKeyboardHeight}px` : "300px";
+  }
+});
+
+document.addEventListener("click", (e) => {
+  if (emojiPicker.style.display === "block" && !emojiPicker.contains(e.target) && e.target !== emojiToggle) {
+    emojiPicker.style.display = "none";
+    emojiToggle.textContent = "😊";
+    updateKeyboardHeight(true);
+    setTimeout(() => {
+      input.focus();
+      updateKeyboardHeight(true);
+      setTimeout(() => updateKeyboardHeight(true), 50); // Forced update
+    }, 150);
+  }
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && emojiPicker.style.display === "block") {
+    emojiPicker.style.display = "none";
+    emojiToggle.textContent = "😊";
+    updateKeyboardHeight(true);
+    setTimeout(() => {
+      input.focus();
+      updateKeyboardHeight(true);
+      setTimeout(() => updateKeyboardHeight(true), 50); // Forced update
+    }, 150);
+  }
+});
 </script>
 </body>
 </html>
