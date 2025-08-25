@@ -8,7 +8,17 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css" />
 
 <style>
-* {margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif;}
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family: Arial, sans-serif;
+  /* User selection disabled for all elements */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
 body {background:#fff; display:flex; flex-direction:column; height:100vh; transition: background .3s, color .3s; color:#0f172a;}
 body.dark-mode {background:#0b0f15; color:#e5e7eb;}
 header {position:fixed; top:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; padding:8px 15px; background:#fff; border-bottom:1px solid #ddd; z-index:1000;}
@@ -19,7 +29,17 @@ header svg.logo {height:50px; width:auto; display:block;}
 #messages {display:flex; flex-direction:column; gap:8px;}
 
 /* WhatsApp-style bubbles */
-.msg {max-width:75%; padding:10px 14px; border-radius:18px; word-wrap:break-word; font-size:15px; line-height:1.4; box-shadow:0 1px 2px rgba(0,0,0,.06);}
+.msg {
+  max-width:75%;
+  padding:10px 14px;
+  border-radius:18px;
+  word-wrap:break-word;
+  font-size:15px;
+  line-height:1.4;
+  box-shadow:0 1px 2px rgba(0,0,0,.06);
+  /* Added display:inline-block to wrap content dynamically */
+  display: inline-block;
+}
 .me {align-self:flex-end; background:#007bff; color:#fff; border-bottom-right-radius:6px;}
 .stranger {align-self:flex-start; background:#e5e5ea; color:#0f172a; border-bottom-left-radius:6px;}
 
@@ -40,17 +60,16 @@ footer {
   gap: 6px;
   background: #fff;
   z-index: 1400;
-  transition: bottom 0.3s ease;
   min-height: 50px;
-  will-change: bottom;
   overflow: hidden;
-  pointer-events: auto;
-  transform: translateY(0);
 }
 body.dark-mode footer {background:#10161d; border-color:#374151;}
 
 /* Footer note (Made in India) */
 .footerNote {position: fixed; bottom: 60px; left: 0; right: 0; text-align: center; font-size: 14px; color: #555; z-index: 999;}
+.footerNote .heart {
+    color: #ff0000; /* Made the heart red */
+}
 body.dark-mode .footerNote {color: #e5e7eb;}
 
 /* Input wrapper with WhatsApp-style toggle inside textarea */
@@ -109,6 +128,19 @@ button:active {opacity: 0.85;}
   background: #fff;
   border-top: 1px solid #ddd;
 }
+@media (min-width: 768px) {
+  #emojiPicker {
+    position: absolute;
+    bottom: 60px; /* Adjust as needed */
+    left: 15px; /* Adjust as needed */
+    width: 350px; /* Set a specific width for desktop */
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-10px);
+    transition: transform 0.3s ease-in-out;
+  }
+}
 body.dark-mode #emojiPicker {
   background: #1f2937;
   border-top-color: #374151;
@@ -144,7 +176,27 @@ button:focus-visible, .icon-btn:focus-visible,
 .share-btn:focus-visible, .share-sheet button:focus-visible { outline: none !important; box-shadow: none !important; }
 
 /* Copy popup */
-#copyLinkPopup { position: fixed; top: 130px; right: 15px; padding: 12px 20px; border-radius: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 0.3s ease; z-index: 2000; pointer-events: none; color: #fff; background: #007bff;}
+#copyLinkPopup {
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0;
+    padding: 12px 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    font-size: 14px;
+    font-weight: 600;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 2000;
+    pointer-events: none;
+    color: #fff;
+    background: #007bff;
+    transform: translateY(-10px);
+}
+#copyLinkPopup.show {
+    opacity: 1;
+    transform: translateY(0);
+}
 body.dark-mode #copyLinkPopup { background: #1d4ed8; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.4);}
 
 /* Animations (logo/search/connected) */
@@ -167,8 +219,8 @@ body.dark-mode .searching-text{color: #e5e7eb;}
 .connected-checkmark::after{content: "";display: block;width: 8px;height: 14px;border: solid #00c853;border-width: 0 3px 3px 0;transform: rotate(45deg);animation: checkmark-appear .5s ease-in-out;}
 @keyframes checkmark-appear{0%{opacity: 0;transform: rotate(45deg) scale(0);}50%{transform: rotate(45deg) scale(1.2);}100%{opacity: 1;transform: rotate(45deg) scale(1);}}
 
-.start-chatting-btn{position: fixed;bottom: 90px;left: 50%;transform: translateX(-50%);padding: 12px 24px;background: #007bff;color: #fff;border: none;border-radius: 25px;font-weight: bold;font-size: 16px;cursor: pointer;box-shadow: 0 4px 15px rgba(0,0,0,0.2);z-index: 999;animation: pulse-glow 2s infinite;display: none;}
-body.dark-mode .start-chatting-btn{background: #007bff;box-shadow: 0 4px 15px rgba(0,123,255,0.4);}
+.start-chatting-btn{position: fixed;bottom: 90px;left: 50%;transform: translateX(-50%);padding: 12px 24px;background: #007bff;color: #fff;border: none;border-radius: 25px;font-weight: bold;font-size: 16px;cursor: pointer;box-shadow: 0 4px 15px rgba(0,0,0,0.2);z-index: 999;animation: pulse-glow 2s infinite;display: block;}
+body.dark-mode .start-chatting-btn{background: #007bff;box-shadow: 0 4mpx 15px rgba(0,123,255,0.4);}
 @keyframes pulse-glow{0%{box-shadow: 0 4px 15px rgba(0,123,255,0.4);transform: translateX(-50%) scale(1);}50%{box-shadow: 0 4px 20px rgba(0,123,255,0.7);transform: translateX(-50%) scale(1.05);}100%{box-shadow: 0 4px 15px rgba(0,123,255,0.4);transform: translateX(-50%) scale(1);}}
 .start-chatting-btn:hover{animation: none;box-shadow: 0 4px 20px rgba(0,123,255,0.8);transform: translateX(-50%) scale(1.05);}
 
@@ -237,7 +289,7 @@ body.dark-mode .start-chatting-btn{background: #007bff;box-shadow: 0 4px 15px rg
 
 <button id="startChattingBtn" class="start-chatting-btn">Start Chat</button>
 
-<p class="footerNote">Made in India ♥️</p>
+<p class="footerNote">Made in India <span class="heart">♥️</span></p>
 
 <footer>
   <button id="nextBtn" title="Next">
@@ -320,12 +372,22 @@ function showCopyPopup(message){
   popup.id = "copyLinkPopup";
   popup.textContent = message;
   document.body.appendChild(popup);
+
   const shareBtnRect = shareBtn.getBoundingClientRect();
-  popup.style.top = (shareBtnRect.bottom + window.scrollY + 10) + "px";
-  popup.style.right = (window.innerWidth - shareBtnRect.right) + "px";
-  void popup.offsetWidth;
-  popup.style.opacity = "1";
-  setTimeout(()=>{ popup.style.opacity="0"; setTimeout(()=>popup.remove(),300); },2000);
+  const sheetRect = shareSheet.getBoundingClientRect();
+
+  // Position relative to the share sheet
+  popup.style.top = (sheetRect.bottom + window.scrollY + 10) + "px";
+  popup.style.right = (window.innerWidth - sheetRect.right) + "px";
+  popup.style.transform = 'translateY(-10px)';
+
+  void popup.offsetWidth; // Force reflow for animation
+  popup.classList.add('show');
+
+  setTimeout(()=>{
+    popup.classList.remove('show');
+    setTimeout(()=>popup.remove(),300);
+  },2000);
 }
 
 // Auto scroll helper
@@ -346,6 +408,7 @@ const nextBtn = document.getElementById("nextBtn");
 const typingIndicator = document.getElementById("typingIndicator");
 const footer = document.querySelector("footer");
 let ws, typingTimeout;
+let isConnected = false; // New variable to track connection status
 
 function addMessage(text, who){
   const div = document.createElement("div");
@@ -365,15 +428,16 @@ function showPopup(text){
           <div class="searching-text">Searching for a stranger...</div>
         </div>
       </div>`;
-    startChattingBtn.style.display = 'block';
+    isConnected = false;
   } else if (text.includes("Connected")) {
     messagesDiv.innerHTML = `
       <div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
-    startChattingBtn.style.display = 'none';
+    isConnected = true;
     setTimeout(() => { if (messagesDiv.innerHTML.includes("Connected")) messagesDiv.innerHTML = ''; }, 3000);
   } else {
     messagesDiv.innerHTML = `<div class="popup">${text}</div>`;
     if (text.includes("disconnected")) startChattingBtn.style.display = 'block';
+    isConnected = false;
   }
   scrollToBottom();
 }
@@ -387,33 +451,32 @@ function connectStranger(){
       const data=JSON.parse(event.data);
       if(data.type==="system"){
         if(data.text==="waiting") showPopup("🔍 Searching for a stranger...");
-        else if(data.text==="connected") showPopup("✅ Connected! Say Hi 👋");
-        else if(data.text==="disconnected") showPopup("❌ Stranger disconnected");
+        else if(data.text==="connected") {
+            showPopup("✅ Connected! Say Hi 👋");
+        }
+        else if(data.text==="disconnected") {
+            showPopup("❌ Stranger disconnected");
+        }
       }
       if(data.type==="message"){ typingIndicator.style.display="none"; addMessage(data.text,"stranger"); }
       if(data.type==="typing"){ typingIndicator.style.display="block"; clearTimeout(typingTimeout); typingTimeout=setTimeout(()=>{typingIndicator.style.display="none";},1500);}
     }catch{}
   };
-  ws.onclose=()=>{showPopup("❌ Disconnected from server"); typingIndicator.style.display="none";}
+  ws.onclose=()=>{showPopup("❌ Disconnected from server"); typingIndicator.style.display="none"; isConnected=false;}
 }
 
 sendBtn.addEventListener("click", ()=>{
-  if(input.value.trim() && ws && ws.readyState===WebSocket.OPEN){
+  // Check if connected before sending
+  if(isConnected && input.value.trim()){
     ws.send(JSON.stringify({type:"message", text:input.value}));
     addMessage(input.value,"me");
     input.value="";
     emojiPicker.style.display = "none";
     emojiToggle.textContent = "😊";
-    updateKeyboardHeight(true);
-    setTimeout(() => {
-      input.focus();
-      updateKeyboardHeight(true);
-      setTimeout(() => updateKeyboardHeight(true), 50); // Forced update for late height
-    }, 150);
   }
 });
 input.addEventListener("input", ()=>{
-  if(ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:"typing"}));
+  if(isConnected && ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:"typing"}));
 });
 nextBtn.addEventListener("click", ()=>{if(ws) ws.close(); connectStranger();});
 
@@ -426,94 +489,19 @@ const observer = new MutationObserver(() => {
 });
 observer.observe(messagesDiv, { childList: true, subtree: true });
 
-// Prevent footer from scrolling with chat
-document.getElementById("chat").addEventListener("scroll", (e) => {
-  footer.style.bottom = emojiPicker.style.display === "block" ? 
-    `${virtualKeyboardHeight > 0 ? virtualKeyboardHeight : 300}px` : 
-    `${virtualKeyboardHeight > 0 ? virtualKeyboardHeight : 0}px`;
-});
-
 // Connect on load
-connectStranger();
+// initial state should just show the button
+showPopup(" ");
+startChattingBtn.style.display = 'block';
 
-// Emoji picker with dynamic keyboard-sized height
+// Emoji picker
 const emojiPicker = document.getElementById("emojiPicker");
 const emojiToggle = document.getElementById("emojiToggle");
-
-let virtualKeyboardHeight = 0;
-const initialViewportHeight = window.innerHeight;
-let updateTimeout = null;
-let pollTimeout = null;
-
-function updateKeyboardHeight(immediate = false) {
-  if (updateTimeout) clearTimeout(updateTimeout);
-  if (pollTimeout) clearTimeout(pollTimeout);
-
-  const update = () => {
-    if (window.visualViewport) {
-      const keyboardHeight = Math.max(0, initialViewportHeight - window.visualViewport.height);
-      virtualKeyboardHeight = keyboardHeight > 30 ? keyboardHeight : 0;
-      footer.style.bottom = Math.max(0, emojiPicker.style.display === "block" ? 
-        (virtualKeyboardHeight > 0 ? virtualKeyboardHeight : 300) : 
-        virtualKeyboardHeight);
-      const chatDiv = document.getElementById("chat");
-      if (chatDiv.scrollTop > 0) {
-        chatDiv.scrollTop = chatDiv.scrollHeight; // Reset scroll if drifted
-      }
-    } else {
-      footer.style.bottom = emojiPicker.style.display === "block" ? "300px" : "0";
-    }
-  };
-
-  if (immediate) {
-    update();
-    // Short-lived polling to catch rapid keyboard height changes
-    let pollCount = 0;
-    pollTimeout = setInterval(() => {
-      update();
-      pollCount++;
-      if (pollCount >= 33) clearInterval(pollTimeout); // Stop after ~1s
-    }, 30);
-  } else {
-    updateTimeout = setTimeout(update, 150);
-  }
-}
-
-if (window.visualViewport) {
-  window.visualViewport.addEventListener('resize', () => {
-    updateKeyboardHeight(true); // Immediate update on resize
-  });
-}
-
-window.addEventListener('resize', () => {
-  updateKeyboardHeight(true); // Fallback for devices with partial visualViewport support
-});
-
-input.addEventListener('mousedown', () => {
-  updateKeyboardHeight(true); // Pre-focus update
-  setTimeout(() => updateKeyboardHeight(true), 0); // Queue before reflow
-});
-
-input.addEventListener('touchstart', () => {
-  updateKeyboardHeight(true); // Pre-focus update
-  setTimeout(() => updateKeyboardHeight(true), 0); // Queue before reflow
-});
-
-input.addEventListener('focusin', () => {
-  updateKeyboardHeight(true); // Immediate update on focus
-  setTimeout(() => updateKeyboardHeight(true), 50); // Forced update for late height
-  setTimeout(() => updateKeyboardHeight(true), 150); // Final correction
-});
-
-input.addEventListener('focusout', () => {
-  updateKeyboardHeight(true); // Immediate update on focus out
-});
 
 // Init EmojiMart
 const picker = new EmojiMart.Picker({
   onEmojiSelect: e => {
     input.value += e.native;
-    updateKeyboardHeight(); // Ensure footer stays in place
   },
   theme: document.body.classList.contains("dark-mode") ? "dark" : "light",
   previewPosition: "none",
@@ -529,18 +517,14 @@ emojiToggle.addEventListener("click", (e) => {
   if (open) {
     emojiPicker.style.display = "none";
     emojiToggle.textContent = "😊";
-    updateKeyboardHeight(true);
-    setTimeout(() => {
-      input.focus();
-      updateKeyboardHeight(true);
-      setTimeout(() => updateKeyboardHeight(true), 50); // Forced update
-    }, 150);
+    input.focus();
   } else {
     input.blur();
-    emojiPicker.style.height = virtualKeyboardHeight > 0 ? `${virtualKeyboardHeight}px` : "300px";
+    // Use fixed height for desktop for better layout
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+    emojiPicker.style.height = isDesktop ? "350px" : "300px";
     emojiPicker.style.display = "block";
     emojiToggle.textContent = "⌨️";
-    footer.style.bottom = virtualKeyboardHeight > 0 ? `${virtualKeyboardHeight}px` : "300px";
   }
 });
 
@@ -548,12 +532,7 @@ document.addEventListener("click", (e) => {
   if (emojiPicker.style.display === "block" && !emojiPicker.contains(e.target) && e.target !== emojiToggle) {
     emojiPicker.style.display = "none";
     emojiToggle.textContent = "😊";
-    updateKeyboardHeight(true);
-    setTimeout(() => {
-      input.focus();
-      updateKeyboardHeight(true);
-      setTimeout(() => updateKeyboardHeight(true), 50); // Forced update
-    }, 150);
+    input.focus();
   }
 });
 
@@ -561,12 +540,7 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && emojiPicker.style.display === "block") {
     emojiPicker.style.display = "none";
     emojiToggle.textContent = "😊";
-    updateKeyboardHeight(true);
-    setTimeout(() => {
-      input.focus();
-      updateKeyboardHeight(true);
-      setTimeout(() => updateKeyboardHeight(true), 50); // Forced update
-    }, 150);
+    input.focus();
   }
 });
 </script>
