@@ -128,19 +128,6 @@ button:active {opacity: 0.85;}
   background: #fff;
   border-top: 1px solid #ddd;
 }
-@media (min-width: 768px) {
-  #emojiPicker {
-    position: absolute;
-    bottom: 60px; /* Adjust as needed */
-    right: 15px; /* Change to right for desktop */
-    width: 350px; /* Set a specific width for desktop */
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transform: translateY(-10px);
-    transition: transform 0.3s ease-in-out;
-  }
-}
 body.dark-mode #emojiPicker {
   background: #1f2937;
   border-top-color: #374151;
@@ -408,6 +395,7 @@ const nextBtn = document.getElementById("nextBtn");
 const typingIndicator = document.getElementById("typingIndicator");
 const footer = document.querySelector("footer");
 let ws, typingTimeout;
+let isConnected = false; // New variable to track connection status
 
 function addMessage(text, who){
   const div = document.createElement("div");
@@ -427,13 +415,16 @@ function showPopup(text){
           <div class="searching-text">Searching for a stranger...</div>
         </div>
       </div>`;
+    isConnected = false;
   } else if (text.includes("Connected")) {
     messagesDiv.innerHTML = `
       <div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
+    isConnected = true;
     setTimeout(() => { if (messagesDiv.innerHTML.includes("Connected")) messagesDiv.innerHTML = ''; }, 3000);
   } else {
     messagesDiv.innerHTML = `<div class="popup">${text}</div>`;
     if (text.includes("disconnected")) startChattingBtn.style.display = 'block';
+    isConnected = false;
   }
   scrollToBottom();
 }
@@ -458,13 +449,12 @@ function connectStranger(){
       if(data.type==="typing"){ typingIndicator.style.display="block"; clearTimeout(typingTimeout); typingTimeout=setTimeout(()=>{typingIndicator.style.display="none";},1500);}
     }catch{}
   };
-  ws.onclose=()=>{showPopup("❌ Disconnected from server"); typingIndicator.style.display="none";}
+  ws.onclose=()=>{showPopup("❌ Disconnected from server"); typingIndicator.style.display="none"; isConnected=false;}
 }
 
 sendBtn.addEventListener("click", ()=>{
-  const isConnectedPopupVisible = messagesDiv.innerHTML.includes("Connected! Say Hi 👋");
-
-  if(isConnectedPopupVisible && input.value.trim()){
+  // Check if connected before sending
+  if(isConnected && input.value.trim()){
     ws.send(JSON.stringify({type:"message", text:input.value}));
     addMessage(input.value,"me");
     input.value="";
@@ -473,7 +463,7 @@ sendBtn.addEventListener("click", ()=>{
   }
 });
 input.addEventListener("input", ()=>{
-  if(ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:"typing"}));
+  if(isConnected && ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:"typing"}));
 });
 nextBtn.addEventListener("click", ()=>{if(ws) ws.close(); connectStranger();});
 
@@ -517,9 +507,7 @@ emojiToggle.addEventListener("click", (e) => {
     input.focus();
   } else {
     input.blur();
-    // Use fixed height for desktop for better layout
-    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-    emojiPicker.style.height = isDesktop ? "350px" : "300px";
+    emojiPicker.style.height = "300px";
     emojiPicker.style.display = "block";
     emojiToggle.textContent = "⌨️";
   }
