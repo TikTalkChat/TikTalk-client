@@ -2,7 +2,7 @@
 
 👋 *Hi,
 
-## 🌟 **TalkRush – Chat With Strangers**  
+## 🌟 **TikTalk – Chat With Strangers**  
 **No login. No registration.** Just instant, anonymous chats!  
 
 ✅ ** Text ** – message
