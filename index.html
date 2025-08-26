@@ -2,55 +2,165 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>TikTalk - Stranger Chat</title>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css" />
 
 <style>
 * {
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
   font-family: Arial, sans-serif;
-  /* User selection disabled for all elements */
   user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
 }
-body {background:#fff; display:flex; flex-direction:column; height:100vh; transition: background .3s, color .3s; color:#0f172a;}
-body.dark-mode {background:#0b0f15; color:#e5e7eb;}
-header {position:fixed; top:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; padding:8px 15px; background:#fff; border-bottom:1px solid #ddd; z-index:1000;}
-body.dark-mode header {background:#10161d; border-color:#374151;}
-header .left, header .right {display:flex; align-items:center; gap:8px;}
-header svg.logo {height:50px; width:auto; display:block;}
-#chat {flex:1; overflow-y:auto; padding:70px 15px 100px;}
-#messages {display:flex; flex-direction:column; gap:8px;}
-
-/* WhatsApp-style bubbles */
+body {
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  transition: background 0.3s, color 0.3s;
+  color: #0f172a;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+body.dark-mode {
+  background: #0b0f15;
+  color: #e5e7eb;
+}
+header {
+  position: fixed !important;
+  top: env(safe-area-inset-top, 0);
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 15px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  z-index: 10001;
+  width: 100%;
+}
+body.dark-mode header {
+  background: #10161d;
+  border-color: #374151;
+}
+header .left, header .right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+header svg.logo {
+  height: 50px;
+  width: auto;
+  display: block;
+}
+.chat-wrapper {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+}
+#chat {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  contain: strict;
+  padding: calc(70px + env(safe-area-inset-top, 0)) 15px calc(150px + env(safe-area-inset-bottom, 0));
+  -webkit-overflow-scrolling: touch;
+}
+#messages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 .msg {
-  max-width:75%;
-  padding:10px 14px;
-  border-radius:18px;
-  word-wrap:break-word;
-  font-size:15px;
-  line-height:1.4;
-  box-shadow:0 1px 2px rgba(0,0,0,.06);
-  /* Added display:inline-block to wrap content dynamically */
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  word-wrap: break-word;
+  font-size: 15px;
+  line-height: 1.4;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
   display: inline-block;
 }
-.me {align-self:flex-end; background:#007bff; color:#fff; border-bottom-right-radius:6px;}
-.stranger {align-self:flex-start; background:#e5e5ea; color:#0f172a; border-bottom-left-radius:6px;}
-
-.popup {background:transparent; border:none; padding:8px; text-align:center; color:#555; max-width:220px; margin:8px auto; font-size:14px;}
-body.dark-mode .popup {background:transparent; color:#e5e7eb;}
-#typingIndicator {font-size:13px; color:#888; margin-top:5px; text-align:left; font-style:italic;}
-
-/* Footer layout */
+.me {
+  align-self: flex-end;
+  background: #e6f0ff;
+  color: #0f172a;
+  border-bottom-right-radius: 6px;
+}
+body.dark-mode .me {
+  background: #2a3d66;
+}
+.stranger {
+  align-self: flex-start;
+  background: #f0f0f5;
+  color: #0f172a;
+  border-bottom-left-radius: 6px;
+}
+body.dark-mode .stranger {
+  background: #2d3748;
+}
+.popup {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  text-align: center;
+  color: #555;
+  max-width: 220px;
+  margin: 8px auto;
+  font-size: 14px;
+}
+body.dark-mode .popup {
+  background: transparent;
+  color: #e5e7eb;
+}
+#typingIndicator {
+  font-size: 13px;
+  color: #888;
+  margin-top: 5px;
+  text-align: left;
+  display: none;
+}
+body.dark-mode #typingIndicator {
+  color: #b0b0b0;
+}
+.typing-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+}
+.typing-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: linear-gradient(45deg, #007bff, #00eaff);
+  animation: typingBounce 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(1) { animation-delay: 0s; }
+.typing-dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes typingBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
 footer {
-  position: fixed;
-  bottom: 0;
+  position: fixed !important;
+  bottom: env(safe-area-inset-bottom, 0);
   left: 0;
   right: 0;
   display: flex;
@@ -59,25 +169,52 @@ footer {
   border-top: 1px solid #ddd;
   gap: 6px;
   background: #fff;
-  z-index: 1400;
+  z-index: 10000;
   min-height: 50px;
-  overflow: hidden;
 }
-body.dark-mode footer {background:#10161d; border-color:#374151;}
-
-/* Footer note (Made in India) */
-.footerNote {position: fixed; bottom: 60px; left: 0; right: 0; text-align: center; font-size: 14px; color: #555; z-index: 999;}
-.footerNote .heart {
-    color: #ff0000; /* Made the heart red */
+body.dark-mode footer {
+  background: #10161d;
+  border-color: #374151;
 }
-body.dark-mode .footerNote {color: #e5e7eb;}
-
-/* Input wrapper with WhatsApp-style toggle inside textarea */
-.inputWrapper {flex: 1; position: relative; display: flex; align-items: center;}
-textarea {width: 100%; resize: none; padding: 10px 44px 10px 44px; border: 1px solid #ccc; border-radius: 20px; font-size: 15px; outline: none; height: 40px; background: #fff; color: #0f172a;}
-body.dark-mode textarea {background: #1f2937; color: #e5e7eb; border-color: #374151;}
-
-/* Emoji/Keyboard toggle inside textarea (left) */
+footer.footer-above-picker {
+  z-index: 1000001;
+}
+.footerNote {
+  position: fixed;
+  bottom: calc(60px + env(safe-area-inset-bottom, 0));
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+  z-index: 9999;
+}
+body.dark-mode .footerNote {
+  color: #e5e7eb;
+}
+.inputWrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+textarea {
+  width: 100%;
+  resize: none;
+  padding: 10px 44px 10px 44px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  font-size: 15px;
+  outline: none;
+  height: 40px;
+  background: #fff;
+  color: #0f172a;
+}
+body.dark-mode textarea {
+  background: #1f2937;
+  color: #e5e7eb;
+  border-color: #374151;
+}
 #emojiToggle {
   position: absolute;
   left: 10px;
@@ -94,9 +231,8 @@ body.dark-mode textarea {background: #1f2937; color: #e5e7eb; border-color: #374
   align-items: center;
   justify-content: center;
   -webkit-tap-highlight-color: transparent !important;
+  z-index: 10001;
 }
-
-/* Send / Next buttons */
 button {
   padding: 0 14px;
   border: none;
@@ -111,124 +247,383 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 10001;
 }
-button:active {opacity: 0.85;}
-#sendBtn, #nextBtn {width: 40px; height: 40px; border-radius: 50%; padding: 0;}
-#sendBtn {order: 3;}
-#nextBtn {order: 0; background: #ff3b30; margin-right: auto;}
-
-/* Emoji picker popup */
+button:active {
+  opacity: 0.85;
+}
+#sendBtn, #nextBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  padding: 0;
+}
+#sendBtn {
+  order: 3;
+}
+#nextBtn {
+  order: 0;
+  background: #ff3b30;
+  margin-right: auto;
+}
 #emojiPicker {
   position: fixed;
+  bottom: calc(60px + env(safe-area-inset-bottom, 0));
   left: 0;
   right: 0;
-  bottom: 0;
-  z-index: 2000;
+  z-index: 1000000;
   display: none;
-  background: #fff;
-  border-top: 1px solid #ddd;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-height: 50vh;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+#emojiPicker.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+#emojiPicker.emoji-picker-hidden {
+  z-index: 9999;
+  display: none !important;
+}
+body.dark-mode #emojiPicker {
+  background: rgba(31, 41, 55, 0.95);
+  border-top-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 @media (min-width: 768px) {
   #emojiPicker {
-    position: absolute;
-    bottom: 60px; /* Adjust as needed */
-    right: 15px; /* Change to right for desktop */
-    width: 350px; /* Set a specific width for desktop */
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    transform: translateY(-10px);
-    transition: transform 0.3s ease-in-out;
+    position: fixed;
+    bottom: calc(70px + env(safe-area-inset-bottom, 0));
+    right: 15px;
+    width: 350px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(15px);
+  }
+  #emojiPicker.show {
+    transform: translateY(0);
+  }
+  body.dark-mode #emojiPicker {
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   }
 }
-body.dark-mode #emojiPicker {
-  background: #1f2937;
-  border-top-color: #374151;
+.icon-btn, .share-btn {
+  border-radius: 8px;
+  height: 36px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
 }
-
-/* Header right actions */
-.icon-btn, .share-btn {border-radius: 999px; height: 36px; cursor: pointer; font-weight: 600; transition: all .2s; display: flex; align-items: center; justify-content: center;}
-.icon-btn {width: 36px; background: transparent; border: none; font-size: 18px;}
-.icon-btn:active {transform: scale(.95);}
-.share-btn {padding: 0; background: green; border: none; width: 36px; height: 36px; position: relative; color: #fff;}
-.share-btn:hover {opacity: 0.85;}
-
-/* Share sheet */
-.right { position: relative; }
-.share-sheet { position: absolute; top: 100%; right: 0; background: #fff !important; border-radius: 12px; padding: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); display: none; flex-direction: row; gap: 12px; z-index: 1000; margin-top: 5px; transform: translateY(-10px); opacity: 0; transition: all 0.3s ease;}
-body.dark-mode .share-sheet { background: #1f2937 !important; box-shadow: 0 4px 20px rgba(0,0,0,0.4);}
-.share-sheet.show { transform: translateY(0); opacity: 1;}
-.share-sheet button { background: #f8f9fa !important; border: 1px solid #dee2e6 !important; border-radius: 50%; padding: 8px; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease;}
-.share-sheet button:hover { background: #e9ecef !important; transform: scale(1.05);}
-body.dark-mode .share-sheet button {background: #2d3748 !important; border-color: #4a5568 !important;}
-body.dark-mode .share-sheet button:hover {background: #4a5568 !important;}
-.share-sheet button img { width: 24px; height: 24px;}
-.share-sheet button svg { display: block;}
-.share-sheet .link { border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #f8f9fa !important; border: 1px solid #dee2e6 !important; color: #007bff !important; font-weight: 600; cursor: pointer; transition: all 0.2s ease;}
-.share-sheet .link:hover { background: #e9ecef !important; transform: scale(1.05); }
-
-/* Remove focus glow */
+.icon-btn {
+  width: 36px;
+  background: transparent;
+  border: none;
+  font-size: 18px;
+}
+.icon-btn:active {
+  transform: scale(0.95);
+}
+.share-btn {
+  padding: 0;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  position: relative;
+  color: #fff;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 10003;
+  visibility: visible !important;
+  opacity: 1 !important;
+  overflow: visible;
+}
+.share-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+body.dark-mode .share-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+body.dark-mode .share-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
+}
+.share-btn svg {
+  fill: #fff !important;
+  width: 20px;
+  height: 20px;
+}
+.right {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  z-index: 10002;
+}
+.share-sheet {
+  position: absolute;
+  top: calc(100% + env(safe-area-inset-top, 0));
+  right: 0;
+  background: #fff !important;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  display: none;
+  flex-direction: row;
+  gap: 12px;
+  z-index: 9998;
+  margin-top: 5px;
+  transform: translateY(-10px);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+body.dark-mode .share-sheet {
+  background: #1f2937 !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+}
+.share-sheet.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+.share-sheet button {
+  background: #f8f9fa !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 50%;
+  padding: 8px;
+  width: 44px;
+  height: 44px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  z-index: 10001;
+}
+.share-sheet button:hover {
+  background: #e9ecef !important;
+  transform: scale(1.05);
+}
+body.dark-mode .share-sheet button {
+  background: #2d3748 !important;
+  border-color: #4a5568 !important;
+}
+body.dark-mode .share-sheet button:hover {
+  background: #4a5568 !important;
+}
+.share-sheet button img {
+  width: 24px;
+  height: 24px;
+}
+.share-sheet button svg {
+  display: block;
+}
+.share-sheet .link {
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa !important;
+  border: 1px solid #dee2e6 !important;
+  color: #007bff !important;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.share-sheet .link:hover {
+  background: #e9ecef !important;
+  transform: scale(1.05);
+}
 button:focus, button:active,
 .icon-btn:focus, .icon-btn:active,
 .share-btn:focus, .share-btn:active,
 .share-sheet button:focus, .share-sheet button:active,
 button:focus-visible, .icon-btn:focus-visible,
-.share-btn:focus-visible, .share-sheet button:focus-visible { outline: none !important; box-shadow: none !important; }
-
-/* Copy popup */
+.share-btn:focus-visible, .share-sheet button:focus-visible {
+  outline: none !important;
+  box-shadow: none !important;
+}
 #copyLinkPopup {
-    position: absolute;
-    top: calc(100% + 15px);
-    right: 0;
-    padding: 12px 20px;
-    border-radius: 25px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-    font-size: 14px;
-    font-weight: 600;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    z-index: 2000;
-    pointer-events: none;
-    color: #fff;
-    background: #007bff;
-    transform: translateY(-10px);
+  position: absolute;
+  top: calc(100% + 15px);
+  right: 0;
+  padding: 12px 20px;
+  border-radius: 25px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 9999;
+  pointer-events: none;
+  color: #fff;
+  background: #007bff;
+  transform: translateY(-10px);
 }
 #copyLinkPopup.show {
-    opacity: 1;
-    transform: translateY(0);
+  opacity: 1;
+  transform: translateY(0);
 }
-body.dark-mode #copyLinkPopup { background: #1d4ed8; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.4);}
-
-/* Animations (logo/search/connected) */
-.bubble {transform-origin: 50% 50%; animation: bubblePulse 3.6s ease-in-out infinite, bubbleRotate 8s linear infinite;}
-.eye {transform-origin: center; animation: eyePop 2s ease-in-out infinite;}
-.smile {animation: smileJelly 2.6s cubic-bezier(.25,.9,.3,1) infinite;}
-@keyframes bubblePulse {0%,100%{transform: scale(1);}50%{transform: scale(1.05);}}
-@keyframes bubbleRotate {0%{transform: rotate(-1deg);}50%{transform: rotate(1deg);}100%{transform: rotate(-1deg);}}
-@keyframes eyePop {0%,100%{transform: translateY(0);opacity: 1;}40%,60%{transform: translateY(-20px);opacity: 0;}}
-@keyframes smileJelly {0%,100%{transform: translateY(0);}40%{transform: translateY(2px) scaleY(.95);}70%{transform: translateY(-1px) scaleY(1.05);}}
-
-.searching-container{display: flex;justify-content: center;align-items: center;padding: 15px 0;}
-.pulse-dots{display: flex;align-items: center;justify-content: center;gap: 4px;}
-.pulse-dot{width: 10px;height: 10px;border-radius: 50%;background: linear-gradient(45deg,#00eaff,#6a00ff);animation: pulse 1.5s ease-in-out infinite;}
-.pulse-dot:nth-child(1){animation-delay: 0s;} .pulse-dot:nth-child(2){animation-delay: .2s;} .pulse-dot:nth-child(3){animation-delay: .4s;}
-@keyframes pulse{0%,100%{transform: scale(.8);opacity: .7;}50%{transform: scale(1.2);opacity: 1;}}
-.searching-text{margin-left: 10px;font-weight: 500;color: #555;white-space: nowrap;}
-body.dark-mode .searching-text{color: #e5e7eb;}
-.connected-checkmark{display: inline-block;width: 20px;height: 20px;margin-right: 8px;}
-.connected-checkmark::after{content: "";display: block;width: 8px;height: 14px;border: solid #00c853;border-width: 0 3px 3px 0;transform: rotate(45deg);animation: checkmark-appear .5s ease-in-out;}
-@keyframes checkmark-appear{0%{opacity: 0;transform: rotate(45deg) scale(0);}50%{transform: rotate(45deg) scale(1.2);}100%{opacity: 1;transform: rotate(45deg) scale(1);}}
-
-.start-chatting-btn{position: fixed;bottom: 90px;left: 50%;transform: translateX(-50%);padding: 12px 24px;background: #007bff;color: #fff;border: none;border-radius: 25px;font-weight: bold;font-size: 16px;cursor: pointer;box-shadow: 0 4px 15px rgba(0,0,0,0.2);z-index: 999;animation: pulse-glow 2s infinite;display: block;}
-body.dark-mode .start-chatting-btn{background: #007bff;box-shadow: 0 4mpx 15px rgba(0,123,255,0.4);}
-@keyframes pulse-glow{0%{box-shadow: 0 4px 15px rgba(0,123,255,0.4);transform: translateX(-50%) scale(1);}50%{box-shadow: 0 4px 20px rgba(0,123,255,0.7);transform: translateX(-50%) scale(1.05);}100%{box-shadow: 0 4px 15px rgba(0,123,255,0.4);transform: translateX(-50%) scale(1);}}
-.start-chatting-btn:hover{animation: none;box-shadow: 0 4px 20px rgba(0,123,255,0.8);transform: translateX(-50%) scale(1.05);}
-
-/* Button icons */
-.button-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
-
-/* Smooth scroll for new messages */
-.auto-scroll-enabled #messages { scroll-behavior: smooth; }
+body.dark-mode #copyLinkPopup {
+  background: #1d4ed8;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.bubble {
+  transform-origin: 50% 50%;
+  animation: bubblePulse 3.6s ease-in-out infinite, bubbleRotate 8s linear infinite;
+}
+.eye {
+  transform-origin: center;
+  animation: eyePop 2s ease-in-out infinite;
+}
+.smile {
+  animation: smileJelly 2.6s cubic-bezier(0.25,0.9,0.3,1) infinite;
+}
+@keyframes bubblePulse {
+  0%,100% {transform: scale(1);}
+  50% {transform: scale(1.05);}
+}
+@keyframes bubbleRotate {
+  0% {transform: rotate(-1deg);}
+  50% {transform: rotate(1deg);}
+  100% {transform: rotate(-1deg);}
+}
+@keyframes eyePop {
+  0%,100% {transform: translateY(0); opacity: 1;}
+  40%,60% {transform: translateY(-20px); opacity: 0;}
+}
+@keyframes smileJelly {
+  0%,100% {transform: translateY(0);}
+  40% {transform: translateY(2px) scaleY(0.95);}
+  70% {transform: translateY(-1px) scaleY(1.05);}
+}
+.searching-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 0;
+}
+.pulse-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(45deg,#00eaff,#6a00ff);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+.pulse-dot:nth-child(1) {animation-delay: 0s;}
+.pulse-dot:nth-child(2) {animation-delay: 0.2s;}
+.pulse-dot:nth-child(3) {animation-delay: 0.4s;}
+@keyframes pulse {
+  0%,100% {transform: scale(0.8); opacity: 0.7;}
+  50% {transform: scale(1.2); opacity: 1;}
+}
+.searching-text {
+  margin-left: 10px;
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+}
+body.dark-mode .searching-text {
+  color: #e5e7eb;
+}
+.connected-checkmark {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+}
+.connected-checkmark::after {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 14px;
+  border: solid #00c853;
+  border-width: 0 3px 3px 0;
+  transform: rotate(45deg);
+  animation: checkmark-appear 0.5s ease-in-out;
+}
+@keyframes checkmark-appear {
+  0% {opacity: 0; transform: rotate(45deg) scale(0);}
+  50% {transform: rotate(45deg) scale(1.2);}
+  100% {opacity: 1; transform: rotate(45deg) scale(1);}
+}
+.start-chatting-btn {
+  position: fixed;
+  bottom: calc(90px + env(safe-area-inset-bottom, 0));
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 24px;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  z-index: 10001;
+  animation: pulse-glow 2s infinite;
+  display: block;
+}
+body.dark-mode .start-chatting-btn {
+  background: #007bff;
+  box-shadow: 0 4px 15px rgba(0,123,255,0.4);
+}
+@keyframes pulse-glow {
+  0% {box-shadow: 0 4px 15px rgba(0,123,255,0.4); transform: translateX(-50%) scale(1);}
+  50% {box-shadow: 0 4px 20px rgba(0,123,255,0.7); transform: translateX(-50%) scale(1.05);}
+  100% {box-shadow: 0 4px 15px rgba(0,123,255,0.4); transform: translateX(-50%) scale(1);}
+}
+.start-chatting-btn:hover {
+  animation: none;
+  box-shadow: 0 4px 20px rgba(0,123,255,0.8);
+  transform: translateX(-50%) scale(1.05);
+}
+.button-icon {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.auto-scroll-enabled #messages {
+  scroll-behavior: smooth;
+}
+.emoji-mart, .emoji-mart * {
+  font-family: "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", sans-serif !important;
+}
+.emoji-mart {
+  font-weight: normal !important;
+}
 </style>
 </head>
 <body>
@@ -282,10 +677,18 @@ body.dark-mode .start-chatting-btn{background: #007bff;box-shadow: 0 4mpx 15px r
   </div>
 </header>
 
-<main id="chat">
-  <div id="messages"></div>
-  <div id="typingIndicator" style="display:none;">Stranger is typing...</div>
-</main>
+<div class="chat-wrapper">
+  <main id="chat">
+    <div id="messages"></div>
+    <div id="typingIndicator" style="display:none;">
+      <div class="typing-container">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+  </main>
+</div>
 
 <button id="startChattingBtn" class="start-chatting-btn">Start Chat</button>
 
@@ -317,7 +720,7 @@ body.dark-mode .start-chatting-btn{background: #007bff;box-shadow: 0 4mpx 15px r
 <script>
 // Theme toggle
 const themeToggle = document.getElementById("themeToggle");
-themeToggle.addEventListener("click", () => {
+const handleThemeToggle = () => {
   document.body.classList.toggle("dark-mode");
   themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
   if (window._emojiPickerInstance) {
@@ -325,14 +728,17 @@ themeToggle.addEventListener("click", () => {
       theme: document.body.classList.contains("dark-mode") ? "dark" : "light"
     });
   }
-});
+};
+themeToggle.addEventListener("click", handleThemeToggle);
+themeToggle.addEventListener("touchstart", handleThemeToggle);
 
 // Share sheet
 const shareBtn = document.getElementById("shareBtn");
 const shareSheet = document.getElementById("shareSheet");
 const startChattingBtn = document.getElementById("startChattingBtn");
 
-shareBtn.addEventListener("click", (e) => {
+const handleShareBtn = (e) => {
+  e.preventDefault();
   e.stopPropagation();
   const btnRect = shareBtn.getBoundingClientRect();
   shareSheet.style.top = (btnRect.bottom + window.scrollY) + "px";
@@ -340,18 +746,34 @@ shareBtn.addEventListener("click", (e) => {
   shareSheet.classList.toggle('show');
   if(shareSheet.classList.contains('show')) shareSheet.style.display = 'flex';
   else setTimeout(()=>{shareSheet.style.display='none';},300);
-});
+};
+shareBtn.addEventListener("click", handleShareBtn);
+shareBtn.addEventListener("touchstart", handleShareBtn);
+
 document.addEventListener("click", (e) => {
   if(!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')){
     shareSheet.classList.remove('show');
     setTimeout(()=>{shareSheet.style.display='none';},300);
   }
 });
-
-startChattingBtn.addEventListener("click", () => {
-  if(ws) ws.close();
-  connectStranger();
+document.addEventListener("touchstart", (e) => {
+  if(!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')){
+    shareSheet.classList.remove('show');
+    setTimeout(()=>{shareSheet.style.display='none';},300);
+  }
 });
+
+let hasStartedChat = false;
+
+const handleStartChatting = (e) => {
+  e.preventDefault();
+  if(ws) ws.close();
+  hasStartedChat = true;
+  startChattingBtn.style.display = 'none';
+  connectStranger();
+};
+startChattingBtn.addEventListener("click", handleStartChatting);
+startChattingBtn.addEventListener("touchstart", handleStartChatting);
 
 function shareApp(platform){
   let url = window.location.href;
@@ -376,17 +798,16 @@ function showCopyPopup(message){
   const shareBtnRect = shareBtn.getBoundingClientRect();
   const sheetRect = shareSheet.getBoundingClientRect();
 
-  // Position relative to the share sheet
   popup.style.top = (sheetRect.bottom + window.scrollY + 10) + "px";
   popup.style.right = (window.innerWidth - sheetRect.right) + "px";
   popup.style.transform = 'translateY(-10px)';
 
-  void popup.offsetWidth; // Force reflow for animation
+  void popup.offsetWidth;
   popup.classList.add('show');
 
   setTimeout(()=>{
     popup.classList.remove('show');
-    setTimeout(()=>popup.remove(),300);
+    setTimeout(()=>{popup.remove()},300);
   },2000);
 }
 
@@ -407,8 +828,131 @@ const sendBtn = document.getElementById("sendBtn");
 const nextBtn = document.getElementById("nextBtn");
 const typingIndicator = document.getElementById("typingIndicator");
 const footer = document.querySelector("footer");
+const emojiPicker = document.getElementById("emojiPicker");
 let ws, typingTimeout;
-let isConnected = false; // New variable to track connection status
+let isConnected = false;
+
+// Debounce function
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+function adjustLayoutForKeyboard() {
+  const header = document.querySelector("header");
+  const chatDiv = document.getElementById("chat");
+  const footerNote = document.querySelector(".footerNote");
+  const headerHeight = header.offsetHeight || 70;
+  let keyboardHeight = 0;
+  let emojiPickerHeight = 0;
+
+  if (window.visualViewport) {
+    const viewportHeight = window.visualViewport.height;
+    const windowHeight = window.innerHeight;
+    keyboardHeight = Math.max(0, windowHeight - viewportHeight);
+    const viewportWidth = window.visualViewport.width;
+    if (emojiPicker.style.display === "block" && !emojiPicker.classList.contains('emoji-picker-hidden')) {
+      emojiPicker.style.width = window.matchMedia("(min-width: 768px)").matches ? "350px" : `${viewportWidth}px`;
+      emojiPickerHeight = window.matchMedia("(min-width: 768px)").matches ? 350 : Math.min(keyboardHeight || 300, window.innerHeight * 0.5);
+      emojiPicker.style.height = `${emojiPickerHeight}px`;
+    } else {
+      emojiPicker.style.width = window.matchMedia("(min-width: 768px)").matches ? "350px" : "100%";
+      emojiPickerHeight = window.matchMedia("(min-width: 768px)").matches ? 350 : 300;
+      emojiPicker.style.height = `${emojiPickerHeight}px`;
+    }
+  } else {
+    keyboardHeight = 0;
+    emojiPicker.style.width = window.matchMedia("(min-width: 768px)").matches ? "350px" : "100%";
+    emojiPickerHeight = window.matchMedia("(min-width: 768px)").matches ? 350 : 300;
+    emojiPicker.style.height = `${emojiPickerHeight}px`;
+  }
+
+  const isEmojiPickerOpen = emojiPicker.style.display === "block" && !emojiPicker.classList.contains('emoji-picker-hidden');
+  const isKeyboardOpen = input === document.activeElement && keyboardHeight > 0;
+
+  if (isKeyboardOpen && isEmojiPickerOpen) {
+    emojiPicker.classList.add('emoji-picker-hidden');
+    emojiPicker.classList.remove('show');
+    emojiPicker.style.display = "none";
+    emojiToggle.textContent = "😊";
+  } else if (!isKeyboardOpen && emojiPicker.classList.contains('emoji-picker-hidden')) {
+    emojiPicker.classList.remove('emoji-picker-hidden');
+  }
+
+  const offsetHeight = isEmojiPickerOpen ? emojiPickerHeight : keyboardHeight;
+
+  footer.style.position = 'fixed';
+  footer.style.bottom = `calc(${offsetHeight}px + env(safe-area-inset-bottom, 0))`;
+  footer.style.top = 'auto';
+  footer.style.width = '100%';
+  footer.style.zIndex = isEmojiPickerOpen ? '1000001' : '10000';
+  if (isEmojiPickerOpen) {
+    footer.classList.add('footer-above-picker');
+  } else {
+    footer.classList.remove('footer-above-picker');
+  }
+
+  footerNote.style.position = 'fixed';
+  footerNote.style.bottom = `calc(60px + ${offsetHeight}px + env(safe-area-inset-bottom, 0))`;
+  footerNote.style.top = 'auto';
+  footerNote.style.zIndex = '9999';
+
+  startChattingBtn.style.position = 'fixed';
+  startChattingBtn.style.bottom = `calc(90px + ${offsetHeight}px + env(safe-area-inset-bottom, 0))`;
+  startChattingBtn.style.top = 'auto';
+  startChattingBtn.style.zIndex = '10001';
+
+  emojiPicker.style.position = 'fixed';
+  emojiPicker.style.bottom = `calc(${keyboardHeight}px + env(safe-area-inset-bottom, 0))`;
+  emojiPicker.style.top = 'auto';
+  if (window.matchMedia("(min-width: 768px)").matches) {
+    emojiPicker.style.right = '15px';
+    emojiPicker.style.left = 'auto';
+  } else {
+    emojiPicker.style.right = '0';
+    emojiPicker.style.left = '0';
+  }
+
+  chatDiv.style.height = `calc(100vh - ${headerHeight}px - env(safe-area-inset-top, 0))`;
+  chatDiv.style.paddingBottom = `calc(150px + ${offsetHeight}px + env(safe-area-inset-bottom, 0))`;
+  chatDiv.style.overflowY = 'auto';
+  chatDiv.style.overscrollBehavior = 'contain';
+
+  footer.offsetHeight;
+  scrollToBottom();
+}
+
+const debouncedAdjustLayout = debounce(adjustLayoutForKeyboard, 50);
+
+let rafId;
+function updateLayout() {
+  adjustLayoutForKeyboard();
+  rafId = requestAnimationFrame(updateLayout);
+}
+
+if (window.visualViewport) {
+  window.visualViewport.addEventListener("resize", debouncedAdjustLayout);
+  window.visualViewport.addEventListener("scroll", debouncedAdjustLayout);
+}
+window.addEventListener("resize", debouncedAdjustLayout);
+window.addEventListener("touchstart", debouncedAdjustLayout);
+window.addEventListener("touchmove", debouncedAdjustLayout);
+input.addEventListener("focusin", () => {
+  debouncedAdjustLayout();
+  if (!rafId) rafId = requestAnimationFrame(updateLayout);
+});
+input.addEventListener("focusout", () => {
+  debouncedAdjustLayout();
+  if (rafId) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+});
+input.addEventListener("input", debouncedAdjustLayout);
+window.addEventListener("load", debouncedAdjustLayout);
 
 function addMessage(text, who){
   const div = document.createElement("div");
@@ -417,6 +961,7 @@ function addMessage(text, who){
   messagesDiv.appendChild(div);
   scrollToBottom();
   startChattingBtn.style.display = 'none';
+  debouncedAdjustLayout();
 }
 
 function showPopup(text){
@@ -429,17 +974,20 @@ function showPopup(text){
         </div>
       </div>`;
     isConnected = false;
+    startChattingBtn.style.display = 'none';
   } else if (text.includes("Connected")) {
     messagesDiv.innerHTML = `
       <div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
     isConnected = true;
+    startChattingBtn.style.display = 'none';
     setTimeout(() => { if (messagesDiv.innerHTML.includes("Connected")) messagesDiv.innerHTML = ''; }, 3000);
   } else {
     messagesDiv.innerHTML = `<div class="popup">${text}</div>`;
-    if (text.includes("disconnected")) startChattingBtn.style.display = 'block';
     isConnected = false;
+    startChattingBtn.style.display = 'none';
   }
   scrollToBottom();
+  debouncedAdjustLayout();
 }
 
 function connectStranger(){
@@ -450,97 +998,152 @@ function connectStranger(){
     try{
       const data=JSON.parse(event.data);
       if(data.type==="system"){
-        if(data.text==="waiting") showPopup("🔍 Searching for a stranger...");
+        if(data.text==="waiting") {
+          showPopup("🔍 Searching for a stranger...");
+        }
         else if(data.text==="connected") {
-            showPopup("✅ Connected! Say Hi 👋");
+          showPopup("✅ Connected! Say Hi 👋");
+          startChattingBtn.style.display = 'none';
         }
         else if(data.text==="disconnected") {
-            showPopup("❌ Stranger disconnected");
+          showPopup("❌ Stranger disconnected");
+          startChattingBtn.style.display = 'none';
         }
       }
-      if(data.type==="message"){ typingIndicator.style.display="none"; addMessage(data.text,"stranger"); }
-      if(data.type==="typing"){ typingIndicator.style.display="block"; clearTimeout(typingTimeout); typingTimeout=setTimeout(()=>{typingIndicator.style.display="none";},1500);}
+      if(data.type==="message"){ 
+        typingIndicator.style.display="none"; 
+        addMessage(data.text,"stranger"); 
+      }
+      if(data.type==="typing"){ 
+        typingIndicator.style.display="block"; 
+        clearTimeout(typingTimeout); 
+        typingTimeout=setTimeout(()=>{typingIndicator.style.display="none";},1500);
+      }
     }catch{}
   };
-  ws.onclose=()=>{showPopup("❌ Disconnected from server"); typingIndicator.style.display="none"; isConnected=false;}
+  ws.onclose=()=>{
+    showPopup("❌ Disconnected from server"); 
+    typingIndicator.style.display="none"; 
+    isConnected=false;
+    startChattingBtn.style.display = 'block';
+    debouncedAdjustLayout();
+  };
 }
 
-sendBtn.addEventListener("click", ()=>{
-  // Check if connected before sending
+const handleSend = (e) => {
+  e.preventDefault();
   if(isConnected && input.value.trim()){
     ws.send(JSON.stringify({type:"message", text:input.value}));
     addMessage(input.value,"me");
     input.value="";
     emojiPicker.style.display = "none";
     emojiToggle.textContent = "😊";
+    debouncedAdjustLayout();
   }
-});
+};
+sendBtn.addEventListener("click", handleSend);
+sendBtn.addEventListener("touchstart", handleSend);
+
+const handleNext = (e) => {
+  e.preventDefault();
+  if(ws) ws.close();
+  connectStranger();
+  debouncedAdjustLayout();
+};
+nextBtn.addEventListener("click", handleNext);
+nextBtn.addEventListener("touchstart", handleNext);
+
 input.addEventListener("input", ()=>{
   if(isConnected && ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:"typing"}));
 });
-nextBtn.addEventListener("click", ()=>{if(ws) ws.close(); connectStranger();});
 
-// Enable smooth auto scroll for chat content only
 document.body.classList.add('auto-scroll-enabled');
 
-// Auto scroll on message div changes
 const observer = new MutationObserver(() => {
   scrollToBottom();
 });
 observer.observe(messagesDiv, { childList: true, subtree: true });
 
-// Connect on load
-// initial state should just show the button
-showPopup(" ");
 startChattingBtn.style.display = 'block';
+messagesDiv.innerHTML = '';
 
-// Emoji picker
-const emojiPicker = document.getElementById("emojiPicker");
 const emojiToggle = document.getElementById("emojiToggle");
 
-// Init EmojiMart
+const handleEmojiToggle = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  const open = emojiPicker.style.display === "block" && !emojiPicker.classList.contains('emoji-picker-hidden');
+  if (open) {
+    emojiPicker.classList.remove('show');
+    setTimeout(() => {
+      emojiPicker.style.display = "none";
+      emojiPicker.classList.remove('emoji-picker-hidden');
+      emojiToggle.textContent = "😊";
+      input.focus();
+      debouncedAdjustLayout();
+    }, 300);
+  } else {
+    emojiPicker.style.display = "block";
+    setTimeout(() => {
+      emojiPicker.classList.add('show');
+      emojiToggle.textContent = "⌨️";
+      input.blur();
+      debouncedAdjustLayout();
+    }, 10);
+  }
+};
+emojiToggle.addEventListener("click", handleEmojiToggle);
+emojiToggle.addEventListener("touchstart", handleEmojiToggle);
+
 const picker = new EmojiMart.Picker({
   onEmojiSelect: e => {
     input.value += e.native;
+    debouncedAdjustLayout();
   },
   theme: document.body.classList.contains("dark-mode") ? "dark" : "light",
   previewPosition: "none",
   skinTonePosition: "none",
-  categories: ["frequent","people","nature","foods","activity","places","objects","symbols","flags"]
+  categories: ["frequent","people","nature","foods","activity","places","objects","symbols","flags"],
+  emoji: "😊"
 });
 emojiPicker.appendChild(picker);
 window._emojiPickerInstance = picker;
 
-emojiToggle.addEventListener("click", (e) => {
-  e.stopPropagation();
-  const open = emojiPicker.style.display === "block";
-  if (open) {
-    emojiPicker.style.display = "none";
-    emojiToggle.textContent = "😊";
-    input.focus();
-  } else {
-    input.blur();
-    // Use fixed height for desktop for better layout
-    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-    emojiPicker.style.height = isDesktop ? "350px" : "300px";
-    emojiPicker.style.display = "block";
-    emojiToggle.textContent = "⌨️";
-  }
-});
-
 document.addEventListener("click", (e) => {
   if (emojiPicker.style.display === "block" && !emojiPicker.contains(e.target) && e.target !== emojiToggle) {
-    emojiPicker.style.display = "none";
-    emojiToggle.textContent = "😊";
-    input.focus();
+    emojiPicker.classList.remove('show');
+    setTimeout(() => {
+      emojiPicker.style.display = "none";
+      emojiPicker.classList.remove('emoji-picker-hidden');
+      emojiToggle.textContent = "😊";
+      input.focus();
+      debouncedAdjustLayout();
+    }, 300);
+  }
+});
+document.addEventListener("touchstart", (e) => {
+  if (emojiPicker.style.display === "block" && !emojiPicker.contains(e.target) && e.target !== emojiToggle) {
+    emojiPicker.classList.remove('show');
+    setTimeout(() => {
+      emojiPicker.style.display = "none";
+      emojiPicker.classList.remove('emoji-picker-hidden');
+      emojiToggle.textContent = "😊";
+      input.focus();
+      debouncedAdjustLayout();
+    }, 300);
   }
 });
 
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && emojiPicker.style.display === "block") {
-    emojiPicker.style.display = "none";
-    emojiToggle.textContent = "😊";
-    input.focus();
+    emojiPicker.classList.remove('show');
+    setTimeout(() => {
+      emojiPicker.style.display = "none";
+      emojiPicker.classList.remove('emoji-picker-hidden');
+      emojiToggle.textContent = "😊";
+      input.focus();
+      debouncedAdjustLayout();
+    }, 300);
   }
 });
 </script>
