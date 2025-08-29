@@ -4,9 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>TikTalk - Stranger Chat</title>
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css" />
-
 <style>
 * {
   margin: 0;
@@ -173,7 +171,7 @@ footer {
   gap: 8px;
   background: #fff;
   z-index: 10000;
-  height: 56px; /* Reduced to match smaller textarea */
+  height: 56px;
   min-height: 56px;
   max-height: 56px;
   overflow: hidden !important;
@@ -191,7 +189,7 @@ body.dark-mode footer {
 }
 .footerNote {
   position: fixed;
-  bottom: calc(72px + env(safe-area-inset-bottom)); /* Adjusted for new footer height */
+  bottom: calc(72px + env(safe-area-inset-bottom));
   left: 0;
   right: 0;
   text-align: center;
@@ -204,12 +202,12 @@ body.dark-mode .footerNote {
 }
 .inputWrapper {
   flex: 1;
-  flex-grow: 5; /* Reverted to previous value for mobile */
+  flex-grow: 5;
   flex-basis: 0;
   position: relative;
   display: flex;
   align-items: center;
-  height: 40px; /* Reduced height */
+  height: 40px;
   min-height: 40px;
   max-height: 40px;
   overflow: hidden !important;
@@ -219,16 +217,16 @@ body.dark-mode .footerNote {
 textarea {
   width: 100%;
   resize: none;
-  padding: 10px 18px 10px 12px; /* Adjusted padding for smaller height */
-  border: 1px solid #ccc !important; /* Subtle border for visibility */
+  padding: 10px 18px 10px 12px;
+  border: 1px solid #ccc !important;
   border-radius: 20px;
-  font-size: 14px; /* Slightly smaller font */
+  font-size: 14px;
   outline: none;
   height: 40px;
   min-height: 40px;
-  max-height: 120px; /* Reduced max-height */
+  max-height: 120px;
   line-height: 18px;
-  background: transparent !important; /* Transparent background */
+  background: transparent !important;
   color: #0f172a;
   overflow-y: auto !important;
   box-sizing: border-box;
@@ -237,7 +235,7 @@ textarea {
   touch-action: manipulation;
 }
 body.dark-mode textarea {
-  border: 1px solid #4a5568 !important; /* Border for dark mode */
+  border: 1px solid #4a5568 !important;
   background: transparent !important;
   color: #e5e7eb;
 }
@@ -340,7 +338,7 @@ button:active {
   overflow-y: auto;
   background: transparent !important;
   border-radius: 16px;
-  z-index: 10001; /* Higher than footer */
+  z-index: 10001;
   opacity: 0;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
   will-change: transform, opacity, bottom;
@@ -352,7 +350,7 @@ button:active {
   opacity: 1;
   transform: translateY(0) scale(1);
   display: block;
-  bottom: calc(56px + 10px + env(safe-area-inset-bottom)); /* Above footer */
+  bottom: calc(10px + env(safe-area-inset-bottom));
 }
 body.dark-mode #emojiPicker {
   background: transparent !important;
@@ -383,7 +381,7 @@ body.dark-mode #emojiPicker {
   #emojiPicker.show {
     transform: translate(0, 0) scale(1);
     display: block;
-    bottom: calc(56px + 10px + env(safe-area-inset-bottom)); /* Above footer */
+    bottom: calc(10px + env(safe-area-inset-bottom));
   }
   .share-btn {
     width: 24px;
@@ -419,7 +417,7 @@ body.dark-mode #emojiPicker {
     height: 24px;
   }
   .inputWrapper {
-    flex-grow: 3; /* Reverted to previous value for desktop */
+    flex-grow: 3;
   }
 }
 @media (max-width: 767px) {
@@ -431,7 +429,7 @@ body.dark-mode #emojiPicker {
   #emojiPicker.show {
     transform: translate(0, 0) scale(1);
     display: block;
-    bottom: calc(56px + 10px + env(safe-area-inset-bottom)); /* Above footer */
+    bottom: calc(10px + env(safe-area-inset-bottom));
   }
   .share-btn {
     padding: 0;
@@ -812,7 +810,7 @@ body.dark-mode .searching-text {
 }
 .start-chatting-btn {
   position: fixed;
-  bottom: calc(100px + env(safe-area-inset-bottom));
+  bottom: calc(130px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   padding: 12px 24px;
@@ -902,7 +900,7 @@ body.dark-mode textarea::-webkit-scrollbar-thumb {
       <g transform="translate(60,70) scale(1.2)">
         <circle cx="0" cy="0" r="45" fill="url(#gBubble)"/>
         <ellipse class="eye left" cx="-12" cy="-9" rx="4.5" ry="7" fill="#fff"/>
-        <path class="eye right" d="M 8 -9 Q 12 -13 16 -9" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path class="right" d="M 8 -9 Q 12 -13 16 -9" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
         <path class="smile" d="M -10 10 Q 0 18 10 10" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>
       </g>
       <text x="120" y="70" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="#007bff" dominant-baseline="middle" alignment-baseline="middle">TikTalk</text>
@@ -934,7 +932,6 @@ body.dark-mode textarea::-webkit-scrollbar-thumb {
     </div>
   </div>
 </header>
-
 <div class="chat-wrapper">
   <main id="chat">
     <div id="messages"></div>
@@ -947,11 +944,8 @@ body.dark-mode textarea::-webkit-scrollbar-thumb {
     </div>
   </main>
 </div>
-
 <button id="startChattingBtn" class="start-chatting-btn">Start Chat</button>
-
 <p class="footerNote">Made in India <span class="heart">♥️</span></p>
-
 <footer>
   <button id="emojiToggle" aria-label="Toggle emoji picker" aria-expanded="false">😊</button>
   <div class="inputWrapper">
@@ -965,15 +959,12 @@ body.dark-mode textarea::-webkit-scrollbar-thumb {
     </button>
   </div>
 </footer>
-
 <button id="nextBtn" title="Next">
   <svg class="button-icon" viewBox="0 0 24 24" fill="white">
     <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
   </svg>
 </button>
-
 <div id="emojiPicker" aria-hidden="true"></div>
-
 <script>
 function debounce(func, wait) {
   let timeout;
@@ -982,7 +973,6 @@ function debounce(func, wait) {
     timeout = setTimeout(() => func.apply(this, args), wait);
   };
 }
-
 document.addEventListener("DOMContentLoaded", () => {
   const shareBtn = document.getElementById("shareBtn");
   if (shareBtn) {
@@ -1014,10 +1004,8 @@ document.addEventListener("DOMContentLoaded", () => {
           const picker = new EmojiMart.Picker({
             onEmojiSelect: (e) => {
               if (!emojiPicker.classList.contains('show') || document.activeElement !== input) {
-                console.log("Emoji selection ignored: picker hidden or input not focused");
                 return;
               }
-              console.log("Emoji selected:", e.native);
               input.value += e.native;
               input.focus();
               debouncedAdjustLayout();
@@ -1030,7 +1018,6 @@ document.addEventListener("DOMContentLoaded", () => {
           });
           emojiPicker.appendChild(picker);
           window._emojiPickerInstance = picker;
-          console.log("Emoji Picker Initialized Successfully");
         }
       };
       script.onerror = () => console.error("Failed to load EmojiMart");
@@ -1048,12 +1035,10 @@ document.addEventListener("DOMContentLoaded", () => {
   
   const handleEmojiToggle = (e) => {
     if (e.target !== emojiToggle || e.currentTarget !== emojiToggle) {
-      console.log("Emoji toggle ignored: not a direct click/touch on emojiToggle");
       return;
     }
     e.preventDefault();
     e.stopImmediatePropagation();
-    console.log("Emoji toggle clicked/touched");
     const isPickerOpen = emojiPicker.classList.contains('show');
     if (isPickerOpen) {
       emojiPicker.classList.remove('show');
@@ -1078,98 +1063,47 @@ document.addEventListener("DOMContentLoaded", () => {
   emojiToggle.addEventListener("click", handleEmojiToggle, { passive: false });
   emojiToggle.addEventListener("touchstart", handleEmojiToggle, { passive: false });
   
-  // Fix keyboard not opening
   const handleInputInteraction = (e) => {
     e.stopImmediatePropagation();
-    console.log(`Textarea ${e.type}:`, e.target);
-    input.focus();
   };
   input.removeEventListener("click", handleInputInteraction);
   input.removeEventListener("touchstart", handleInputInteraction);
-  input.addEventListener("click", handleInputInteraction, { passive: false });
-  input.addEventListener("touchstart", handleInputInteraction, { passive: false });
+  input.addEventListener("click", handleInputInteraction, { passive: true });
+  input.addEventListener("touchstart", handleInputInteraction, { passive: true });
   
   input.addEventListener("focus", () => {
-    console.log("Textarea focused, should open keyboard");
-  });
-  
-  footer.addEventListener("touchstart", (e) => {
-    if (e.target !== emojiToggle && e.target !== input && e.target !== document.getElementById("sendBtn")) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      console.log("Footer touched, ignored:", e.target);
-    }
-  }, { passive: false });
-  
-  document.addEventListener("touchstart", (e) => {
-    console.log("Global touchstart:", e.target);
-    if (!emojiPicker.contains(e.target) && e.target !== emojiToggle && e.target !== input && e.target !== document.getElementById("sendBtn")) {
-      if (emojiPicker.classList.contains('show')) {
-        console.log("Closing emoji picker: touch outside");
-        emojiPicker.classList.remove('show');
-        emojiPicker.style.display = 'none';
-        emojiToggle.textContent = "😊";
-        emojiToggle.setAttribute('aria-expanded', 'false');
-        wasPickerOpenBeforeKeyboard = false;
-        debouncedAdjustLayout();
-      }
-    }
-  }, { passive: false });
-  
-  document.addEventListener("click", (e) => {
-    if (emojiPicker.classList.contains('show') && !emojiPicker.contains(e.target) && e.target !== emojiToggle) {
-      console.log("Clicked outside emoji picker");
-      emojiPicker.classList.remove('show');
-      emojiPicker.style.display = 'none';
-      emojiToggle.textContent = "😊";
-      emojiToggle.setAttribute('aria-expanded', 'false');
-      wasPickerOpenBeforeKeyboard = false;
-      debouncedAdjustLayout();
-    }
-  });
-  
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && emojiPicker.classList.contains('show')) {
-      console.log("Escape key pressed");
-      emojiPicker.classList.remove('show');
-      emojiPicker.style.display = 'none';
-      emojiToggle.textContent = "😊";
-      emojiToggle.setAttribute('aria-expanded', 'false');
-      wasPickerOpenBeforeKeyboard = false;
-      input.focus();
-      debouncedAdjustLayout();
-    }
-  });
-  
-  input.addEventListener("focusin", () => {
-    console.log("Textarea focusin");
     if (emojiPicker.classList.contains('show')) {
       emojiPicker.classList.remove('show');
       emojiPicker.style.display = 'none';
       emojiToggle.textContent = "😊";
       emojiToggle.setAttribute('aria-expanded', 'false');
       wasPickerOpenBeforeKeyboard = true;
-      debouncedAdjustLayout();
     }
+    adjustLayoutForKeyboard();
+    if (!rafId) rafId = requestAnimationFrame(updateLayout);
   });
   
-  input.addEventListener("focusout", () => {
-    console.log("Textarea focusout");
+  input.addEventListener("blur", () => {
+    setTimeout(() => {
+      const isStillFocused = document.activeElement === input || document.activeElement === emojiToggle;
+      if (!isStillFocused) {
+        adjustLayoutForKeyboard();
+      }
+    }, 50);
     if (wasPickerOpenBeforeKeyboard) {
       emojiPicker.classList.add('show');
       emojiPicker.style.display = 'block';
       emojiToggle.textContent = "⌨️";
       emojiToggle.setAttribute('aria-expanded', 'true');
-      debouncedAdjustLayout();
+    }
+    if (rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
     }
   });
-
-  const smileElement = document.querySelector('.smile');
-  if (smileElement) {
-    // No animations or hover effects
-  }
-});
   
+  input.addEventListener("input", debouncedAdjustLayout);
+});
 const themeToggle = document.getElementById("themeToggle");
 const handleThemeToggle = (e) => {
   e.preventDefault();
@@ -1184,16 +1118,13 @@ const handleThemeToggle = (e) => {
 };
 themeToggle.addEventListener("click", handleThemeToggle);
 themeToggle.addEventListener("touchstart", handleThemeToggle, { passive: false });
-  
 const shareBtn = document.getElementById("shareBtn");
 const shareSheet = document.getElementById("shareSheet");
 const startChattingBtn = document.getElementById("startChattingBtn");
 const nextBtn = document.getElementById("nextBtn");
-  
 const handleShareBtn = (e) => {
   e.preventDefault();
   e.stopImmediatePropagation();
-  console.log("Share button clicked/touched");
   const btnRect = shareBtn.getBoundingClientRect();
   shareSheet.style.top = (btnRect.bottom + window.scrollY) + "px";
   shareSheet.style.right = (window.innerWidth - btnRect.right) + "px";
@@ -1203,7 +1134,6 @@ const handleShareBtn = (e) => {
 };
 shareBtn.addEventListener("click", handleShareBtn);
 shareBtn.addEventListener("touchstart", handleShareBtn, { passive: false });
-  
 document.addEventListener("click", (e) => {
   if(!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')){
     shareSheet.classList.remove('show');
@@ -1216,13 +1146,10 @@ document.addEventListener("touchstart", (e) => {
     setTimeout(()=>{shareSheet.style.display='none';},300);
   }
 });
-  
 let hasStartedChat = false;
-  
 const handleStartChatting = (e) => {
   e.preventDefault();
   e.stopImmediatePropagation();
-  console.log("Start chatting clicked/touched");
   if(ws) ws.close();
   hasStartedChat = true;
   startChattingBtn.style.display = 'none';
@@ -1230,7 +1157,6 @@ const handleStartChatting = (e) => {
 };
 startChattingBtn.addEventListener("click", handleStartChatting);
 startChattingBtn.addEventListener("touchstart", handleStartChatting, { passive: false });
-  
 function shareApp(platform){
   let url = window.location.href;
   if(platform==="whatsapp") window.open("https://wa.me/?text="+encodeURIComponent(url),"_blank");
@@ -1250,22 +1176,17 @@ function showCopyPopup(message){
   popup.id = "copyLinkPopup";
   popup.textContent = message;
   document.body.appendChild(popup);
-  
   const shareBtnRect = shareBtn.getBoundingClientRect();
   const sheetRect = shareSheet.getBoundingClientRect();
-  
   popup.style.top = (sheetRect.bottom + window.scrollY + 10) + "px";
   popup.style.right = (window.innerWidth - sheetRect.right) + "px";
   popup.style.transform = 'translateY(-10px)';
-  
   void popup.offsetWidth;
   popup.classList.add('show');
-  
   setTimeout(()=>{
     popup.classList.remove('show');
   },2000);
 }
-  
 function scrollToBottom() {
   const chatDiv = document.getElementById("chat");
   const isNearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 100;
@@ -1273,7 +1194,6 @@ function scrollToBottom() {
     chatDiv.scrollTop = chatDiv.scrollHeight;
   }
 }
-  
 window.TIKTALK_BACKEND = "https://tiktalk-server-8dmz.onrender.com";
 const messagesDiv = document.getElementById("messages");
 const input = document.getElementById("messageInput");
@@ -1285,9 +1205,7 @@ let ws, typingTimeout;
 let isConnected = false;
 let reconnectAttempts = 0;
 const maxReconnectAttempts = 5;
-  
 let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
-  
 function adjustLayoutForKeyboard() {
   const header = document.querySelector("header");
   const chatDiv = document.getElementById("chat");
@@ -1299,44 +1217,33 @@ function adjustLayoutForKeyboard() {
   const headerHeight = header.offsetHeight || 70;
   let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)') || '0', 10);
   let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
-  
-  const isKeyboardOpen = input === document.activeElement;
+  const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
   const isEmojiPickerOpen = emojiPicker.classList.contains('show');
-  
   let keyboardHeight = 0;
-  let keyboardBottom = 0;
-  
-  if (window.visualViewport) {
+  if ('virtualKeyboard' in navigator) {
+    keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
+  } else if (window.visualViewport) {
     const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
     const windowBottom = window.innerHeight;
-    keyboardHeight = windowBottom - visualViewportBottom;
-    if (keyboardHeight > 0) {
-      keyboardBottom = keyboardHeight;
-    }
-  } else if ('virtualKeyboard' in navigator) {
-    keyboardBottom = navigator.virtualKeyboard.boundingRect.height || 0;
+    keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
   }
-  
-  if (keyboardBottom > 0) {
-    lastKeyboardHeight = Math.max(keyboardBottom, 300);
+  if (keyboardHeight > 0) {
+    lastKeyboardHeight = Math.max(keyboardHeight, 300);
     localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
-  } else {
+  } else if (!isKeyboardOpen && !isEmojiPickerOpen) {
     lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
   }
-  
   document.documentElement.style.setProperty('--keyboard-height', `${lastKeyboardHeight}px`);
   document.documentElement.style.setProperty('--emoji-picker-height', `${lastKeyboardHeight}px`);
-  
   const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-  
+  const emojiPickerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--emoji-picker-height')) || 350;
   if (isKeyboardOpen) {
-    footer.style.top = 'auto';
-    footer.style.bottom = `${keyboardBottom}px`;
-    chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardBottom}px)`;
-    footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardBottom}px)`;
-    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardBottom}px + 30px)`;
-    nextBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardBottom}px + 30px)`;
-    
+    footer.style.transition = 'bottom 0.3s ease';
+    footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
+    chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
+    footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
+    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 60px)`;
+    nextBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 30px)`;
     if (emojiPicker.classList.contains('show')) {
       emojiPicker.classList.remove('show');
       emojiPicker.style.display = 'none';
@@ -1344,64 +1251,75 @@ function adjustLayoutForKeyboard() {
       document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
     }
   } else if (isEmojiPickerOpen) {
-    footer.style.top = 'auto';
-    footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
-    chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${lastKeyboardHeight}px + ${safeAreaBottom}px + 10px)`;
-    footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
-    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 30px + ${safeAreaBottom}px)`;
-    nextBtn.style.bottom = `calc(${footer.offsetHeight}px + 30px + ${safeAreaBottom}px)`;
-    emojiPicker.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px)`;
+    footer.style.transition = 'bottom 0.3s ease';
+    footer.style.bottom = `calc(${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+    chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+    footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 60px)`;
+    nextBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 30px)`;
+    emojiPicker.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
   } else {
-    footer.style.top = 'auto';
+    footer.style.transition = 'none';
     footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
     chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
     footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
-    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 30px + ${safeAreaBottom}px)`;
+    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 60px + ${safeAreaBottom}px)`;
     nextBtn.style.bottom = `calc(${footer.offsetHeight}px + 30px + ${safeAreaBottom}px)`;
-    emojiPicker.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px)`;
+    emojiPicker.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
+    footer.offsetHeight;
+    setTimeout(() => {
+      footer.style.transition = 'bottom 0.3s ease';
+    }, 0);
   }
-  
+  footer.style.position = 'fixed';
   footer.style.transform = 'none';
   footer.style.height = isDesktop ? "56px" : "56px";
-  
   chatDiv.style.marginTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
   chatDiv.style.height = `calc(100vh - ${headerHeight}px - ${safeAreaBottom}px)`;
-  
   requestAnimationFrame(() => {
     footer.offsetHeight;
     scrollToBottom();
   });
 }
-  
 const debouncedAdjustLayout = debounce(adjustLayoutForKeyboard, 50);
-  
 let rafId;
 function updateLayout() {
   adjustLayoutForKeyboard();
   rafId = requestAnimationFrame(updateLayout);
 }
-  
 if (window.visualViewport && !('virtualKeyboard' in navigator)) {
-  window.visualViewport.addEventListener("resize", debouncedAdjustLayout);
+  window.visualViewport.addEventListener("resize", () => {
+    const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
+    const windowBottom = window.innerHeight;
+    const keyboardHeight = windowBottom - visualViewportBottom;
+    if (keyboardHeight === 0 && document.activeElement !== document.getElementById("messageInput")) {
+      adjustLayoutForKeyboard();
+    } else {
+      debouncedAdjustLayout();
+    }
+  });
   window.visualViewport.addEventListener("scroll", debouncedAdjustLayout);
 }
+// Fallback interval to check keyboard state
+setInterval(() => {
+  const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
+  const isEmojiPickerOpen = document.getElementById("emojiPicker").classList.contains('show');
+  let keyboardHeight = 0;
+  if ('virtualKeyboard' in navigator) {
+    keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
+  } else if (window.visualViewport) {
+    const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
+    const windowBottom = window.innerHeight;
+    keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
+  }
+  if (!isKeyboardOpen && keyboardHeight === 0 && !isEmojiPickerOpen) {
+    adjustLayoutForKeyboard();
+  }
+}, 500);
 window.addEventListener("resize", debouncedAdjustLayout);
 window.addEventListener("touchstart", debouncedAdjustLayout);
 window.addEventListener("touchmove", debouncedAdjustLayout);
-input.addEventListener("focusin", () => {
-  debouncedAdjustLayout();
-  if (!rafId) rafId = requestAnimationFrame(updateLayout);
-});
-input.addEventListener("focusout", () => {
-  debouncedAdjustLayout();
-  if (rafId) {
-    cancelAnimationFrame(rafId);
-    rafId = null;
-  }
-});
-input.addEventListener("input", debouncedAdjustLayout);
 window.addEventListener("load", debouncedAdjustLayout);
-  
 function addMessage(text, who) {
   const fragment = document.createDocumentFragment();
   const div = document.createElement("div");
@@ -1413,7 +1331,6 @@ function addMessage(text, who) {
   startChattingBtn.style.display = 'none';
   debouncedAdjustLayout();
 }
-  
 function showPopup(text) {
   if (text.includes("Searching")) {
     messagesDiv.innerHTML = `
@@ -1442,7 +1359,6 @@ function showPopup(text) {
   scrollToBottom();
   debouncedAdjustLayout();
 }
-  
 function connectStranger() {
   showPopup("🔍 Searching for a stranger...");
   typingIndicator.style.display = "none";
@@ -1498,11 +1414,9 @@ function connectStranger() {
     ws.close();
   };
 }
-  
 const handleSend = (e) => {
   e.preventDefault();
   e.stopImmediatePropagation();
-  console.log("Send button clicked/touched");
   if(isConnected && input.value.trim()){
     ws.send(JSON.stringify({type:"message", text:input.value}));
     addMessage(input.value,"me");
@@ -1517,29 +1431,23 @@ const handleSend = (e) => {
 };
 sendBtn.addEventListener("click", handleSend);
 sendBtn.addEventListener("touchstart", handleSend, { passive: false });
-  
 const handleNext = (e) => {
   e.preventDefault();
   e.stopImmediatePropagation();
-  console.log("Next button clicked/touched");
   if(ws) ws.close();
   connectStranger();
   debouncedAdjustLayout();
 };
 nextBtn.addEventListener("click", handleNext);
 nextBtn.addEventListener("touchstart", handleNext, { passive: false });
-  
 input.addEventListener("input", ()=>{
   if(isConnected && ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:"typing"}));
 });
-  
 document.body.classList.add('auto-scroll-enabled');
-  
 const observer = new MutationObserver(() => {
   scrollToBottom();
 });
 observer.observe(messagesDiv, { childList: true, subtree: true });
-  
 startChattingBtn.style.display = 'block';
 messagesDiv.innerHTML = '';
 </script>
