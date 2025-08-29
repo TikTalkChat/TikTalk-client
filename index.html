@@ -31,6 +31,7 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
+  overscroll-behavior-y: none;
 }
 body.dark-mode {
   background: #0b0f15;
@@ -38,21 +39,23 @@ body.dark-mode {
 }
 header {
   position: fixed !important;
-  top: env(safe-area-inset-top, 0);
+  top: env(safe-area-inset-top);
   left: 0;
   right: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 15px;
+  padding: 8px 10px;
   background: #fff;
-  border-bottom: 1px solid #ddd;
-  z-index: 10001;
+  z-index: 10003;
   width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  border-radius: 0 0 16px 16px;
 }
 body.dark-mode header {
   background: #10161d;
-  border-color: #374151;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.3);
 }
 header .left, header .right {
   display: flex;
@@ -60,7 +63,7 @@ header .left, header .right {
   gap: 8px;
 }
 header svg.logo {
-  height: 50px;
+  height: 60px;
   width: auto;
   display: block;
 }
@@ -78,7 +81,7 @@ header svg.logo {
   overflow-y: auto;
   overscroll-behavior: contain;
   contain: strict;
-  padding: calc(70px + env(safe-area-inset-top, 0)) 15px calc(150px + env(safe-area-inset-bottom, 0));
+  padding: calc(70px + env(safe-area-inset-top)) 15px calc(70px + env(safe-area-inset-bottom));
   -webkit-overflow-scrolling: touch;
 }
 #messages {
@@ -150,6 +153,7 @@ body.dark-mode #typingIndicator {
   border-radius: 50%;
   background: linear-gradient(45deg, #007bff, #00eaff);
   animation: typingBounce 1.2s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 .typing-dot:nth-child(1) { animation-delay: 0s; }
 .typing-dot:nth-child(2) { animation-delay: 0.2s; }
@@ -160,28 +164,34 @@ body.dark-mode #typingIndicator {
 }
 footer {
   position: fixed !important;
-  bottom: env(safe-area-inset-bottom, 0);
-  left: 0;
-  right: 0;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  left: 8px;
+  right: 8px;
   display: flex;
   align-items: center;
-  padding: 8px;
-  border-top: 1px solid #ddd;
-  gap: 6px;
+  padding: 6px;
+  gap: 8px;
   background: #fff;
   z-index: 10000;
-  min-height: 50px;
+  height: 56px; /* Reduced to match smaller textarea */
+  min-height: 56px;
+  max-height: 56px;
+  overflow: hidden !important;
+  -webkit-overflow-scrolling: none;
+  contain: strict;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  border-radius: 35px;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  transition: bottom 0.3s ease;
 }
 body.dark-mode footer {
   background: #10161d;
-  border-color: #374151;
-}
-footer.footer-above-picker {
-  z-index: 1000001;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.3);
 }
 .footerNote {
   position: fixed;
-  bottom: calc(60px + env(safe-area-inset-bottom, 0));
+  bottom: calc(72px + env(safe-area-inset-bottom)); /* Adjusted for new footer height */
   left: 0;
   right: 0;
   text-align: center;
@@ -194,44 +204,71 @@ body.dark-mode .footerNote {
 }
 .inputWrapper {
   flex: 1;
+  flex-grow: 5; /* Reverted to previous value for mobile */
+  flex-basis: 0;
   position: relative;
   display: flex;
   align-items: center;
+  height: 40px; /* Reduced height */
+  min-height: 40px;
+  max-height: 40px;
+  overflow: hidden !important;
+  box-sizing: border-box;
+  background: transparent !important;
 }
 textarea {
   width: 100%;
   resize: none;
-  padding: 10px 44px 10px 44px;
-  border: 1px solid #ccc;
+  padding: 10px 18px 10px 12px; /* Adjusted padding for smaller height */
+  border: 1px solid #ccc !important; /* Subtle border for visibility */
   border-radius: 20px;
-  font-size: 15px;
+  font-size: 14px; /* Slightly smaller font */
   outline: none;
   height: 40px;
-  background: #fff;
+  min-height: 40px;
+  max-height: 120px; /* Reduced max-height */
+  line-height: 18px;
+  background: transparent !important; /* Transparent background */
   color: #0f172a;
+  overflow-y: auto !important;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  z-index: 10002;
+  touch-action: manipulation;
 }
 body.dark-mode textarea {
-  background: #1f2937;
+  border: 1px solid #4a5568 !important; /* Border for dark mode */
+  background: transparent !important;
   color: #e5e7eb;
-  border-color: #374151;
 }
 #emojiToggle {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: transparent;
   border: none;
   font-size: 20px;
   cursor: pointer;
   line-height: 1;
-  width: 24px;
-  height: 24px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   -webkit-tap-highlight-color: transparent !important;
-  z-index: 10001;
+  z-index: 10000;
+  overflow: hidden;
+  pointer-events: auto;
+  touch-action: manipulation;
+  margin-right: 8px;
+  color: #0f172a;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+body.dark-mode #emojiToggle {
+  color: #e5e7eb;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+#emojiToggle:hover, #emojiToggle:active, #emojiToggle:focus {
+  background: transparent !important;
+  box-shadow: none !important;
 }
 button {
   padding: 0 14px;
@@ -248,79 +285,254 @@ button {
   align-items: center;
   justify-content: center;
   z-index: 10001;
+  touch-action: manipulation;
 }
 button:active {
   opacity: 0.85;
 }
-#sendBtn, #nextBtn {
-  width: 40px;
-  height: 40px;
+#sendBtn {
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   padding: 0;
+  background: #007bff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  overflow: hidden;
+  margin-left: 8px;
+  box-shadow: 0 2px 8px rgba(0,123,255,0.4);
 }
-#sendBtn {
-  order: 3;
+#sendBtn svg {
+  width: 22px;
+  height: 22px;
 }
 #nextBtn {
-  order: 0;
+  position: fixed;
+  bottom: calc(100px + env(safe-area-inset-bottom));
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  padding: 0;
   background: #ff3b30;
-  margin-right: auto;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10002;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(255,59,48,0.4);
+}
+#nextBtn svg {
+  width: 24px;
+  height: 24px;
 }
 #emojiPicker {
   position: fixed;
-  bottom: calc(60px + env(safe-area-inset-bottom, 0));
-  left: 0;
-  right: 0;
-  z-index: 1000000;
-  display: none;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  width: 100%;
+  left: 8px;
+  right: 8px;
+  margin: 0 auto;
+  width: calc(100% - 16px);
+  max-width: 400px;
+  height: var(--emoji-picker-height, 350px);
   max-height: 50vh;
+  overflow-y: auto;
+  background: transparent !important;
+  border-radius: 16px;
+  z-index: 10001; /* Higher than footer */
   opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  will-change: opacity, transform;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  will-change: transform, opacity, bottom;
+  display: none;
+  transform: translateY(30px) scale(0.98);
+  bottom: calc(10px + env(safe-area-inset-bottom));
 }
 #emojiPicker.show {
-  display: block;
   opacity: 1;
-  transform: translateY(0);
-}
-#emojiPicker.emoji-picker-hidden {
-  z-index: 9999;
-  display: none !important;
+  transform: translateY(0) scale(1);
+  display: block;
+  bottom: calc(56px + 10px + env(safe-area-inset-bottom)); /* Above footer */
 }
 body.dark-mode #emojiPicker {
-  background: rgba(31, 41, 55, 0.95);
-  border-top-color: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: transparent !important;
+}
+.emoji-mart {
+  width: 100% !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+  font-family: "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", sans-serif !important;
+  box-sizing: border-box !important;
+  border-radius: 16px;
+  background: transparent !important;
+}
+.emoji-mart-scroll {
+  overflow-y: auto !important;
+  height: auto !important;
 }
 @media (min-width: 768px) {
   #emojiPicker {
-    position: fixed;
-    bottom: calc(70px + env(safe-area-inset-bottom, 0));
-    right: 15px;
-    width: 350px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-    transform: translateY(15px);
+    width: 360px;
+    left: auto;
+    right: 8px;
+    height: var(--emoji-picker-height, 350px);
+    max-height: 350px;
+    transform: translate(0, 30px) scale(0.98);
+    bottom: calc(10px + env(safe-area-inset-bottom));
   }
   #emojiPicker.show {
-    transform: translateY(0);
+    transform: translate(0, 0) scale(1);
+    display: block;
+    bottom: calc(56px + 10px + env(safe-area-inset-bottom)); /* Above footer */
   }
-  body.dark-mode #emojiPicker {
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  .share-btn {
+    width: 24px;
+    height: 24px;
+  }
+  .share-btn svg.button-icon {
+    width: 12px;
+    height: 12px;
+  }
+  .right {
+    gap: 8px;
+    padding-right: 10px;
+  }
+  textarea {
+    padding: 10px 18px 10px 12px;
+  }
+  #sendBtn {
+    width: 46px;
+    height: 46px;
+  }
+  #sendBtn svg {
+    width: 22px;
+    height: 22px;
+  }
+  #nextBtn {
+    width: 50px;
+    height: 50px;
+    right: 20px;
+    bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+  #nextBtn svg {
+    width: 24px;
+    height: 24px;
+  }
+  .inputWrapper {
+    flex-grow: 3; /* Reverted to previous value for desktop */
   }
 }
-.icon-btn, .share-btn {
-  border-radius: 8px;
-  height: 36px;
+@media (max-width: 767px) {
+  #emojiPicker {
+    height: var(--emoji-picker-height, 350px) !important;
+    max-height: 50vh !important;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+  }
+  #emojiPicker.show {
+    transform: translate(0, 0) scale(1);
+    display: block;
+    bottom: calc(56px + 10px + env(safe-area-inset-bottom)); /* Above footer */
+  }
+  .share-btn {
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    position: relative;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10005;
+    visibility: visible;
+    opacity: 1;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  }
+  .share-btn svg.button-icon {
+    width: 12px;
+    height: 12px;
+  }
+  .right {
+    gap: 6px;
+    padding-right: 8px;
+  }
+  header {
+    padding: 6px 8px;
+  }
+  textarea {
+    padding: 10px 18px 10px 12px;
+  }
+  #sendBtn {
+    width: 46px;
+    height: 46px;
+  }
+  #sendBtn svg {
+    width: 22px;
+    height: 22px;
+  }
+  #nextBtn {
+    width: 46px;
+    height: 46px;
+    right: 15px;
+    bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+  #nextBtn svg {
+    width: 22px;
+    height: 22px;
+  }
+}
+@media (max-width: 480px) {
+  .msg {
+    max-width: 85%;
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+  footer {
+    padding: 6px;
+    height: 56px;
+    min-height: 56px;
+    max-height: 56px;
+    left: 8px;
+    right: 8px;
+    border-radius: 32px;
+  }
+  .inputWrapper {
+    height: 40px;
+    min-height: 40px;
+    max-height: 40px;
+  }
+  textarea {
+    height: 40px;
+    min-height: 40px;
+    max-height: 120px;
+    font-size: 14px;
+    padding: 10px 18px 10px 12px;
+  }
+  #emojiToggle {
+    font-size: 18px;
+    width: 44px;
+    height: 44px;
+  }
+  #nextBtn {
+    width: 44px;
+    height: 44px;
+    right: 12px;
+    bottom: calc(100px + env(safe-area-inset-bottom));
+  }
+  #nextBtn svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  font-size: 20px;
+  border-radius: 50%;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.2s;
@@ -328,62 +540,95 @@ body.dark-mode #emojiPicker {
   align-items: center;
   justify-content: center;
   z-index: 10001;
-}
-.icon-btn {
-  width: 36px;
-  background: transparent;
+  touch-action: manipulation;
+  background: transparent !important;
   border: none;
-  font-size: 18px;
+  box-shadow: none !important;
 }
 .icon-btn:active {
   transform: scale(0.95);
 }
 .share-btn {
   padding: 0;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  width: 36px;
-  height: 36px;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
   position: relative;
   color: #fff;
   display: flex !important;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
-  z-index: 10003;
-  visibility: visible !important;
-  opacity: 1 !important;
-  overflow: visible;
+  z-index: 10005;
+  visibility: visible;
+  opacity: 1;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.share-btn svg.button-icon {
+  width: 12px;
+  height: 12px;
 }
 .share-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
   transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 body.dark-mode .share-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-color: rgba(255,255,255,0.5);
 }
 body.dark-mode .share-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
-}
-.share-btn svg {
-  fill: #fff !important;
-  width: 20px;
-  height: 20px;
+  border-color: rgba(255,255,255,0.7);
+  box-shadow: 0 4px 12px rgba(255,255,255,0.2);
 }
 .right {
   position: relative;
   display: flex !important;
   align-items: center;
   gap: 8px;
-  z-index: 10002;
+  z-index: 10004;
+  padding-right: 10px;
+}
+.share-animation {
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10006;
+  pointer-events: none;
+}
+.share-animation::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 50%;
+  padding: 2px;
+  background: linear-gradient(45deg, #00eaff, #007bff, #6a00ff, #00eaff);
+  background-size: 300% 300%;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: shareBorderAnimation 3s ease infinite;
+}
+@keyframes shareBorderAnimation {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 .share-sheet {
   position: absolute;
-  top: calc(100% + env(safe-area-inset-top, 0));
+  top: calc(100% + env(safe-area-inset-top));
   right: 0;
   background: #fff !important;
   border-radius: 12px;
@@ -392,7 +637,7 @@ body.dark-mode .share-btn:hover {
   display: none;
   flex-direction: row;
   gap: 12px;
-  z-index: 9998;
+  z-index: 10006;
   margin-top: 5px;
   transform: translateY(-10px);
   opacity: 0;
@@ -476,7 +721,7 @@ button:focus-visible, .icon-btn:focus-visible,
   font-weight: 600;
   opacity: 0;
   transition: opacity 0.3s ease;
-  z-index: 9999;
+  z-index: 10007;
   pointer-events: none;
   color: #fff;
   background: #007bff;
@@ -491,34 +736,22 @@ body.dark-mode #copyLinkPopup {
   color: #fff;
   box-shadow: 0 4px 12px rgba(0,0,0,0.4);
 }
-.bubble {
-  transform-origin: 50% 50%;
-  animation: bubblePulse 3.6s ease-in-out infinite, bubbleRotate 8s linear infinite;
+.bubble, .typing-dot, .pulse-dot {
+  will-change: transform, opacity;
 }
 .eye {
   transform-origin: center;
-  animation: eyePop 2s ease-in-out infinite;
+  animation: blink 4s infinite;
+}
+@keyframes blink {
+  0%, 95% { opacity: 1; }
+  96%, 98% { opacity: 0.1; }
+  99%, 100% { opacity: 1; }
 }
 .smile {
-  animation: smileJelly 2.6s cubic-bezier(0.25,0.9,0.3,1) infinite;
-}
-@keyframes bubblePulse {
-  0%,100% {transform: scale(1);}
-  50% {transform: scale(1.05);}
-}
-@keyframes bubbleRotate {
-  0% {transform: rotate(-1deg);}
-  50% {transform: rotate(1deg);}
-  100% {transform: rotate(-1deg);}
-}
-@keyframes eyePop {
-  0%,100% {transform: translateY(0); opacity: 1;}
-  40%,60% {transform: translateY(-20px); opacity: 0;}
-}
-@keyframes smileJelly {
-  0%,100% {transform: translateY(0);}
-  40% {transform: translateY(2px) scaleY(0.95);}
-  70% {transform: translateY(-1px) scaleY(1.05);}
+  transform-origin: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 .searching-container {
   display: flex;
@@ -538,6 +771,7 @@ body.dark-mode #copyLinkPopup {
   border-radius: 50%;
   background: linear-gradient(45deg,#00eaff,#6a00ff);
   animation: pulse 1.5s ease-in-out infinite;
+  will-change: transform, opacity;
 }
 .pulse-dot:nth-child(1) {animation-delay: 0s;}
 .pulse-dot:nth-child(2) {animation-delay: 0.2s;}
@@ -578,7 +812,7 @@ body.dark-mode .searching-text {
 }
 .start-chatting-btn {
   position: fixed;
-  bottom: calc(90px + env(safe-area-inset-bottom, 0));
+  bottom: calc(100px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   padding: 12px 24px;
@@ -606,11 +840,11 @@ body.dark-mode .start-chatting-btn {
 .start-chatting-btn:hover {
   animation: none;
   box-shadow: 0 4px 20px rgba(0,123,255,0.8);
-  transform: translateX(-50%) scale(1.05);
+  transform: translateX(-50%) scale(1);
 }
 .button-icon {
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -618,18 +852,39 @@ body.dark-mode .start-chatting-btn {
 .auto-scroll-enabled #messages {
   scroll-behavior: smooth;
 }
-.emoji-mart, .emoji-mart * {
-  font-family: "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", sans-serif !important;
+footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
-.emoji-mart {
-  font-weight: normal !important;
+.inputWrapper {
+  border: none !important;
+  box-shadow: none !important;
+}
+.footer-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+textarea::-webkit-scrollbar {
+  width: 4px;
+}
+textarea::-webkit-scrollbar-track {
+  background: transparent;
+}
+textarea::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 2px;
+}
+body.dark-mode textarea::-webkit-scrollbar-thumb {
+  background: #555;
 }
 </style>
 </head>
 <body>
 <header>
   <div class="left">
-    <svg class="logo" width="auto" height="50" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TikTalk animated logo">
+    <svg class="logo" width="auto" height="60" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TikTalk animated logo">
       <defs>
         <linearGradient id="gBubble" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stop-color="#00eaff">
@@ -644,24 +899,27 @@ body.dark-mode .start-chatting-btn {
           <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-      <g transform="translate(60,70)">
-        <g class="bubble">
-          <circle cx="0" cy="0" r="45" fill="url(#gBubble)"/>
-          <ellipse class="eye left" cx="-12" cy="-7" rx="4.5" ry="7" fill="#fff"/>
-          <path class="eye right" d="M 8 -7 Q 12 -11 16 -7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
-          <path class="smile" d="M -15 8 Q 0 22 15 8" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/>
-        </g>
-        <text x="70" y="20" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="#007bff">TikTalk</text>
+      <g transform="translate(60,70) scale(1.2)">
+        <circle cx="0" cy="0" r="45" fill="url(#gBubble)"/>
+        <ellipse class="eye left" cx="-12" cy="-9" rx="4.5" ry="7" fill="#fff"/>
+        <path class="eye right" d="M 8 -9 Q 12 -13 16 -9" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path class="smile" d="M -10 10 Q 0 18 10 10" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>
       </g>
+      <text x="120" y="70" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="#007bff" dominant-baseline="middle" alignment-baseline="middle">TikTalk</text>
     </svg>
   </div>
   <div class="right">
     <button id="themeToggle" class="icon-btn">🌙</button>
-    <button id="shareBtn" class="share-btn">
-      <svg class="button-icon" viewBox="0 0 24 24" fill="white">
-        <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.70s-.04-.47-.09-.70l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.70L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-      </svg>
-    </button>
+    <div style="position: relative;">
+      <button id="shareBtn" class="share-btn">
+        <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+          <path d="M18 8l-8 8-8-8"/>
+          <animate attributeName="stroke" values="#007bff;#00eaff;#6a00ff;#007bff" dur="3s" repeatCount="indefinite"/>
+          <animate attributeName="transform" values="scale(1);scale(1.1);scale(1)" dur="1.5s" repeatCount="indefinite"/>
+        </svg>
+      </button>
+      <div class="share-animation"></div>
+    </div>
     <div class="share-sheet" id="shareSheet">
       <button onclick="shareApp('whatsapp')"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></button>
       <button onclick="shareApp('instagram')"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram"></button>
@@ -695,32 +953,226 @@ body.dark-mode .start-chatting-btn {
 <p class="footerNote">Made in India <span class="heart">♥️</span></p>
 
 <footer>
-  <button id="nextBtn" title="Next">
-    <svg class="button-icon" viewBox="0 0 24 24" fill="white">
-      <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
-    </svg>
-  </button>
-
+  <button id="emojiToggle" aria-label="Toggle emoji picker" aria-expanded="false">😊</button>
   <div class="inputWrapper">
-    <button id="emojiToggle" aria-label="Emoji">😊</button>
     <textarea id="messageInput" placeholder="Type a message..."></textarea>
   </div>
-
-  <button id="sendBtn" title="Send">
-    <svg class="button-icon" viewBox="0 0 24 24" fill="white">
-      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-    </svg>
-  </button>
+  <div class="footer-buttons">
+    <button id="sendBtn" title="Send">
+      <svg class="button-icon" viewBox="0 0 24 24" fill="white">
+        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+      </svg>
+    </button>
+  </div>
 </footer>
+
+<button id="nextBtn" title="Next">
+  <svg class="button-icon" viewBox="0 0 24 24" fill="white">
+    <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
+  </svg>
+</button>
 
 <div id="emojiPicker" aria-hidden="true"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
-
 <script>
-// Theme toggle
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const shareBtn = document.getElementById("shareBtn");
+  if (shareBtn) {
+    shareBtn.style.display = "flex";
+    shareBtn.style.visibility = "visible";
+    shareBtn.style.opacity = "1";
+  } else {
+    console.error("Share Button not found in DOM!");
+  }
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme === "dark") {
+    document.body.classList.add("dark-mode");
+    themeToggle.textContent = "☀️";
+  }
+  
+  if ('virtualKeyboard' in navigator) {
+    navigator.virtualKeyboard.overlaysContent = true;
+    navigator.virtualKeyboard.addEventListener('geometrychange', debouncedAdjustLayout);
+  }
+  
+  function initializeEmojiPicker() {
+    const emojiPicker = document.getElementById("emojiPicker");
+    const input = document.getElementById("messageInput");
+    if (!window._emojiPickerInstance) {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js";
+      script.onload = () => {
+        if (window.EmojiMart) {
+          const picker = new EmojiMart.Picker({
+            onEmojiSelect: (e) => {
+              if (!emojiPicker.classList.contains('show') || document.activeElement !== input) {
+                console.log("Emoji selection ignored: picker hidden or input not focused");
+                return;
+              }
+              console.log("Emoji selected:", e.native);
+              input.value += e.native;
+              input.focus();
+              debouncedAdjustLayout();
+            },
+            theme: document.body.classList.contains("dark-mode") ? "dark" : "light",
+            previewPosition: "none",
+            skinTonePosition: "search",
+            categories: ["frequent", "people", "nature", "foods", "activity", "places", "objects", "symbols", "flags"],
+            emoji: "😊"
+          });
+          emojiPicker.appendChild(picker);
+          window._emojiPickerInstance = picker;
+          console.log("Emoji Picker Initialized Successfully");
+        }
+      };
+      script.onerror = () => console.error("Failed to load EmojiMart");
+      document.head.appendChild(script);
+    }
+  }
+  
+  initializeEmojiPicker();
+  
+  const emojiToggle = document.getElementById("emojiToggle");
+  const emojiPicker = document.getElementById("emojiPicker");
+  const input = document.getElementById("messageInput");
+  const footer = document.querySelector("footer");
+  let wasPickerOpenBeforeKeyboard = false;
+  
+  const handleEmojiToggle = (e) => {
+    if (e.target !== emojiToggle || e.currentTarget !== emojiToggle) {
+      console.log("Emoji toggle ignored: not a direct click/touch on emojiToggle");
+      return;
+    }
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    console.log("Emoji toggle clicked/touched");
+    const isPickerOpen = emojiPicker.classList.contains('show');
+    if (isPickerOpen) {
+      emojiPicker.classList.remove('show');
+      emojiPicker.style.display = 'none';
+      emojiToggle.textContent = "😊";
+      emojiToggle.setAttribute('aria-expanded', 'false');
+      wasPickerOpenBeforeKeyboard = false;
+      input.focus();
+    } else {
+      emojiPicker.classList.add('show');
+      emojiPicker.style.display = 'block';
+      emojiToggle.textContent = "⌨️";
+      emojiToggle.setAttribute('aria-expanded', 'true');
+      input.blur();
+    }
+    debouncedAdjustLayout();
+  };
+  
+  emojiToggle.removeEventListener("click", handleEmojiToggle);
+  emojiToggle.removeEventListener("touchstart", handleEmojiToggle);
+  emojiToggle.removeEventListener("pointerdown", handleEmojiToggle);
+  emojiToggle.addEventListener("click", handleEmojiToggle, { passive: false });
+  emojiToggle.addEventListener("touchstart", handleEmojiToggle, { passive: false });
+  
+  // Fix keyboard not opening
+  const handleInputInteraction = (e) => {
+    e.stopImmediatePropagation();
+    console.log(`Textarea ${e.type}:`, e.target);
+    input.focus();
+  };
+  input.removeEventListener("click", handleInputInteraction);
+  input.removeEventListener("touchstart", handleInputInteraction);
+  input.addEventListener("click", handleInputInteraction, { passive: false });
+  input.addEventListener("touchstart", handleInputInteraction, { passive: false });
+  
+  input.addEventListener("focus", () => {
+    console.log("Textarea focused, should open keyboard");
+  });
+  
+  footer.addEventListener("touchstart", (e) => {
+    if (e.target !== emojiToggle && e.target !== input && e.target !== document.getElementById("sendBtn")) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      console.log("Footer touched, ignored:", e.target);
+    }
+  }, { passive: false });
+  
+  document.addEventListener("touchstart", (e) => {
+    console.log("Global touchstart:", e.target);
+    if (!emojiPicker.contains(e.target) && e.target !== emojiToggle && e.target !== input && e.target !== document.getElementById("sendBtn")) {
+      if (emojiPicker.classList.contains('show')) {
+        console.log("Closing emoji picker: touch outside");
+        emojiPicker.classList.remove('show');
+        emojiPicker.style.display = 'none';
+        emojiToggle.textContent = "😊";
+        emojiToggle.setAttribute('aria-expanded', 'false');
+        wasPickerOpenBeforeKeyboard = false;
+        debouncedAdjustLayout();
+      }
+    }
+  }, { passive: false });
+  
+  document.addEventListener("click", (e) => {
+    if (emojiPicker.classList.contains('show') && !emojiPicker.contains(e.target) && e.target !== emojiToggle) {
+      console.log("Clicked outside emoji picker");
+      emojiPicker.classList.remove('show');
+      emojiPicker.style.display = 'none';
+      emojiToggle.textContent = "😊";
+      emojiToggle.setAttribute('aria-expanded', 'false');
+      wasPickerOpenBeforeKeyboard = false;
+      debouncedAdjustLayout();
+    }
+  });
+  
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && emojiPicker.classList.contains('show')) {
+      console.log("Escape key pressed");
+      emojiPicker.classList.remove('show');
+      emojiPicker.style.display = 'none';
+      emojiToggle.textContent = "😊";
+      emojiToggle.setAttribute('aria-expanded', 'false');
+      wasPickerOpenBeforeKeyboard = false;
+      input.focus();
+      debouncedAdjustLayout();
+    }
+  });
+  
+  input.addEventListener("focusin", () => {
+    console.log("Textarea focusin");
+    if (emojiPicker.classList.contains('show')) {
+      emojiPicker.classList.remove('show');
+      emojiPicker.style.display = 'none';
+      emojiToggle.textContent = "😊";
+      emojiToggle.setAttribute('aria-expanded', 'false');
+      wasPickerOpenBeforeKeyboard = true;
+      debouncedAdjustLayout();
+    }
+  });
+  
+  input.addEventListener("focusout", () => {
+    console.log("Textarea focusout");
+    if (wasPickerOpenBeforeKeyboard) {
+      emojiPicker.classList.add('show');
+      emojiPicker.style.display = 'block';
+      emojiToggle.textContent = "⌨️";
+      emojiToggle.setAttribute('aria-expanded', 'true');
+      debouncedAdjustLayout();
+    }
+  });
+
+  const smileElement = document.querySelector('.smile');
+  if (smileElement) {
+    // No animations or hover effects
+  }
+});
+  
 const themeToggle = document.getElementById("themeToggle");
-const handleThemeToggle = () => {
+const handleThemeToggle = (e) => {
+  e.preventDefault();
   document.body.classList.toggle("dark-mode");
   themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
   if (window._emojiPickerInstance) {
@@ -728,18 +1180,20 @@ const handleThemeToggle = () => {
       theme: document.body.classList.contains("dark-mode") ? "dark" : "light"
     });
   }
+  localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
 };
 themeToggle.addEventListener("click", handleThemeToggle);
-themeToggle.addEventListener("touchstart", handleThemeToggle);
-
-// Share sheet
+themeToggle.addEventListener("touchstart", handleThemeToggle, { passive: false });
+  
 const shareBtn = document.getElementById("shareBtn");
 const shareSheet = document.getElementById("shareSheet");
 const startChattingBtn = document.getElementById("startChattingBtn");
-
+const nextBtn = document.getElementById("nextBtn");
+  
 const handleShareBtn = (e) => {
   e.preventDefault();
-  e.stopPropagation();
+  e.stopImmediatePropagation();
+  console.log("Share button clicked/touched");
   const btnRect = shareBtn.getBoundingClientRect();
   shareSheet.style.top = (btnRect.bottom + window.scrollY) + "px";
   shareSheet.style.right = (window.innerWidth - btnRect.right) + "px";
@@ -748,8 +1202,8 @@ const handleShareBtn = (e) => {
   else setTimeout(()=>{shareSheet.style.display='none';},300);
 };
 shareBtn.addEventListener("click", handleShareBtn);
-shareBtn.addEventListener("touchstart", handleShareBtn);
-
+shareBtn.addEventListener("touchstart", handleShareBtn, { passive: false });
+  
 document.addEventListener("click", (e) => {
   if(!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')){
     shareSheet.classList.remove('show');
@@ -762,22 +1216,24 @@ document.addEventListener("touchstart", (e) => {
     setTimeout(()=>{shareSheet.style.display='none';},300);
   }
 });
-
+  
 let hasStartedChat = false;
-
+  
 const handleStartChatting = (e) => {
   e.preventDefault();
+  e.stopImmediatePropagation();
+  console.log("Start chatting clicked/touched");
   if(ws) ws.close();
   hasStartedChat = true;
   startChattingBtn.style.display = 'none';
   connectStranger();
 };
 startChattingBtn.addEventListener("click", handleStartChatting);
-startChattingBtn.addEventListener("touchstart", handleStartChatting);
-
+startChattingBtn.addEventListener("touchstart", handleStartChatting, { passive: false });
+  
 function shareApp(platform){
   let url = window.location.href;
-  if(platform==="whatsapp") window.open("https://api.whatsapp.com/send?text="+encodeURIComponent(url),"_blank");
+  if(platform==="whatsapp") window.open("https://wa.me/?text="+encodeURIComponent(url),"_blank");
   else if(platform==="instagram") window.open("https://www.instagram.com/","_blank");
   else if(platform==="facebook") window.open("https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(url),"_blank");
   else if(platform==="x") window.open("https://twitter.com/intent/tweet?url="+encodeURIComponent(url),"_blank");
@@ -794,24 +1250,22 @@ function showCopyPopup(message){
   popup.id = "copyLinkPopup";
   popup.textContent = message;
   document.body.appendChild(popup);
-
+  
   const shareBtnRect = shareBtn.getBoundingClientRect();
   const sheetRect = shareSheet.getBoundingClientRect();
-
+  
   popup.style.top = (sheetRect.bottom + window.scrollY + 10) + "px";
   popup.style.right = (window.innerWidth - sheetRect.right) + "px";
   popup.style.transform = 'translateY(-10px)';
-
+  
   void popup.offsetWidth;
   popup.classList.add('show');
-
+  
   setTimeout(()=>{
     popup.classList.remove('show');
-    setTimeout(()=>{popup.remove()},300);
   },2000);
 }
-
-// Auto scroll helper
+  
 function scrollToBottom() {
   const chatDiv = document.getElementById("chat");
   const isNearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 100;
@@ -819,121 +1273,115 @@ function scrollToBottom() {
     chatDiv.scrollTop = chatDiv.scrollHeight;
   }
 }
-
-// WebSocket chat
+  
 window.TIKTALK_BACKEND = "https://tiktalk-server-8dmz.onrender.com";
 const messagesDiv = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
-const nextBtn = document.getElementById("nextBtn");
 const typingIndicator = document.getElementById("typingIndicator");
 const footer = document.querySelector("footer");
 const emojiPicker = document.getElementById("emojiPicker");
 let ws, typingTimeout;
 let isConnected = false;
-
-// Debounce function
-function debounce(func, wait) {
-  let timeout;
-  return function (...args) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(this, args), wait);
-  };
-}
-
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 5;
+  
+let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
+  
 function adjustLayoutForKeyboard() {
   const header = document.querySelector("header");
   const chatDiv = document.getElementById("chat");
   const footerNote = document.querySelector(".footerNote");
+  const footer = document.querySelector("footer");
+  const startChattingBtn = document.getElementById("startChattingBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const emojiPicker = document.getElementById("emojiPicker");
   const headerHeight = header.offsetHeight || 70;
+  let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)') || '0', 10);
+  let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
+  
+  const isKeyboardOpen = input === document.activeElement;
+  const isEmojiPickerOpen = emojiPicker.classList.contains('show');
+  
   let keyboardHeight = 0;
-  let emojiPickerHeight = 0;
-
+  let keyboardBottom = 0;
+  
   if (window.visualViewport) {
-    const viewportHeight = window.visualViewport.height;
-    const windowHeight = window.innerHeight;
-    keyboardHeight = Math.max(0, windowHeight - viewportHeight);
-    const viewportWidth = window.visualViewport.width;
-    if (emojiPicker.style.display === "block" && !emojiPicker.classList.contains('emoji-picker-hidden')) {
-      emojiPicker.style.width = window.matchMedia("(min-width: 768px)").matches ? "350px" : `${viewportWidth}px`;
-      emojiPickerHeight = window.matchMedia("(min-width: 768px)").matches ? 350 : Math.min(keyboardHeight || 300, window.innerHeight * 0.5);
-      emojiPicker.style.height = `${emojiPickerHeight}px`;
-    } else {
-      emojiPicker.style.width = window.matchMedia("(min-width: 768px)").matches ? "350px" : "100%";
-      emojiPickerHeight = window.matchMedia("(min-width: 768px)").matches ? 350 : 300;
-      emojiPicker.style.height = `${emojiPickerHeight}px`;
+    const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
+    const windowBottom = window.innerHeight;
+    keyboardHeight = windowBottom - visualViewportBottom;
+    if (keyboardHeight > 0) {
+      keyboardBottom = keyboardHeight;
     }
+  } else if ('virtualKeyboard' in navigator) {
+    keyboardBottom = navigator.virtualKeyboard.boundingRect.height || 0;
+  }
+  
+  if (keyboardBottom > 0) {
+    lastKeyboardHeight = Math.max(keyboardBottom, 300);
+    localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
   } else {
-    keyboardHeight = 0;
-    emojiPicker.style.width = window.matchMedia("(min-width: 768px)").matches ? "350px" : "100%";
-    emojiPickerHeight = window.matchMedia("(min-width: 768px)").matches ? 350 : 300;
-    emojiPicker.style.height = `${emojiPickerHeight}px`;
+    lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
   }
-
-  const isEmojiPickerOpen = emojiPicker.style.display === "block" && !emojiPicker.classList.contains('emoji-picker-hidden');
-  const isKeyboardOpen = input === document.activeElement && keyboardHeight > 0;
-
-  if (isKeyboardOpen && isEmojiPickerOpen) {
-    emojiPicker.classList.add('emoji-picker-hidden');
-    emojiPicker.classList.remove('show');
-    emojiPicker.style.display = "none";
-    emojiToggle.textContent = "😊";
-  } else if (!isKeyboardOpen && emojiPicker.classList.contains('emoji-picker-hidden')) {
-    emojiPicker.classList.remove('emoji-picker-hidden');
-  }
-
-  const offsetHeight = isEmojiPickerOpen ? emojiPickerHeight : keyboardHeight;
-
-  footer.style.position = 'fixed';
-  footer.style.bottom = `calc(${offsetHeight}px + env(safe-area-inset-bottom, 0))`;
-  footer.style.top = 'auto';
-  footer.style.width = '100%';
-  footer.style.zIndex = isEmojiPickerOpen ? '1000001' : '10000';
-  if (isEmojiPickerOpen) {
-    footer.classList.add('footer-above-picker');
+  
+  document.documentElement.style.setProperty('--keyboard-height', `${lastKeyboardHeight}px`);
+  document.documentElement.style.setProperty('--emoji-picker-height', `${lastKeyboardHeight}px`);
+  
+  const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+  
+  if (isKeyboardOpen) {
+    footer.style.top = 'auto';
+    footer.style.bottom = `${keyboardBottom}px`;
+    chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardBottom}px)`;
+    footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardBottom}px)`;
+    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardBottom}px + 30px)`;
+    nextBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardBottom}px + 30px)`;
+    
+    if (emojiPicker.classList.contains('show')) {
+      emojiPicker.classList.remove('show');
+      emojiPicker.style.display = 'none';
+      document.getElementById("emojiToggle").textContent = "😊";
+      document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
+    }
+  } else if (isEmojiPickerOpen) {
+    footer.style.top = 'auto';
+    footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
+    chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${lastKeyboardHeight}px + ${safeAreaBottom}px + 10px)`;
+    footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
+    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 30px + ${safeAreaBottom}px)`;
+    nextBtn.style.bottom = `calc(${footer.offsetHeight}px + 30px + ${safeAreaBottom}px)`;
+    emojiPicker.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px)`;
   } else {
-    footer.classList.remove('footer-above-picker');
+    footer.style.top = 'auto';
+    footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
+    chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
+    footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
+    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 30px + ${safeAreaBottom}px)`;
+    nextBtn.style.bottom = `calc(${footer.offsetHeight}px + 30px + ${safeAreaBottom}px)`;
+    emojiPicker.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px)`;
   }
-
-  footerNote.style.position = 'fixed';
-  footerNote.style.bottom = `calc(60px + ${offsetHeight}px + env(safe-area-inset-bottom, 0))`;
-  footerNote.style.top = 'auto';
-  footerNote.style.zIndex = '9999';
-
-  startChattingBtn.style.position = 'fixed';
-  startChattingBtn.style.bottom = `calc(90px + ${offsetHeight}px + env(safe-area-inset-bottom, 0))`;
-  startChattingBtn.style.top = 'auto';
-  startChattingBtn.style.zIndex = '10001';
-
-  emojiPicker.style.position = 'fixed';
-  emojiPicker.style.bottom = `calc(${keyboardHeight}px + env(safe-area-inset-bottom, 0))`;
-  emojiPicker.style.top = 'auto';
-  if (window.matchMedia("(min-width: 768px)").matches) {
-    emojiPicker.style.right = '15px';
-    emojiPicker.style.left = 'auto';
-  } else {
-    emojiPicker.style.right = '0';
-    emojiPicker.style.left = '0';
-  }
-
-  chatDiv.style.height = `calc(100vh - ${headerHeight}px - env(safe-area-inset-top, 0))`;
-  chatDiv.style.paddingBottom = `calc(150px + ${offsetHeight}px + env(safe-area-inset-bottom, 0))`;
-  chatDiv.style.overflowY = 'auto';
-  chatDiv.style.overscrollBehavior = 'contain';
-
-  footer.offsetHeight;
-  scrollToBottom();
+  
+  footer.style.transform = 'none';
+  footer.style.height = isDesktop ? "56px" : "56px";
+  
+  chatDiv.style.marginTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
+  chatDiv.style.height = `calc(100vh - ${headerHeight}px - ${safeAreaBottom}px)`;
+  
+  requestAnimationFrame(() => {
+    footer.offsetHeight;
+    scrollToBottom();
+  });
 }
-
+  
 const debouncedAdjustLayout = debounce(adjustLayoutForKeyboard, 50);
-
+  
 let rafId;
 function updateLayout() {
   adjustLayoutForKeyboard();
   rafId = requestAnimationFrame(updateLayout);
 }
-
-if (window.visualViewport) {
+  
+if (window.visualViewport && !('virtualKeyboard' in navigator)) {
   window.visualViewport.addEventListener("resize", debouncedAdjustLayout);
   window.visualViewport.addEventListener("scroll", debouncedAdjustLayout);
 }
@@ -953,18 +1401,20 @@ input.addEventListener("focusout", () => {
 });
 input.addEventListener("input", debouncedAdjustLayout);
 window.addEventListener("load", debouncedAdjustLayout);
-
-function addMessage(text, who){
+  
+function addMessage(text, who) {
+  const fragment = document.createDocumentFragment();
   const div = document.createElement("div");
-  div.className="msg "+who;
+  div.className = "msg " + who;
   div.textContent = text;
-  messagesDiv.appendChild(div);
+  fragment.appendChild(div);
+  messagesDiv.appendChild(fragment);
   scrollToBottom();
   startChattingBtn.style.display = 'none';
   debouncedAdjustLayout();
 }
-
-function showPopup(text){
+  
+function showPopup(text) {
   if (text.includes("Searching")) {
     messagesDiv.innerHTML = `
       <div class="popup">
@@ -975,177 +1425,123 @@ function showPopup(text){
       </div>`;
     isConnected = false;
     startChattingBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
   } else if (text.includes("Connected")) {
     messagesDiv.innerHTML = `
       <div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
     isConnected = true;
     startChattingBtn.style.display = 'none';
+    nextBtn.style.display = 'none';
     setTimeout(() => { if (messagesDiv.innerHTML.includes("Connected")) messagesDiv.innerHTML = ''; }, 3000);
   } else {
     messagesDiv.innerHTML = `<div class="popup">${text}</div>`;
     isConnected = false;
     startChattingBtn.style.display = 'none';
+    nextBtn.style.display = 'block';
   }
   scrollToBottom();
   debouncedAdjustLayout();
 }
-
-function connectStranger(){
+  
+function connectStranger() {
   showPopup("🔍 Searching for a stranger...");
-  typingIndicator.style.display="none";
-  ws=new WebSocket(window.TIKTALK_BACKEND.replace("http","ws")+"/ws");
-  ws.onmessage=(event)=>{
-    try{
-      const data=JSON.parse(event.data);
-      if(data.type==="system"){
-        if(data.text==="waiting") {
+  typingIndicator.style.display = "none";
+  ws = new WebSocket(window.TIKTALK_BACKEND.replace("http", "ws") + "/ws");
+  ws.onopen = () => {
+    reconnectAttempts = 0;
+  };
+  ws.onmessage = (event) => {
+    try {
+      const data = JSON.parse(event.data);
+      if (data.type === "system") {
+        if (data.text === "waiting") {
           showPopup("🔍 Searching for a stranger...");
-        }
-        else if(data.text==="connected") {
+        } else if (data.text === "connected") {
           showPopup("✅ Connected! Say Hi 👋");
           startChattingBtn.style.display = 'none';
-        }
-        else if(data.text==="disconnected") {
+        } else if (data.text === "disconnected") {
           showPopup("❌ Stranger disconnected");
           startChattingBtn.style.display = 'none';
+          nextBtn.style.display = 'block';
         }
       }
-      if(data.type==="message"){ 
-        typingIndicator.style.display="none"; 
-        addMessage(data.text,"stranger"); 
+      if (data.type === "message") {
+        typingIndicator.style.display = "none";
+        addMessage(data.text, "stranger");
       }
-      if(data.type==="typing"){ 
-        typingIndicator.style.display="block"; 
-        clearTimeout(typingTimeout); 
-        typingTimeout=setTimeout(()=>{typingIndicator.style.display="none";},1500);
+      if (data.type === "typing") {
+        typingIndicator.style.display = "block";
+        clearTimeout(typingTimeout);
+        typingTimeout = setTimeout(() => {
+          typingIndicator.style.display = "none";
+        }, 1500);
       }
-    }catch{}
+    } catch {}
   };
-  ws.onclose=()=>{
-    showPopup("❌ Disconnected from server"); 
-    typingIndicator.style.display="none"; 
-    isConnected=false;
+  ws.onclose = () => {
+    showPopup("❌ Disconnected from server");
+    typingIndicator.style.display = "none";
+    isConnected = false;
     startChattingBtn.style.display = 'block';
+    nextBtn.style.display = 'block';
+    if (reconnectAttempts < maxReconnectAttempts) {
+      setTimeout(() => {
+        reconnectAttempts++;
+        connectStranger();
+      }, 2000 * reconnectAttempts);
+    } else {
+      showPopup("❌ Failed to reconnect. Please try again later.");
+    }
     debouncedAdjustLayout();
   };
+  ws.onerror = () => {
+    ws.close();
+  };
 }
-
+  
 const handleSend = (e) => {
   e.preventDefault();
+  e.stopImmediatePropagation();
+  console.log("Send button clicked/touched");
   if(isConnected && input.value.trim()){
     ws.send(JSON.stringify({type:"message", text:input.value}));
     addMessage(input.value,"me");
     input.value="";
-    emojiPicker.style.display = "none";
-    emojiToggle.textContent = "😊";
+    emojiPicker.classList.remove('show');
+    emojiPicker.style.display = 'none';
+    document.getElementById("emojiToggle").textContent = "😊";
+    document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
+    wasPickerOpenBeforeKeyboard = false;
     debouncedAdjustLayout();
   }
 };
 sendBtn.addEventListener("click", handleSend);
-sendBtn.addEventListener("touchstart", handleSend);
-
+sendBtn.addEventListener("touchstart", handleSend, { passive: false });
+  
 const handleNext = (e) => {
   e.preventDefault();
+  e.stopImmediatePropagation();
+  console.log("Next button clicked/touched");
   if(ws) ws.close();
   connectStranger();
   debouncedAdjustLayout();
 };
 nextBtn.addEventListener("click", handleNext);
-nextBtn.addEventListener("touchstart", handleNext);
-
+nextBtn.addEventListener("touchstart", handleNext, { passive: false });
+  
 input.addEventListener("input", ()=>{
   if(isConnected && ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:"typing"}));
 });
-
+  
 document.body.classList.add('auto-scroll-enabled');
-
+  
 const observer = new MutationObserver(() => {
   scrollToBottom();
 });
 observer.observe(messagesDiv, { childList: true, subtree: true });
-
+  
 startChattingBtn.style.display = 'block';
 messagesDiv.innerHTML = '';
-
-const emojiToggle = document.getElementById("emojiToggle");
-
-const handleEmojiToggle = (e) => {
-  e.preventDefault();
-  e.stopPropagation();
-  const open = emojiPicker.style.display === "block" && !emojiPicker.classList.contains('emoji-picker-hidden');
-  if (open) {
-    emojiPicker.classList.remove('show');
-    setTimeout(() => {
-      emojiPicker.style.display = "none";
-      emojiPicker.classList.remove('emoji-picker-hidden');
-      emojiToggle.textContent = "😊";
-      input.focus();
-      debouncedAdjustLayout();
-    }, 300);
-  } else {
-    emojiPicker.style.display = "block";
-    setTimeout(() => {
-      emojiPicker.classList.add('show');
-      emojiToggle.textContent = "⌨️";
-      input.blur();
-      debouncedAdjustLayout();
-    }, 10);
-  }
-};
-emojiToggle.addEventListener("click", handleEmojiToggle);
-emojiToggle.addEventListener("touchstart", handleEmojiToggle);
-
-const picker = new EmojiMart.Picker({
-  onEmojiSelect: e => {
-    input.value += e.native;
-    debouncedAdjustLayout();
-  },
-  theme: document.body.classList.contains("dark-mode") ? "dark" : "light",
-  previewPosition: "none",
-  skinTonePosition: "none",
-  categories: ["frequent","people","nature","foods","activity","places","objects","symbols","flags"],
-  emoji: "😊"
-});
-emojiPicker.appendChild(picker);
-window._emojiPickerInstance = picker;
-
-document.addEventListener("click", (e) => {
-  if (emojiPicker.style.display === "block" && !emojiPicker.contains(e.target) && e.target !== emojiToggle) {
-    emojiPicker.classList.remove('show');
-    setTimeout(() => {
-      emojiPicker.style.display = "none";
-      emojiPicker.classList.remove('emoji-picker-hidden');
-      emojiToggle.textContent = "😊";
-      input.focus();
-      debouncedAdjustLayout();
-    }, 300);
-  }
-});
-document.addEventListener("touchstart", (e) => {
-  if (emojiPicker.style.display === "block" && !emojiPicker.contains(e.target) && e.target !== emojiToggle) {
-    emojiPicker.classList.remove('show');
-    setTimeout(() => {
-      emojiPicker.style.display = "none";
-      emojiPicker.classList.remove('emoji-picker-hidden');
-      emojiToggle.textContent = "😊";
-      input.focus();
-      debouncedAdjustLayout();
-    }, 300);
-  }
-});
-
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && emojiPicker.style.display === "block") {
-    emojiPicker.classList.remove('show');
-    setTimeout(() => {
-      emojiPicker.style.display = "none";
-      emojiPicker.classList.remove('emoji-picker-hidden');
-      emojiToggle.textContent = "😊";
-      input.focus();
-      debouncedAdjustLayout();
-    }, 300);
-  }
-});
 </script>
 </body>
 </html>
