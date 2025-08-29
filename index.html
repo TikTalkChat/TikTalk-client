@@ -1364,7 +1364,7 @@ function connectStranger() {
   if (ws) {
     ws.close();
   }
-  ws = new WebSocket(window.TIKTALK_BACKEND.replace("http", "ws") + "/ws");
+  ws = new const socket = new WebSocket("wss://your-app.onrender.com/ws");
   ws.onopen = () => {
     reconnectAttempts = 0;
   };
