@@ -650,7 +650,7 @@ body.dark-mode .share-sheet {
   opacity: 1;
 }
 .share-sheet button {
-  background: #f8f9fa ! Drizzle: #f8f9fa !important;
+  background: #f8f9fa !important;
   border: 1px solid #dee2e6 !important;
   border-radius: 50%;
   padding: 8px;
@@ -973,6 +973,7 @@ function debounce(func, wait) {
     timeout = setTimeout(() => func.apply(this, args), wait);
   };
 }
+
 document.addEventListener("DOMContentLoaded", () => {
   const shareBtn = document.getElementById("shareBtn");
   if (shareBtn) {
@@ -1061,7 +1062,6 @@ document.addEventListener("DOMContentLoaded", () => {
   emojiToggle.removeEventListener("touchstart", handleEmojiToggle);
   emojiToggle.removeEventListener("pointerdown", handleEmojiToggle);
   emojiToggle.addEventListener("click", handleEmojiToggle, { passive: false });
-  emojiToggle.addEventListener("touchstart", handleEmojiToggle, { passive: false });
   
   const handleInputInteraction = (e) => {
     e.stopImmediatePropagation();
@@ -1104,6 +1104,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
   input.addEventListener("input", debouncedAdjustLayout);
 });
+
 const themeToggle = document.getElementById("themeToggle");
 const handleThemeToggle = (e) => {
   e.preventDefault();
@@ -1118,10 +1119,12 @@ const handleThemeToggle = (e) => {
 };
 themeToggle.addEventListener("click", handleThemeToggle);
 themeToggle.addEventListener("touchstart", handleThemeToggle, { passive: false });
+
 const shareBtn = document.getElementById("shareBtn");
 const shareSheet = document.getElementById("shareSheet");
 const startChattingBtn = document.getElementById("startChattingBtn");
 const nextBtn = document.getElementById("nextBtn");
+
 const handleShareBtn = (e) => {
   e.preventDefault();
   e.stopImmediatePropagation();
@@ -1129,23 +1132,25 @@ const handleShareBtn = (e) => {
   shareSheet.style.top = (btnRect.bottom + window.scrollY) + "px";
   shareSheet.style.right = (window.innerWidth - btnRect.right) + "px";
   shareSheet.classList.toggle('show');
-  if(shareSheet.classList.contains('show')) shareSheet.style.display = 'flex';
-  else setTimeout(()=>{shareSheet.style.display='none';},300);
+  if (shareSheet.classList.contains('show')) shareSheet.style.display = 'flex';
+  else setTimeout(() => { shareSheet.style.display = 'none'; }, 300);
 };
 shareBtn.addEventListener("click", handleShareBtn);
 shareBtn.addEventListener("touchstart", handleShareBtn, { passive: false });
+
 document.addEventListener("click", (e) => {
-  if(!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')){
+  if (!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')) {
     shareSheet.classList.remove('show');
-    setTimeout(()=>{shareSheet.style.display='none';},300);
+    setTimeout(() => { shareSheet.style.display = 'none'; }, 300);
   }
 });
 document.addEventListener("touchstart", (e) => {
-  if(!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')){
+  if (!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')) {
     shareSheet.classList.remove('show');
-    setTimeout(()=>{shareSheet.style.display='none';},300);
+    setTimeout(() => { shareSheet.style.display = 'none'; }, 300);
   }
 });
+
 let hasStartedChat = false;
 const handleStartChatting = (e) => {
   e.preventDefault();
@@ -1158,21 +1163,27 @@ const handleStartChatting = (e) => {
 };
 startChattingBtn.addEventListener("click", handleStartChatting);
 startChattingBtn.addEventListener("touchstart", handleStartChatting, { passive: false });
-function shareApp(platform){
+
+function shareApp(platform) {
   let url = window.location.href;
-  if(platform==="whatsapp") window.open("https://wa.me/?text="+encodeURIComponent(url),"_blank");
-  else if(platform==="instagram") window.open("https://www.instagram.com/","_blank");
-  else if(platform==="facebook") window.open("https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(url),"_blank");
-  else if(platform==="x") window.open("https://twitter.com/intent/tweet?url="+encodeURIComponent(url),"_blank");
-  else if(platform==="link"){
-    const tempInput=document.createElement('input');
-    tempInput.value=url; document.body.appendChild(tempInput); tempInput.select(); document.execCommand('copy'); document.body.removeChild(tempInput);
+  if (platform === "whatsapp") window.open("https://wa.me/?text=" + encodeURIComponent(url), "_blank");
+  else if (platform === "instagram") window.open("https://www.instagram.com/", "_blank");
+  else if (platform === "facebook") window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url), "_blank");
+  else if (platform === "x") window.open("https://twitter.com/intent/tweet?url=" + encodeURIComponent(url), "_blank");
+  else if (platform === "link") {
+    const tempInput = document.createElement('input');
+    tempInput.value = url;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
     showCopyPopup("✅ Copied!");
   }
 }
-function showCopyPopup(message){
+
+function showCopyPopup(message) {
   let existing = document.getElementById("copyLinkPopup");
-  if(existing) existing.remove();
+  if (existing) existing.remove();
   const popup = document.createElement("div");
   popup.id = "copyLinkPopup";
   popup.textContent = message;
@@ -1184,10 +1195,11 @@ function showCopyPopup(message){
   popup.style.transform = 'translateY(-10px)';
   void popup.offsetWidth;
   popup.classList.add('show');
-  setTimeout(()=>{
+  setTimeout(() => {
     popup.classList.remove('show');
-  },2000);
+  }, 2000);
 }
+
 function scrollToBottom() {
   const chatDiv = document.getElementById("chat");
   const isNearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 100;
@@ -1195,6 +1207,7 @@ function scrollToBottom() {
     chatDiv.scrollTop = chatDiv.scrollHeight;
   }
 }
+
 const messagesDiv = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
@@ -1205,9 +1218,9 @@ let ws, typingTimeout;
 let isConnected = false;
 let reconnectAttempts = 0;
 const maxReconnectAttempts = 5;
-const reconnectDelay = 2000;
+const reconnectDelay = 5000; // बढ़ाया गया डिले
 const backendUrl = window.TIKTALK_BACKEND || "https://tiktalk-server-8dmz.onrender.com";
-const wsUrl = backendUrl.replace(/^http(s?)/, 'ws$1') + "/ws";
+const wsUrl = backendUrl.replace(/^http(s?)/, 'wss$1') + "/ws";
 let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
 
 function adjustLayoutForKeyboard() {
@@ -1222,7 +1235,6 @@ function adjustLayoutForKeyboard() {
   let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-top') || '0', 10);
   let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom') || '0', 10);
 
-  // Fallback for env() not working
   if (isNaN(safeAreaTop)) safeAreaTop = 0;
   if (isNaN(safeAreaBottom)) safeAreaBottom = 0;
 
@@ -1230,7 +1242,6 @@ function adjustLayoutForKeyboard() {
   const isEmojiPickerOpen = emojiPicker.classList.contains('show');
   let keyboardHeight = 0;
 
-  // Detect keyboard height
   if ('virtualKeyboard' in navigator && navigator.virtualKeyboard.boundingRect.height > 0) {
     keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
   } else if (window.visualViewport) {
@@ -1239,7 +1250,6 @@ function adjustLayoutForKeyboard() {
     keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
   }
 
-  // Store last known keyboard height
   if (keyboardHeight > 0) {
     lastKeyboardHeight = Math.max(keyboardHeight, 300);
     localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
@@ -1253,7 +1263,6 @@ function adjustLayoutForKeyboard() {
   const isDesktop = window.matchMedia("(min-width: 768px)").matches;
   const emojiPickerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--emoji-picker-height')) || 350;
 
-  // Reset transitions to avoid glitches
   footer.style.transition = 'none';
 
   if (isKeyboardOpen) {
@@ -1290,23 +1299,23 @@ function adjustLayoutForKeyboard() {
     emojiPicker.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
   }
 
-  // Ensure header stays fixed at the top
   header.style.top = `calc(0px + ${safeAreaTop}px)`;
   chatDiv.style.marginTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
   chatDiv.style.height = `calc(100vh - ${headerHeight}px - ${safeAreaBottom}px)`;
 
-  // Re-apply transition after layout
   requestAnimationFrame(() => {
     footer.style.transition = 'bottom 0.3s ease';
     scrollToBottom();
   });
 }
+
 const debouncedAdjustLayout = debounce(adjustLayoutForKeyboard, 50);
 let rafId;
 function updateLayout() {
   adjustLayoutForKeyboard();
   rafId = requestAnimationFrame(updateLayout);
 }
+
 if (window.visualViewport && !('virtualKeyboard' in navigator)) {
   window.visualViewport.addEventListener("resize", () => {
     const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
@@ -1320,6 +1329,7 @@ if (window.visualViewport && !('virtualKeyboard' in navigator)) {
   });
   window.visualViewport.addEventListener("scroll", debouncedAdjustLayout);
 }
+
 setInterval(() => {
   const isKeyboardOpen = document.activeElement === input;
   const isEmojiPickerOpen = emojiPicker.classList.contains('show');
@@ -1335,10 +1345,12 @@ setInterval(() => {
     adjustLayoutForKeyboard();
   }
 }, 500);
+
 window.addEventListener("resize", debouncedAdjustLayout);
 window.addEventListener("touchstart", debouncedAdjustLayout);
 window.addEventListener("touchmove", debouncedAdjustLayout);
 window.addEventListener("load", debouncedAdjustLayout);
+
 function addMessage(text, who) {
   const fragment = document.createDocumentFragment();
   const div = document.createElement("div");
@@ -1352,6 +1364,7 @@ function addMessage(text, who) {
   }
   debouncedAdjustLayout();
 }
+
 function showPopup(text) {
   if (text.includes("Searching")) {
     messagesDiv.innerHTML = `
@@ -1388,6 +1401,7 @@ function showPopup(text) {
   scrollToBottom();
   debouncedAdjustLayout();
 }
+
 function connectStranger() {
   if (ws && ws.readyState !== WebSocket.CLOSED) {
     ws.close();
@@ -1395,7 +1409,14 @@ function connectStranger() {
   showPopup("🔍 Searching for a stranger...");
   typingIndicator.style.display = "none";
   ws = new WebSocket(wsUrl);
+  const searchTimeout = setTimeout(() => {
+    if (!isConnected) {
+      showPopup("😕 No strangers available. Try again later.");
+      nextBtn.style.display = 'block';
+    }
+  }, 30000); // 30 सेकंड का टाइमआउट
   ws.onopen = () => {
+    clearTimeout(searchTimeout);
     reconnectAttempts = 0;
     isConnected = true;
     showPopup("✅ Connected! Say Hi 👋");
@@ -1409,6 +1430,7 @@ function connectStranger() {
     try {
       const data = JSON.parse(event.data);
       if (data.type === "system") {
+        clearTimeout(searchTimeout);
         if (data.text === "waiting") {
           showPopup("🔍 Searching for a stranger...");
         } else if (data.text === "connected") {
@@ -1418,8 +1440,13 @@ function connectStranger() {
           showPopup("❌ Stranger disconnected");
           isConnected = false;
           nextBtn.style.display = 'block';
+        } else if (data.text === "no_strangers") {
+          showPopup("😕 No strangers available. Try again later.");
+          isConnected = false;
+          nextBtn.style.display = 'block';
         }
       } else if (data.type === "message") {
+        clearTimeout(searchTimeout);
         typingIndicator.style.display = "none";
         addMessage(data.text, "stranger");
       } else if (data.type === "typing") {
@@ -1436,20 +1463,18 @@ function connectStranger() {
     }
   };
   ws.onclose = (event) => {
+    clearTimeout(searchTimeout);
     isConnected = false;
     typingIndicator.style.display = "none";
+    console.log(`WebSocket closed with code: ${event.code}, reason: ${event.reason}`);
     showPopup(`❌ Disconnected from server (Code: ${event.code})`);
-    if (hasStartedChat) {
-      startChattingBtn.style.display = 'none';
-    }
-    nextBtn.style.display = 'block';
     if (reconnectAttempts < maxReconnectAttempts && event.code !== 1000) {
       setTimeout(() => {
         reconnectAttempts++;
         console.log(`Reconnect attempt ${reconnectAttempts}/${maxReconnectAttempts}`);
         connectStranger();
       }, reconnectDelay * (reconnectAttempts + 1));
-  } else if (reconnectAttempts >= maxReconnectAttempts) {
+    } else if (reconnectAttempts >= maxReconnectAttempts) {
       showPopup("❌ Failed to reconnect. Please try again later.");
     }
     debouncedAdjustLayout();
@@ -1461,6 +1486,7 @@ function connectStranger() {
     }
   };
 }
+
 const handleSend = (e) => {
   e.preventDefault();
   e.stopImmediatePropagation();
@@ -1480,6 +1506,7 @@ const handleSend = (e) => {
 };
 sendBtn.addEventListener("click", handleSend);
 sendBtn.addEventListener("touchstart", handleSend, { passive: false });
+
 const handleNext = (e) => {
   e.preventDefault();
   e.stopImmediatePropagation();
@@ -1490,18 +1517,20 @@ const handleNext = (e) => {
   connectStranger();
   debouncedAdjustLayout();
 };
-nextBtn.addEventListener("click", handleNext);
-nextBtn.addEventListener("touchstart", handleNext, { passive: false });
+nextBtn.addEventListener("click", handleNext); // केवल click इवेंट
+
 input.addEventListener("input", () => {
   if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ type: "typing" }));
   }
 });
+
 document.body.classList.add('auto-scroll-enabled');
 const observer = new MutationObserver(() => {
   scrollToBottom();
 });
 observer.observe(messagesDiv, { childList: true, subtree: true });
+
 if (!hasStartedChat) {
   startChattingBtn.style.display = 'block';
 }
