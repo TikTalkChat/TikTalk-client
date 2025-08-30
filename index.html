@@ -1214,14 +1214,35 @@ const sendBtn = document.getElementById("sendBtn");
 const typingIndicator = document.getElementById("typingIndicator");
 const footer = document.querySelector("footer");
 const emojiPicker = document.getElementById("emojiPicker");
-let ws, typingTimeout;
+let ws, typingTimeout, heartbeatInterval;
 let isConnected = false;
 let reconnectAttempts = 0;
-const maxReconnectAttempts = 5;
-const reconnectDelay = 5000; // बढ़ाया गया डिले
+const maxReconnectAttempts = 10; // बढ़ाया
+const reconnectDelay = 3000; // बेस डिले
+const heartbeatIntervalMs = 30000; // 30 सेकंड में पिंग
+const searchTimeoutMs = 60000; // 60 सेकंड सर्च टाइमआउट
 const backendUrl = window.TIKTALK_BACKEND || "https://tiktalk-server-8dmz.onrender.com";
 const wsUrl = backendUrl.replace(/^http(s?)/, 'wss$1') + "/ws";
 let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
+
+function sendPing() {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: "ping" }));
+    console.log("Ping sent to keep connection alive");
+  }
+}
+
+function startHeartbeat() {
+  stopHeartbeat();
+  heartbeatInterval = setInterval(sendPing, heartbeatIntervalMs);
+}
+
+function stopHeartbeat() {
+  if (heartbeatInterval) {
+    clearInterval(heartbeatInterval);
+    heartbeatInterval = null;
+  }
+}
 
 function adjustLayoutForKeyboard() {
   const header = document.querySelector("header");
@@ -1406,6 +1427,7 @@ function connectStranger() {
   if (ws && ws.readyState !== WebSocket.CLOSED) {
     ws.close();
   }
+  stopHeartbeat();
   showPopup("🔍 Searching for a stranger...");
   typingIndicator.style.display = "none";
   ws = new WebSocket(wsUrl);
@@ -1414,7 +1436,7 @@ function connectStranger() {
       showPopup("😕 No strangers available. Try again later.");
       nextBtn.style.display = 'block';
     }
-  }, 30000); // 30 सेकंड का टाइमआउट
+  }, searchTimeoutMs); // 60 सेकंड
   ws.onopen = () => {
     clearTimeout(searchTimeout);
     reconnectAttempts = 0;
@@ -1424,29 +1446,36 @@ function connectStranger() {
       startChattingBtn.style.display = 'none';
     }
     nextBtn.style.display = 'block';
+    startHeartbeat(); // Heartbeat शुरू करें
     debouncedAdjustLayout();
   };
   ws.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data);
+      clearTimeout(searchTimeout);
+      if (data.type === "pong") {
+        console.log("Pong received - connection alive");
+        return; // Pong को इग्नोर करें
+      }
       if (data.type === "system") {
-        clearTimeout(searchTimeout);
         if (data.text === "waiting") {
           showPopup("🔍 Searching for a stranger...");
         } else if (data.text === "connected") {
           showPopup("✅ Connected! Say Hi 👋");
           nextBtn.style.display = 'block';
+          startHeartbeat();
         } else if (data.text === "disconnected") {
           showPopup("❌ Stranger disconnected");
           isConnected = false;
           nextBtn.style.display = 'block';
+          stopHeartbeat();
         } else if (data.text === "no_strangers") {
           showPopup("😕 No strangers available. Try again later.");
           isConnected = false;
           nextBtn.style.display = 'block';
+          stopHeartbeat();
         }
       } else if (data.type === "message") {
-        clearTimeout(searchTimeout);
         typingIndicator.style.display = "none";
         addMessage(data.text, "stranger");
       } else if (data.type === "typing") {
@@ -1464,23 +1493,31 @@ function connectStranger() {
   };
   ws.onclose = (event) => {
     clearTimeout(searchTimeout);
+    stopHeartbeat();
     isConnected = false;
     typingIndicator.style.display = "none";
     console.log(`WebSocket closed with code: ${event.code}, reason: ${event.reason}`);
-    showPopup(`❌ Disconnected from server (Code: ${event.code})`);
+    let popupMsg = `❌ Disconnected from server (Code: ${event.code})`;
+    if (event.code === 1006) {
+      popupMsg = "❌ Connection lost (Server sleep or network issue). Reconnecting...";
+    }
+    showPopup(popupMsg);
+    const delay = Math.min(reconnectDelay * Math.pow(2, reconnectAttempts), 30000); // एक्सपोनेंशियल बैकऑफ
     if (reconnectAttempts < maxReconnectAttempts && event.code !== 1000) {
       setTimeout(() => {
         reconnectAttempts++;
-        console.log(`Reconnect attempt ${reconnectAttempts}/${maxReconnectAttempts}`);
+        console.log(`Reconnect attempt ${reconnectAttempts}/${maxReconnectAttempts} in ${delay}ms`);
         connectStranger();
-      }, reconnectDelay * (reconnectAttempts + 1));
+      }, delay);
     } else if (reconnectAttempts >= maxReconnectAttempts) {
-      showPopup("❌ Failed to reconnect. Please try again later.");
+      showPopup("❌ Failed to reconnect. Please refresh the page or check your internet.");
+      reconnectAttempts = 0;
     }
     debouncedAdjustLayout();
   };
   ws.onerror = (error) => {
     console.error("WebSocket error:", error);
+    stopHeartbeat();
     if (ws.readyState !== WebSocket.CLOSED) {
       ws.close();
     }
@@ -1517,7 +1554,7 @@ const handleNext = (e) => {
   connectStranger();
   debouncedAdjustLayout();
 };
-nextBtn.addEventListener("click", handleNext); // केवल click इवेंट
+nextBtn.addEventListener("click", handleNext); // केवल click
 
 input.addEventListener("input", () => {
   if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
