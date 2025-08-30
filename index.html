@@ -105,7 +105,6 @@ header svg.logo {
 }
 body.dark-mode .me {
   background: #2a3d66;
-  color: #e5e7eb;
 }
 .stranger {
   align-self: flex-start;
@@ -115,7 +114,6 @@ body.dark-mode .me {
 }
 body.dark-mode .stranger {
   background: #2d3748;
-  color: #e5e7eb;
 }
 .popup {
   background: transparent;
@@ -134,7 +132,7 @@ body.dark-mode .popup {
 #typingIndicator {
   font-size: 13px;
   color: #888;
-  margin-top: 12px;
+  margin-top: 5px;
   text-align: left;
   display: none;
 }
@@ -315,6 +313,7 @@ button:active {
   width: 50px;
   height: 50px;
   border-radius: 50%;
+  padding: 0;
   background: #ff3b30;
   display: none;
   align-items: center;
@@ -324,8 +323,8 @@ button:active {
   box-shadow: 0 2px 8px rgba(255,59,48,0.4);
 }
 #nextBtn svg {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
 }
 #emojiPicker {
   position: fixed;
@@ -414,8 +413,8 @@ body.dark-mode #emojiPicker {
     bottom: calc(100px + env(safe-area-inset-bottom));
   }
   #nextBtn svg {
-    width: 32px;
-    height: 32px;
+    width: 24px;
+    height: 24px;
   }
   .inputWrapper {
     flex-grow: 3;
@@ -441,7 +440,7 @@ body.dark-mode #emojiPicker {
     height: 24px;
     position: relative;
     color: #fff;
-    display: flex !important;
+    display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
@@ -480,8 +479,8 @@ body.dark-mode #emojiPicker {
     bottom: calc(100px + env(safe-area-inset-bottom));
   }
   #nextBtn svg {
-    width: 32px;
-    height: 32px;
+    width: 22px;
+    height: 22px;
   }
 }
 @media (max-width: 480px) {
@@ -523,8 +522,8 @@ body.dark-mode #emojiPicker {
     bottom: calc(100px + env(safe-area-inset-bottom));
   }
   #nextBtn svg {
-    width: 32px;
-    height: 32px;
+    width: 20px;
+    height: 20px;
   }
 }
 .icon-btn {
@@ -651,7 +650,7 @@ body.dark-mode .share-sheet {
   opacity: 1;
 }
 .share-sheet button {
-  background: #f8f9fa !important;
+  background: #f8f9fa ! Drizzle: #f8f9fa !important;
   border: 1px solid #dee2e6 !important;
   border-radius: 50%;
   padding: 8px;
@@ -824,24 +823,26 @@ body.dark-mode .searching-text {
   cursor: pointer;
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
   z-index: 10001;
-  display: block;
   animation: pulse-glow 2s infinite;
+  display: block;
 }
 body.dark-mode .start-chatting-btn {
   background: #007bff;
   box-shadow: 0 4px 15px rgba(0,123,255,0.4);
 }
-.start-chatting-btn:hover {
-  box-shadow: 0 4px 20px rgba(0,123,255,0.8);
-}
 @keyframes pulse-glow {
-  0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4); }
-  70% { box-shadow: 0 0 0 15px rgba(0, 123, 255, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.4); }
+  0% {box-shadow: 0 4px 15px rgba(0,123,255,0.4); transform: translateX(-50%) scale(1);}
+  50% {box-shadow: 0 4px 20px rgba(0,123,255,0.7); transform: translateX(-50%) scale(1.05);}
+  100% {box-shadow: 0 4px 15px rgba(0,123,255,0.4); transform: translateX(-50%) scale(1);}
+}
+.start-chatting-btn:hover {
+  animation: none;
+  box-shadow: 0 4px 20px rgba(0,123,255,0.8);
+  transform: translateX(-50%) scale(1);
 }
 .button-icon {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -958,7 +959,7 @@ body.dark-mode textarea::-webkit-scrollbar-thumb {
     </button>
   </div>
 </footer>
-<button id="nextBtn" title="Next" style="display:none;">
+<button id="nextBtn" title="Next">
   <svg class="button-icon" viewBox="0 0 24 24" fill="white">
     <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
   </svg>
@@ -1149,9 +1150,10 @@ let hasStartedChat = false;
 const handleStartChatting = (e) => {
   e.preventDefault();
   e.stopImmediatePropagation();
-  if(ws) ws.close();
+  if (ws) ws.close();
   hasStartedChat = true;
   startChattingBtn.style.display = 'none';
+  nextBtn.style.display = 'block';
   connectStranger();
 };
 startChattingBtn.addEventListener("click", handleStartChatting);
@@ -1193,7 +1195,6 @@ function scrollToBottom() {
     chatDiv.scrollTop = chatDiv.scrollHeight;
   }
 }
-window.TIKTALK_BACKEND = "https://tiktalk-server-8dmz.onrender.com";
 const messagesDiv = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
@@ -1204,7 +1205,11 @@ let ws, typingTimeout;
 let isConnected = false;
 let reconnectAttempts = 0;
 const maxReconnectAttempts = 5;
+const reconnectDelay = 2000;
+const backendUrl = window.TIKTALK_BACKEND || "https://tiktalk-server-8dmz.onrender.com";
+const wsUrl = backendUrl.replace(/^http(s?)/, 'ws$1') + "/ws";
 let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
+
 function adjustLayoutForKeyboard() {
   const header = document.querySelector("header");
   const chatDiv = document.getElementById("chat");
@@ -1214,34 +1219,50 @@ function adjustLayoutForKeyboard() {
   const nextBtn = document.getElementById("nextBtn");
   const emojiPicker = document.getElementById("emojiPicker");
   const headerHeight = header.offsetHeight || 70;
-  let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)') || '0', 10);
-  let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
-  const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
+  let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-top') || '0', 10);
+  let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--safe-area-inset-bottom') || '0', 10);
+
+  // Fallback for env() not working
+  if (isNaN(safeAreaTop)) safeAreaTop = 0;
+  if (isNaN(safeAreaBottom)) safeAreaBottom = 0;
+
+  const isKeyboardOpen = document.activeElement === input;
   const isEmojiPickerOpen = emojiPicker.classList.contains('show');
   let keyboardHeight = 0;
-  if ('virtualKeyboard' in navigator) {
+
+  // Detect keyboard height
+  if ('virtualKeyboard' in navigator && navigator.virtualKeyboard.boundingRect.height > 0) {
     keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
   } else if (window.visualViewport) {
     const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
     const windowBottom = window.innerHeight;
     keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
   }
+
+  // Store last known keyboard height
   if (keyboardHeight > 0) {
     lastKeyboardHeight = Math.max(keyboardHeight, 300);
     localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
   } else if (!isKeyboardOpen && !isEmojiPickerOpen) {
     lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
   }
+
   document.documentElement.style.setProperty('--keyboard-height', `${lastKeyboardHeight}px`);
   document.documentElement.style.setProperty('--emoji-picker-height', `${lastKeyboardHeight}px`);
+
   const isDesktop = window.matchMedia("(min-width: 768px)").matches;
   const emojiPickerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--emoji-picker-height')) || 350;
+
+  // Reset transitions to avoid glitches
+  footer.style.transition = 'none';
+
   if (isKeyboardOpen) {
-    footer.style.transition = 'bottom 0.3s ease';
-    footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
+    footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px)`;
     chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
     footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
-    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 60px)`;
+    if (!hasStartedChat) {
+      startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 60px)`;
+    }
     nextBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 30px)`;
     if (emojiPicker.classList.contains('show')) {
       emojiPicker.classList.remove('show');
@@ -1250,33 +1271,33 @@ function adjustLayoutForKeyboard() {
       document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
     }
   } else if (isEmojiPickerOpen) {
-    footer.style.transition = 'bottom 0.3s ease';
-    footer.style.bottom = `calc(${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+    footer.style.bottom = `calc(${emojiPickerHeight}px + ${safeAreaBottom}px)`;
     chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
     footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
-    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 60px)`;
+    if (!hasStartedChat) {
+      startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 60px)`;
+    }
     nextBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 30px)`;
     emojiPicker.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
   } else {
-    footer.style.transition = 'none';
     footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
     chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
     footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
-    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 60px + ${safeAreaBottom}px)`;
-    nextBtn.style.bottom = `calc(${footer.offsetHeight}px + 30px + ${safeAreaBottom}px)`;
+    if (!hasStartedChat) {
+      startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 60px)`;
+    }
+    nextBtn.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 30px)`;
     emojiPicker.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
-    footer.offsetHeight;
-    setTimeout(() => {
-      footer.style.transition = 'bottom 0.3s ease';
-    }, 0);
   }
-  footer.style.position = 'fixed';
-  footer.style.transform = 'none';
-  footer.style.height = isDesktop ? "56px" : "56px";
+
+  // Ensure header stays fixed at the top
+  header.style.top = `calc(0px + ${safeAreaTop}px)`;
   chatDiv.style.marginTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
   chatDiv.style.height = `calc(100vh - ${headerHeight}px - ${safeAreaBottom}px)`;
+
+  // Re-apply transition after layout
   requestAnimationFrame(() => {
-    footer.offsetHeight;
+    footer.style.transition = 'bottom 0.3s ease';
     scrollToBottom();
   });
 }
@@ -1291,7 +1312,7 @@ if (window.visualViewport && !('virtualKeyboard' in navigator)) {
     const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
     const windowBottom = window.innerHeight;
     const keyboardHeight = windowBottom - visualViewportBottom;
-    if (keyboardHeight === 0 && document.activeElement !== document.getElementById("messageInput")) {
+    if (keyboardHeight === 0 && document.activeElement !== input) {
       adjustLayoutForKeyboard();
     } else {
       debouncedAdjustLayout();
@@ -1299,17 +1320,16 @@ if (window.visualViewport && !('virtualKeyboard' in navigator)) {
   });
   window.visualViewport.addEventListener("scroll", debouncedAdjustLayout);
 }
-// Fallback interval to check keyboard state
 setInterval(() => {
-  const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
-  const isEmojiPickerOpen = document.getElementById("emojiPicker").classList.contains('show');
+  const isKeyboardOpen = document.activeElement === input;
+  const isEmojiPickerOpen = emojiPicker.classList.contains('show');
   let keyboardHeight = 0;
   if ('virtualKeyboard' in navigator) {
     keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
   } else if (window.visualViewport) {
     const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
     const windowBottom = window.innerHeight;
-    const keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
+    keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
   }
   if (!isKeyboardOpen && keyboardHeight === 0 && !isEmojiPickerOpen) {
     adjustLayoutForKeyboard();
@@ -1327,7 +1347,9 @@ function addMessage(text, who) {
   fragment.appendChild(div);
   messagesDiv.appendChild(fragment);
   scrollToBottom();
-  startChattingBtn.style.display = 'none';
+  if (hasStartedChat) {
+    startChattingBtn.style.display = 'none';
+  }
   debouncedAdjustLayout();
 }
 function showPopup(text) {
@@ -1340,33 +1362,48 @@ function showPopup(text) {
         </div>
       </div>`;
     isConnected = false;
-    startChattingBtn.style.display = 'none';
-    nextBtn.style.display = 'none';
+    if (hasStartedChat) {
+      startChattingBtn.style.display = 'none';
+    }
+    nextBtn.style.display = 'block';
   } else if (text.includes("Connected")) {
     messagesDiv.innerHTML = `
       <div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
     isConnected = true;
-    startChattingBtn.style.display = 'none';
-    nextBtn.style.display = 'none';
-    setTimeout(() => { if (messagesDiv.innerHTML.includes("Connected")) messagesDiv.innerHTML = ''; }, 3000);
+    if (hasStartedChat) {
+      startChattingBtn.style.display = 'none';
+    }
+    nextBtn.style.display = 'block';
+    setTimeout(() => {
+      if (messagesDiv.innerHTML.includes("Connected")) messagesDiv.innerHTML = '';
+    }, 3000);
   } else {
     messagesDiv.innerHTML = `<div class="popup">${text}</div>`;
     isConnected = false;
-    startChattingBtn.style.display = 'block';
+    if (hasStartedChat) {
+      startChattingBtn.style.display = 'none';
+    }
     nextBtn.style.display = 'block';
   }
   scrollToBottom();
   debouncedAdjustLayout();
 }
 function connectStranger() {
-  showPopup("🔍 Searching for a stranger...");
-  typingIndicator.style.display = "none";
-  if (ws) {
+  if (ws && ws.readyState !== WebSocket.CLOSED) {
     ws.close();
   }
-  ws = new const socket = new WebSocket("wss://tiktalk-server-8dmz.onrender.com/ws");
+  showPopup("🔍 Searching for a stranger...");
+  typingIndicator.style.display = "none";
+  ws = new WebSocket(wsUrl);
   ws.onopen = () => {
     reconnectAttempts = 0;
+    isConnected = true;
+    showPopup("✅ Connected! Say Hi 👋");
+    if (hasStartedChat) {
+      startChattingBtn.style.display = 'none';
+    }
+    nextBtn.style.display = 'block';
+    debouncedAdjustLayout();
   };
   ws.onmessage = (event) => {
     try {
@@ -1376,60 +1413,69 @@ function connectStranger() {
           showPopup("🔍 Searching for a stranger...");
         } else if (data.text === "connected") {
           showPopup("✅ Connected! Say Hi 👋");
-          startChattingBtn.style.display = 'none';
+          nextBtn.style.display = 'block';
         } else if (data.text === "disconnected") {
           showPopup("❌ Stranger disconnected");
-          startChattingBtn.style.display = 'none';
+          isConnected = false;
           nextBtn.style.display = 'block';
         }
-      }
-      if (data.type === "message") {
+      } else if (data.type === "message") {
         typingIndicator.style.display = "none";
         addMessage(data.text, "stranger");
+      } else if (data.type === "typing") {
+        if (isConnected) {
+          typingIndicator.style.display = "block";
+          clearTimeout(typingTimeout);
+          typingTimeout = setTimeout(() => {
+            typingIndicator.style.display = "none";
+          }, 1500);
+        }
       }
-      if (data.type === "typing") {
-        typingIndicator.style.display = "block";
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-          typingIndicator.style.display = "none";
-        }, 1500);
-      }
-    } catch {}
+    } catch (error) {
+      console.error("Error parsing WebSocket message:", error);
+    }
   };
-  ws.onclose = () => {
-    showPopup("❌ Disconnected from server");
-    typingIndicator.style.display = "none";
+  ws.onclose = (event) => {
     isConnected = false;
-    startChattingBtn.style.display = 'block';
+    typingIndicator.style.display = "none";
+    showPopup(`❌ Disconnected from server (Code: ${event.code})`);
+    if (hasStartedChat) {
+      startChattingBtn.style.display = 'none';
+    }
     nextBtn.style.display = 'block';
-    if (reconnectAttempts < maxReconnectAttempts) {
+    if (reconnectAttempts < maxReconnectAttempts && event.code !== 1000) {
       setTimeout(() => {
         reconnectAttempts++;
+        console.log(`Reconnect attempt ${reconnectAttempts}/${maxReconnectAttempts}`);
         connectStranger();
-      }, 2000 * reconnectAttempts);
-    } else {
+      }, reconnectDelay * (reconnectAttempts + 1));
+  } else if (reconnectAttempts >= maxReconnectAttempts) {
       showPopup("❌ Failed to reconnect. Please try again later.");
     }
     debouncedAdjustLayout();
   };
-  ws.onerror = () => {
-    ws.close();
+  ws.onerror = (error) => {
+    console.error("WebSocket error:", error);
+    if (ws.readyState !== WebSocket.CLOSED) {
+      ws.close();
+    }
   };
-  debouncedAdjustLayout();
 }
 const handleSend = (e) => {
   e.preventDefault();
   e.stopImmediatePropagation();
-  if(isConnected && input.value.trim()){
-    ws.send(JSON.stringify({type:"message", text:input.value}));
-    addMessage(input.value,"me");
-    input.value="";
+  if (isConnected && ws.readyState === WebSocket.OPEN && input.value.trim()) {
+    ws.send(JSON.stringify({ type: "message", text: input.value }));
+    addMessage(input.value, "me");
+    input.value = "";
     emojiPicker.classList.remove('show');
     emojiPicker.style.display = 'none';
     document.getElementById("emojiToggle").textContent = "😊";
     document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
     wasPickerOpenBeforeKeyboard = false;
     debouncedAdjustLayout();
+  } else if (!isConnected) {
+    showPopup("❌ Not connected to a stranger. Please try again.");
   }
 };
 sendBtn.addEventListener("click", handleSend);
@@ -1437,21 +1483,28 @@ sendBtn.addEventListener("touchstart", handleSend, { passive: false });
 const handleNext = (e) => {
   e.preventDefault();
   e.stopImmediatePropagation();
-  if(ws) ws.close();
+  if (ws) {
+    ws.close();
+  }
+  reconnectAttempts = 0;
   connectStranger();
   debouncedAdjustLayout();
 };
 nextBtn.addEventListener("click", handleNext);
 nextBtn.addEventListener("touchstart", handleNext, { passive: false });
-input.addEventListener("input", ()=>{
-  if(isConnected && ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:"typing"}));
+input.addEventListener("input", () => {
+  if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: "typing" }));
+  }
 });
 document.body.classList.add('auto-scroll-enabled');
 const observer = new MutationObserver(() => {
   scrollToBottom();
 });
 observer.observe(messagesDiv, { childList: true, subtree: true });
-startChattingBtn.style.display = 'block';
+if (!hasStartedChat) {
+  startChattingBtn.style.display = 'block';
+}
 messagesDiv.innerHTML = '';
 </script>
 </body>
