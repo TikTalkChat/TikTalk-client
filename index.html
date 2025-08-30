@@ -1357,8 +1357,8 @@ function showPopup(text) {
 function connectStranger() {
   showPopup("🔍 Searching for a stranger...");
   typingIndicator.style.display = "none";
-  const wsUrl = window.TIKTALK_BACKEND.replace("https://", "wss://") + "/ws";
-  console.log("Attempting to connect to WebSocket:", wsUrl);
+  const const socket = io('https://tiktalkchat-backend-v2.onrender.com');
+  console.log("Attempting to connect to ('https://tiktalkchat-backend-v2.onrender.com');
   ws = new WebSocket(wsUrl);
   ws.onopen = () => {
     console.log("WebSocket Connected Successfully!");
