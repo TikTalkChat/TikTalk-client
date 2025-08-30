@@ -4,8 +4,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <title>TikTalk - Stranger Chat</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@5.6.0/css/emoji-mart.css" />
 <style>
+/* Your existing CSS remains unchanged */
 * {
   margin: 0;
   padding: 0;
@@ -859,11 +860,6 @@ footer {
   border: none !important;
   box-shadow: none !important;
 }
-.footer-buttons {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 textarea::-webkit-scrollbar {
   width: 4px;
 }
@@ -998,10 +994,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const input = document.getElementById("messageInput");
     if (!window._emojiPickerInstance) {
       const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/broer.js";
+      script.src = "https://cdn.jsdelivr.net/npm/emoji-mart@5.6.0/dist/browser.js";
       script.onload = () => {
         if (window.EmojiMart) {
-          const picker = new EmojiMart.Picker({
+          const picker = new window.EmojiMart.Picker({
             onEmojiSelect: (e) => {
               if (!emojiPicker.classList.contains('show') || document.activeElement !== input) {
                 return;
@@ -1300,7 +1296,6 @@ if (window.visualViewport && !('virtualKeyboard' in navigator)) {
   });
   window.visualViewport.addEventListener("scroll", debouncedAdjustLayout);
 }
-// Fallback interval to check keyboard state
 setInterval(() => {
   const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
   const isEmojiPickerOpen = document.getElementById("emojiPicker").classList.contains('show');
@@ -1362,13 +1357,17 @@ function showPopup(text) {
 function connectStranger() {
   showPopup("🔍 Searching for a stranger...");
   typingIndicator.style.display = "none";
-  ws = new WebSocket(window.TIKTALK_BACKEND.replace("http://tiktalkchat-backend-v2.onrender.com/ws");
+  const wsUrl = window.TIKTALK_BACKEND.replace("https://", "wss://") + "/ws";
+  console.log("Attempting to connect to WebSocket:", wsUrl);
+  ws = new WebSocket(wsUrl);
   ws.onopen = () => {
+    console.log("WebSocket Connected Successfully!");
     reconnectAttempts = 0;
   };
   ws.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data);
+      console.log("WebSocket Message Received:", data);
       if (data.type === "system") {
         if (data.text === "waiting") {
           showPopup("🔍 Searching for a stranger...");
@@ -1392,9 +1391,12 @@ function connectStranger() {
           typingIndicator.style.display = "none";
         }, 1500);
       }
-    } catch {}
+    } catch (error) {
+      console.error("Error parsing WebSocket message:", error);
+    }
   };
   ws.onclose = () => {
+    console.log("WebSocket Disconnected");
     showPopup("❌ Disconnected from server");
     typingIndicator.style.display = "none";
     isConnected = false;
@@ -1403,6 +1405,7 @@ function connectStranger() {
     if (reconnectAttempts < maxReconnectAttempts) {
       setTimeout(() => {
         reconnectAttempts++;
+        console.log(`Reconnect attempt ${reconnectAttempts}`);
         connectStranger();
       }, 2000 * reconnectAttempts);
     } else {
@@ -1410,7 +1413,8 @@ function connectStranger() {
     }
     debouncedAdjustLayout();
   };
-  ws.onerror = () => {
+  ws.onerror = (error) => {
+    console.error("WebSocket Error:", error);
     ws.close();
   };
 }
