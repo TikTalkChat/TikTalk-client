@@ -1222,7 +1222,7 @@ const reconnectBaseDelay = 2000; // बेस डिले
 const heartbeatIntervalMs = 30000; // 30 सेकंड में पिंग
 const pongTimeoutMs = 5000; // 5 सेकंड में पोंग की उम्मीद
 const searchTimeoutMs = 45000; // 45 सेकंड सर्च टाइमआउट
-const backendUrl = window.TIKTALK_BACKEND || "https://tiktalk-server-8dmz.onrender.com";
+const backendUrl = window.TIKTALK_BACKEND || "https://tiktalkchat-backend.onrender.com";
 const wsUrl = backendUrl.replace(/^http(s?)/, 'wss$1') + "/ws";
 let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
 
