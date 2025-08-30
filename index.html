@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>TikTalk - Stranger Chat</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css" />
-    <!-- Socket.io क्लाइंट CDN -->
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <style>
-        /* आपका मौजूदा CSS बरकरार है */
         * {
             margin: 0;
             padding: 0;
@@ -287,6 +285,7 @@
             justify-content: center;
             z-index: 10001;
             touch-action: manipulation;
+            pointer-events: auto;
         }
         button:active {
             opacity: 0.85;
@@ -324,6 +323,7 @@
             z-index: 10002;
             overflow: hidden;
             box-shadow: 0 2px 8px rgba(255,59,48,0.4);
+            pointer-events: auto;
         }
         #nextBtn svg {
             width: 24px;
@@ -545,6 +545,7 @@
             background: transparent !important;
             border: none;
             box-shadow: none !important;
+            pointer-events: auto;
         }
         .icon-btn:active {
             transform: scale(0.95);
@@ -567,6 +568,7 @@
             opacity: 1;
             overflow: hidden;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            pointer-events: auto;
         }
         .share-btn svg.button-icon {
             width: 12px;
@@ -665,6 +667,7 @@
             justify-content: center;
             transition: all 0.2s ease;
             z-index: 10001;
+            pointer-events: auto;
         }
         .share-sheet button:hover {
             background: #e9ecef !important;
@@ -828,6 +831,7 @@
             z-index: 10001;
             animation: pulse-glow 2s infinite;
             display: block;
+            pointer-events: auto;
         }
         body.dark-mode .start-chatting-btn {
             background: #007bff;
@@ -973,29 +977,35 @@
         }
 
         document.addEventListener("DOMContentLoaded", () => {
+            console.log("DOM loaded, initializing buttons...");
             const shareBtn = document.getElementById("shareBtn");
             if (shareBtn) {
                 shareBtn.style.display = "flex";
                 shareBtn.style.visibility = "visible";
                 shareBtn.style.opacity = "1";
+                console.log("Share button initialized");
             } else {
-                console.error("Share Button not found in DOM!");
+                console.error("Share Button not found!");
             }
+
             const savedTheme = localStorage.getItem("theme");
             if (savedTheme === "dark") {
                 document.body.classList.add("dark-mode");
                 themeToggle.textContent = "☀️";
+                console.log("Dark mode applied from localStorage");
             }
 
             if ('virtualKeyboard' in navigator) {
                 navigator.virtualKeyboard.overlaysContent = true;
                 navigator.virtualKeyboard.addEventListener('geometrychange', debouncedAdjustLayout);
+                console.log("Virtual keyboard support enabled");
             }
 
             function initializeEmojiPicker() {
                 const emojiPicker = document.getElementById("emojiPicker");
                 const input = document.getElementById("messageInput");
                 if (!window._emojiPickerInstance) {
+                    console.log("Loading EmojiMart...");
                     const script = document.createElement("script");
                     script.src = "https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js";
                     script.onload = () => {
@@ -1008,6 +1018,7 @@
                                     input.value += e.native;
                                     input.focus();
                                     debouncedAdjustLayout();
+                                    console.log(`Emoji selected: ${e.native}`);
                                 },
                                 theme: document.body.classList.contains("dark-mode") ? "dark" : "light",
                                 previewPosition: "none",
@@ -1017,6 +1028,7 @@
                             });
                             emojiPicker.appendChild(picker);
                             window._emojiPickerInstance = picker;
+                            console.log("Emoji picker initialized");
                         }
                     };
                     script.onerror = () => console.error("Failed to load EmojiMart");
@@ -1033,11 +1045,9 @@
             let wasPickerOpenBeforeKeyboard = false;
 
             const handleEmojiToggle = (e) => {
-                if (e.target !== emojiToggle || e.currentTarget !== emojiToggle) {
-                    return;
-                }
                 e.preventDefault();
                 e.stopImmediatePropagation();
+                console.log("Emoji toggle clicked");
                 const isPickerOpen = emojiPicker.classList.contains('show');
                 if (isPickerOpen) {
                     emojiPicker.classList.remove('show');
@@ -1058,11 +1068,12 @@
 
             emojiToggle.removeEventListener("click", handleEmojiToggle);
             emojiToggle.removeEventListener("touchstart", handleEmojiToggle);
-            emojiToggle.removeEventListener("pointerdown", handleEmojiToggle);
             emojiToggle.addEventListener("click", handleEmojiToggle, { passive: false });
+            emojiToggle.addEventListener("touchstart", handleEmojiToggle, { passive: false });
 
             const handleInputInteraction = (e) => {
                 e.stopImmediatePropagation();
+                console.log("Input interaction");
             };
             input.removeEventListener("click", handleInputInteraction);
             input.removeEventListener("touchstart", handleInputInteraction);
@@ -1070,6 +1081,7 @@
             input.addEventListener("touchstart", handleInputInteraction, { passive: true });
 
             input.addEventListener("focus", () => {
+                console.log("Input focused");
                 if (emojiPicker.classList.contains('show')) {
                     emojiPicker.classList.remove('show');
                     emojiPicker.style.display = 'none';
@@ -1082,6 +1094,7 @@
             });
 
             input.addEventListener("blur", () => {
+                console.log("Input blurred");
                 setTimeout(() => {
                     const isStillFocused = document.activeElement === input || document.activeElement === emojiToggle;
                     if (!isStillFocused) {
@@ -1106,6 +1119,7 @@
         const themeToggle = document.getElementById("themeToggle");
         const handleThemeToggle = (e) => {
             e.preventDefault();
+            console.log("Theme toggle clicked");
             document.body.classList.toggle("dark-mode");
             themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
             if (window._emojiPickerInstance) {
@@ -1115,17 +1129,18 @@
             }
             localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
         };
-        themeToggle.addEventListener("click", handleThemeToggle);
+        themeToggle.removeEventListener("click", handleThemeToggle);
+        themeToggle.removeEventListener("touchstart", handleThemeToggle);
+        themeToggle.addEventListener("click", handleThemeToggle, { passive: false });
         themeToggle.addEventListener("touchstart", handleThemeToggle, { passive: false });
 
         const shareBtn = document.getElementById("shareBtn");
         const shareSheet = document.getElementById("shareSheet");
-        const startChattingBtn = document.getElementById("startChattingBtn");
-        const nextBtn = document.getElementById("nextBtn");
 
         const handleShareBtn = (e) => {
             e.preventDefault();
             e.stopImmediatePropagation();
+            console.log("Share button clicked");
             const btnRect = shareBtn.getBoundingClientRect();
             shareSheet.style.top = (btnRect.bottom + window.scrollY) + "px";
             shareSheet.style.right = (window.innerWidth - btnRect.right) + "px";
@@ -1133,40 +1148,87 @@
             if (shareSheet.classList.contains('show')) shareSheet.style.display = 'flex';
             else setTimeout(() => { shareSheet.style.display = 'none'; }, 300);
         };
-        shareBtn.addEventListener("click", handleShareBtn);
+        shareBtn.removeEventListener("click", handleShareBtn);
+        shareBtn.removeEventListener("touchstart", handleShareBtn);
+        shareBtn.addEventListener("click", handleShareBtn, { passive: false });
         shareBtn.addEventListener("touchstart", handleShareBtn, { passive: false });
 
         document.addEventListener("click", (e) => {
             if (!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')) {
+                console.log("Closing share sheet");
                 shareSheet.classList.remove('show');
                 setTimeout(() => { shareSheet.style.display = 'none'; }, 300);
             }
         });
         document.addEventListener("touchstart", (e) => {
             if (!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')) {
+                console.log("Closing share sheet (touch)");
                 shareSheet.classList.remove('show');
                 setTimeout(() => { shareSheet.style.display = 'none'; }, 300);
             }
         });
 
+        function shareApp(platform) {
+            console.log(`Sharing on ${platform}`);
+            let url = window.location.href;
+            if (platform === "whatsapp") window.open("https://wa.me/?text=" + encodeURIComponent(url), "_blank");
+            else if (platform === "instagram") window.open("https://www.instagram.com/", "_blank");
+            else if (platform === "facebook") window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url), "_blank");
+            else if (platform === "x") window.open("https://twitter.com/intent/tweet?url=" + encodeURIComponent(url), "_blank");
+            else if (platform === "link") {
+                const tempInput = document.createElement('input');
+                tempInput.value = url;
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+                showCopyPopup("✅ Copied!");
+            }
+        }
+
+        function showCopyPopup(message) {
+            console.log("Showing copy popup:", message);
+            let existing = document.getElementById("copyLinkPopup");
+            if (existing) existing.remove();
+            const popup = document.createElement("div");
+            popup.id = "copyLinkPopup";
+            popup.textContent = message;
+            document.body.appendChild(popup);
+            const shareBtnRect = shareBtn.getBoundingClientRect();
+            const sheetRect = shareSheet.getBoundingClientRect();
+            popup.style.top = (sheetRect.bottom + window.scrollY + 10) + "px";
+            popup.style.right = (window.innerWidth - sheetRect.right) + "px";
+            popup.style.transform = 'translateY(-10px)';
+            void popup.offsetWidth;
+            popup.classList.add('show');
+            setTimeout(() => {
+                popup.classList.remove('show');
+                setTimeout(() => popup.remove(), 300);
+            }, 2000);
+        }
+
+        function scrollToBottom() {
+            const chatDiv = document.getElementById("chat");
+            const isNearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 100;
+            if (isNearBottom && messagesDiv.children.length > 0) {
+                chatDiv.scrollTop = chatDiv.scrollHeight;
+            }
+        }
+
         let hasStartedChat = false;
         let socket;
-        let username = `User${Math.floor(Math.random() * 10000)}`; // रैंडम यूजरनेम
+        let username = `User${Math.floor(Math.random() * 10000)}`;
         let isConnected = false;
         let typingTimeout;
         let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
 
-        // Render.com का URL
-        const SERVER_URL = "https://tiktalkchat-backend.onrender.com"; // Render.com URL
+        const SERVER_URL = "https://tiktalkchat-backend.onrender.com";
 
         async function checkServerStatus() {
             try {
                 const response = await fetch(SERVER_URL, { method: 'GET', mode: 'cors' });
-                if (!response.ok) {
-                    console.error(`Server check failed: HTTP ${response.status}`);
-                    return false;
-                }
-                return true;
+                console.log(`Server status: ${response.status}`);
+                return response.ok;
             } catch (error) {
                 console.error("Server check error:", error);
                 return false;
@@ -1188,4 +1250,323 @@
             if (isNaN(safeAreaTop)) safeAreaTop = 0;
             if (isNaN(safeAreaBottom)) safeAreaBottom = 0;
 
-            const isKeyboardOpen = document
+            const isKeyboardOpen = document.activeElement === input;
+            const isEmojiPickerOpen = emojiPicker.classList.contains('show');
+            let keyboardHeight = 0;
+
+            if ('virtualKeyboard' in navigator && navigator.virtualKeyboard.boundingRect.height > 0) {
+                keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
+            } else if (window.visualViewport) {
+                const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
+                const windowBottom = window.innerHeight;
+                keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
+            }
+
+            if (keyboardHeight > 0) {
+                lastKeyboardHeight = Math.max(keyboardHeight, 300);
+                localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
+            } else if (!isKeyboardOpen && !isEmojiPickerOpen) {
+                lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
+            }
+
+            document.documentElement.style.setProperty('--keyboard-height', `${lastKeyboardHeight}px`);
+            document.documentElement.style.setProperty('--emoji-picker-height', `${lastKeyboardHeight}px`);
+
+            const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+            const emojiPickerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--emoji-picker-height')) || 350;
+
+            footer.style.transition = 'none';
+
+            if (isKeyboardOpen) {
+                footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px)`;
+                chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
+                footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
+                if (!hasStartedChat) {
+                    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 60px)`;
+                }
+                nextBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 30px)`;
+                emojiPicker.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
+            } else if (isEmojiPickerOpen) {
+                footer.style.bottom = `calc(${emojiPickerHeight}px + ${safeAreaBottom}px)`;
+                chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+                footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+                if (!hasStartedChat) {
+                    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 60px)`;
+                }
+                nextBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 30px)`;
+                emojiPicker.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
+            } else {
+                footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
+                chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
+                footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
+                if (!hasStartedChat) {
+                    startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 60px)`;
+                }
+                nextBtn.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 30px)`;
+                emojiPicker.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
+            }
+
+            header.style.top = `calc(0px + ${safeAreaTop}px)`;
+            chatDiv.style.marginTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
+            chatDiv.style.height = `calc(100vh - ${headerHeight}px - ${safeAreaBottom}px)`;
+
+            requestAnimationFrame(() => {
+                footer.style.transition = 'bottom 0.3s ease';
+                scrollToBottom();
+            });
+        }
+
+        const debouncedAdjustLayout = debounce(adjustLayoutForKeyboard, 50);
+        let rafId;
+        function updateLayout() {
+            adjustLayoutForKeyboard();
+            rafId = requestAnimationFrame(updateLayout);
+        }
+
+        if (window.visualViewport && !('virtualKeyboard' in navigator)) {
+            window.visualViewport.addEventListener("resize", () => {
+                const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
+                const windowBottom = window.innerHeight;
+                const keyboardHeight = windowBottom - visualViewportBottom;
+                if (keyboardHeight === 0 && document.activeElement !== input) {
+                    adjustLayoutForKeyboard();
+                } else {
+                    debouncedAdjustLayout();
+                }
+            });
+            window.visualViewport.addEventListener("scroll", debouncedAdjustLayout);
+        }
+
+        setInterval(() => {
+            const isKeyboardOpen = document.activeElement === input;
+            const isEmojiPickerOpen = emojiPicker.classList.contains('show');
+            let keyboardHeight = 0;
+            if ('virtualKeyboard' in navigator) {
+                keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
+            } else if (window.visualViewport) {
+                const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
+                const windowBottom = window.innerHeight;
+                keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
+            }
+            if (!isKeyboardOpen && keyboardHeight === 0 && !isEmojiPickerOpen) {
+                adjustLayoutForKeyboard();
+            }
+        }, 500);
+
+        window.addEventListener("resize", debouncedAdjustLayout);
+        window.addEventListener("touchstart", debouncedAdjustLayout);
+        window.addEventListener("touchmove", debouncedAdjustLayout);
+        window.addEventListener("load", debouncedAdjustLayout);
+
+        const messagesDiv = document.getElementById("messages");
+        const input = document.getElementById("messageInput");
+        const sendBtn = document.getElementById("sendBtn");
+        const startChattingBtn = document.getElementById("startChattingBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const typingIndicator = document.getElementById("typingIndicator");
+
+        function addMessage(text, who) {
+            const fragment = document.createDocumentFragment();
+            const div = document.createElement("div");
+            div.className = "msg " + who;
+            div.textContent = text;
+            fragment.appendChild(div);
+            messagesDiv.appendChild(fragment);
+            scrollToBottom();
+            if (hasStartedChat) {
+                startChattingBtn.style.display = 'none';
+            }
+            debouncedAdjustLayout();
+            console.log(`Message added: ${text} (${who})`);
+        }
+
+        function showPopup(text) {
+            if (text.includes("Searching")) {
+                messagesDiv.innerHTML = `
+                    <div class="popup">
+                        <div class="searching-container">
+                            <div class="pulse-dots"><div class="pulse-dot"></div><div class="pulse-dot"></div><div class="pulse-dot"></div></div>
+                            <div class="searching-text">Searching for a stranger...</div>
+                        </div>
+                    </div>`;
+                isConnected = false;
+                if (hasStartedChat) {
+                    startChattingBtn.style.display = 'none';
+                }
+                nextBtn.style.display = 'block';
+                console.log("Showing searching popup");
+            } else if (text.includes("Connected")) {
+                messagesDiv.innerHTML = `
+                    <div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
+                isConnected = true;
+                if (hasStartedChat) {
+                    startChattingBtn.style.display = 'none';
+                }
+                nextBtn.style.display = 'block';
+                setTimeout(() => {
+                    if (messagesDiv.innerHTML.includes("Connected")) messagesDiv.innerHTML = '';
+                }, 3000);
+                console.log("Showing connected popup");
+            } else {
+                messagesDiv.innerHTML = `<div class="popup">${text}</div>`;
+                isConnected = false;
+                if (hasStartedChat) {
+                    startChattingBtn.style.display = 'none';
+                }
+                nextBtn.style.display = 'block';
+                console.log(`Showing popup: ${text}`);
+            }
+            scrollToBottom();
+            debouncedAdjustLayout();
+        }
+
+        async function connectStranger() {
+            if (socket && socket.connected) {
+                socket.disconnect();
+                console.log("Disconnected existing socket");
+            }
+
+            const serverAvailable = await checkServerStatus();
+            if (!serverAvailable) {
+                showPopup("❌ Server is unavailable. Please try again later or refresh the page.");
+                nextBtn.style.display = 'block';
+                console.error("Server unavailable");
+                return;
+            }
+
+            showPopup("🔍 Searching for a stranger...");
+            typingIndicator.style.display = "none";
+            socket = io(SERVER_URL, {
+                reconnection: true,
+                reconnectionAttempts: 5,
+                reconnectionDelay: 1000
+            });
+
+            socket.on('connect', () => {
+                console.log("Socket connected:", socket.id);
+                socket.emit('startChat', { username });
+                hasStartedChat = true;
+                nextBtn.style.display = 'block';
+                debouncedAdjustLayout();
+            });
+
+            socket.on('system', (data) => {
+                console.log("System message:", data.text);
+                showPopup(data.text);
+            });
+
+            socket.on('receiveMessage', (data) => {
+                console.log("Message received:", data.message);
+                typingIndicator.style.display = "none";
+                addMessage(data.message, "stranger");
+            });
+
+            socket.on('typing', (data) => {
+                if (isConnected) {
+                    console.log("Typing indicator received");
+                    typingIndicator.style.display = "block";
+                    clearTimeout(typingTimeout);
+                    typingTimeout = setTimeout(() => {
+                        typingIndicator.style.display = "none";
+                    }, 1500);
+                }
+            });
+
+            socket.on('disconnect', () => {
+                console.log("Socket disconnected");
+                isConnected = false;
+                typingIndicator.style.display = "none";
+                showPopup("❌ Disconnected from server");
+                nextBtn.style.display = 'block';
+                debouncedAdjustLayout();
+            });
+
+            socket.on('connect_error', (error) => {
+                console.error("Socket connect error:", error);
+                showPopup("❌ Connection error. Please try again.");
+                nextBtn.style.display = 'block';
+            });
+        }
+
+        const handleStartChatting = async (e) => {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            console.log("Start Chatting button clicked");
+            hasStartedChat = true;
+            startChattingBtn.style.display = 'none';
+            await connectStranger();
+        };
+        startChattingBtn.removeEventListener("click", handleStartChatting);
+        startChattingBtn.removeEventListener("touchstart", handleStartChatting);
+        startChattingBtn.addEventListener("click", handleStartChatting, { passive: false });
+        startChattingBtn.addEventListener("touchstart", handleStartChatting, { passive: false });
+
+        const handleSend = (e) => {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            console.log("Send button clicked");
+            if (isConnected && socket && socket.connected && input.value.trim()) {
+                socket.emit('sendMessage', { message: input.value, username });
+                addMessage(input.value, "me");
+                input.value = "";
+                emojiPicker.classList.remove('show');
+                emojiPicker.style.display = 'none';
+                document.getElementById("emojiToggle").textContent = "😊";
+                document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
+                wasPickerOpenBeforeKeyboard = false;
+                debouncedAdjustLayout();
+            } else if (!isConnected) {
+                showPopup("❌ Not connected to a stranger. Please try again.");
+                console.log("Send failed: not connected");
+            }
+        };
+        sendBtn.removeEventListener("click", handleSend);
+        sendBtn.removeEventListener("touchstart", handleSend);
+        sendBtn.addEventListener("click", handleSend, { passive: false });
+        sendBtn.addEventListener("touchstart", handleSend, { passive: false });
+
+        const handleNext = async (e) => {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            console.log("Next button clicked");
+            if (socket && socket.connected) {
+                socket.emit('nextChat');
+                console.log("Next chat requested");
+            } else {
+                const serverAvailable = await checkServerStatus();
+                if (serverAvailable) {
+                    await connectStranger();
+                } else {
+                    showPopup("❌ Server is unavailable. Please try again later.");
+                    nextBtn.style.display = 'block';
+                    console.error("Server unavailable for next chat");
+                }
+            }
+            debouncedAdjustLayout();
+        };
+        nextBtn.removeEventListener("click", handleNext);
+        nextBtn.removeEventListener("touchstart", handleNext);
+        nextBtn.addEventListener("click", handleNext, { passive: false });
+        nextBtn.addEventListener("touchstart", handleNext, { passive: false });
+
+        input.addEventListener("input", () => {
+            if (isConnected && socket && socket.connected) {
+                socket.emit('typing', { username });
+                console.log("Typing event emitted");
+            }
+        });
+
+        document.body.classList.add('auto-scroll-enabled');
+        const observer = new MutationObserver(() => {
+            scrollToBottom();
+        });
+        observer.observe(messagesDiv, { childList: true, subtree: true });
+
+        if (!hasStartedChat) {
+            startChattingBtn.style.display = 'block';
+        }
+        messagesDiv.innerHTML = '';
+        console.log("App initialized");
+    </script>
+</body>
+</html>
