@@ -6,6 +6,7 @@
 <title>TikTalk - Stranger Chat</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css" />
 <style>
+/* Your CSS remains mostly the same, just a few small fixes */
 * {
   margin: 0;
   padding: 0;
@@ -556,6 +557,7 @@ body.dark-mode .share-sheet button {
 </button>
 <div id="emojiPicker" aria-hidden="true"></div>
 <script>
+// Fixed WebSocket URL - use Render.com backend
 window.TIKTALK_BACKEND = "https://tiktalkchat-backend-v2.onrender.com";
 
 function debounce(func, wait) {
@@ -566,8 +568,11 @@ function debounce(func, wait) {
   };
 }
 
+// Initialize everything when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM loaded, initializing UI...");
+  
+  // Initialize all UI elements
   const shareBtn = document.getElementById("shareBtn");
   const messagesDiv = document.getElementById("messages");
   const startChattingBtn = document.getElementById("startChattingBtn");
@@ -578,21 +583,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const nextBtn = document.getElementById("nextBtn");
   const themeToggle = document.getElementById("themeToggle");
 
-  // Ensure initial UI state
-  if (shareBtn) {
-    shareBtn.style.display = "flex";
-    shareBtn.style.visibility = "visible";
-    shareBtn.style.opacity = "1";
-  } else {
-    console.error("Share Button not found!");
-  }
-  if (startChattingBtn) {
-    startChattingBtn.style.display = "block";
-  } else {
-    console.error("Start Chatting Button not found!");
-  }
-  messagesDiv.innerHTML = '<div class="popup">Welcome to TikTalk! Click "Start Chat" to connect with a stranger.</div>';
-
   // Theme toggle
   const savedTheme = localStorage.getItem("theme");
   if (savedTheme === "dark") {
@@ -600,45 +590,63 @@ document.addEventListener("DOMContentLoaded", () => {
     themeToggle.textContent = "☀️";
   }
 
-  // Virtual keyboard support
-  if ('virtualKeyboard' in navigator) {
-    navigator.virtualKeyboard.overlaysContent = true;
-    navigator.virtualKeyboard.addEventListener('geometrychange', debouncedAdjustLayout);
-  }
-
-  // Emoji picker initialization
+  // Initialize emoji picker
   function initializeEmojiPicker() {
     try {
-      const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js";
-      script.onload = () => {
-        if (window.EmojiMart) {
-          const picker = new window.EmojiMart.Picker({
-            onEmojiSelect: (e) => {
-              if (!emojiPicker.classList.contains('show') || document.activeElement !== input) return;
-              input.value += e.native;
-              input.focus();
-              debouncedAdjustLayout();
-            },
-            theme: document.body.classList.contains("dark-mode") ? "dark" : "light",
-            previewPosition: "none",
-            skinTonePosition: "search",
-            categories: ["frequent", "people", "nature", "foods", "activity", "places", "objects", "symbols", "flags"],
-            emoji: "😊"
-          });
-          emojiPicker.appendChild(picker);
-          window._emojiPickerInstance = picker;
-        } else {
-          console.error("EmojiMart not loaded");
-        }
-      };
-      script.onerror = () => console.error("Failed to load EmojiMart");
-      document.head.appendChild(script);
+      // Check if EmojiMart is already loaded
+      if (window.EmojiMart) {
+        const picker = new window.EmojiMart.Picker({
+          onEmojiSelect: (e) => {
+            if (!emojiPicker.classList.contains('show') || document.activeElement !== input) return;
+            input.value += e.native;
+            input.focus();
+            debouncedAdjustLayout();
+          },
+          theme: document.body.classList.contains("dark-mode") ? "dark" : "light",
+          previewPosition: "none",
+          skinTonePosition: "search",
+          categories: ["frequent", "people", "nature", "foods", "activity", "places", "objects", "symbols", "flags"],
+          emoji: "😊"
+        });
+        emojiPicker.innerHTML = ''; // Clear previous content
+        emojiPicker.appendChild(picker);
+        window._emojiPickerInstance = picker;
+      } else {
+        // Load EmojiMart if not already loaded
+        const script = document.createElement("script");
+        script.src = "https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js";
+        script.onload = () => {
+          if (window.EmojiMart) {
+            const picker = new window.EmojiMart.Picker({
+              onEmojiSelect: (e) => {
+                if (!emojiPicker.classList.contains('show') || document.activeElement !== input) return;
+                input.value += e.native;
+                input.focus();
+                debouncedAdjustLayout();
+              },
+              theme: document.body.classList.contains("dark-mode") ? "dark" : "light",
+              previewPosition: "none",
+              skinTonePosition: "search",
+              categories: ["frequent", "people", "nature", "foods", "activity", "places", "objects", "symbols", "flags"],
+              emoji: "😊"
+            });
+            emojiPicker.innerHTML = ''; // Clear previous content
+            emojiPicker.appendChild(picker);
+            window._emojiPickerInstance = picker;
+          } else {
+            console.error("EmojiMart not loaded");
+          }
+        };
+        script.onerror = () => console.error("Failed to load EmojiMart");
+        document.head.appendChild(script);
+      }
     } catch (error) {
       console.error("Error initializing EmojiPicker:", error);
     }
   }
-  initializeEmojiPicker();
+
+  // Initialize emoji picker after a short delay to ensure DOM is ready
+  setTimeout(initializeEmojiPicker, 500);
 
   // Emoji toggle
   let wasPickerOpenBeforeKeyboard = false;
@@ -650,15 +658,16 @@ document.addEventListener("DOMContentLoaded", () => {
     emojiPicker.style.display = isPickerOpen ? 'none' : 'block';
     emojiToggle.textContent = isPickerOpen ? "😊" : "⌨️";
     emojiToggle.setAttribute('aria-expanded', !isPickerOpen);
-    if (!isPickerOpen) input.blur();
-    else input.focus();
+    if (!isPickerOpen) input.focus();
     wasPickerOpenBeforeKeyboard = isPickerOpen;
     debouncedAdjustLayout();
   };
-  emojiToggle.removeEventListener("click", handleEmojiToggle);
-  emojiToggle.removeEventListener("touchstart", handleEmojiToggle);
+  
   emojiToggle.addEventListener("click", handleEmojiToggle);
-  emojiToggle.addEventListener("touchstart", handleEmojiToggle, { passive: false });
+  emojiToggle.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    handleEmojiToggle(e);
+  }, { passive: false });
 
   // Input interaction
   input.addEventListener("focus", () => {
@@ -671,7 +680,6 @@ document.addEventListener("DOMContentLoaded", () => {
       wasPickerOpenBeforeKeyboard = true;
     }
     adjustLayoutForKeyboard();
-    if (!rafId) rafId = requestAnimationFrame(updateLayout);
   });
 
   input.addEventListener("blur", () => {
@@ -681,64 +689,127 @@ document.addEventListener("DOMContentLoaded", () => {
         adjustLayoutForKeyboard();
       }
     }, 50);
-    if (wasPickerOpenBeforeKeyboard) {
-      emojiPicker.classList.add('show');
-      emojiPicker.style.display = 'block';
-      emojiToggle.textContent = "⌨️";
-      emojiToggle.setAttribute('aria-expanded', 'true');
-    }
-    if (rafId) {
-      cancelAnimationFrame(rafId);
-      rafId = null;
-    }
   });
 
   input.addEventListener("input", debouncedAdjustLayout);
+  
+  // Send message on Enter key
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend(e);
+    }
+  });
+
+  // Theme toggle
+  const handleThemeToggle = (e) => {
+    console.log("Theme toggle clicked");
+    e.preventDefault();
+    document.body.classList.toggle("dark-mode");
+    themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
+    if (window._emojiPickerInstance) {
+      window._emojiPickerInstance.setOptions({
+        theme: document.body.classList.contains("dark-mode") ? "dark" : "light"
+      });
+    }
+    localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
+  };
+  
+  themeToggle.addEventListener("click", handleThemeToggle);
+  themeToggle.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    handleThemeToggle(e);
+  }, { passive: false });
+
+  // Share button
+  const shareSheet = document.getElementById("shareSheet");
+  const handleShareBtn = (e) => {
+    console.log("Share button clicked");
+    e.preventDefault();
+    const btnRect = shareBtn.getBoundingClientRect();
+    shareSheet.style.top = (btnRect.bottom + window.scrollY) + "px";
+    shareSheet.style.right = (window.innerWidth - btnRect.right) + "px";
+    shareSheet.classList.toggle('show');
+    shareSheet.style.display = shareSheet.classList.contains('show') ? 'flex' : 'none';
+  };
+  
+  shareBtn.addEventListener("click", handleShareBtn);
+  shareBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    handleShareBtn(e);
+  }, { passive: false });
+
+  document.addEventListener("click", (e) => {
+    if (!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')) {
+      shareSheet.classList.remove('show');
+      shareSheet.style.display = 'none';
+    }
+  });
+
+  // Start chatting button
+  const handleStartChatting = (e) => {
+    console.log("Start Chatting clicked");
+    e.preventDefault();
+    if (window.ws) window.ws.close();
+    startChattingBtn.style.display = 'none';
+    connectStranger();
+  };
+  
+  startChattingBtn.addEventListener("click", handleStartChatting);
+  startChattingBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    handleStartChatting(e);
+  }, { passive: false });
+
+  // Send button
+  const handleSend = (e) => {
+    console.log("Send button clicked");
+    e.preventDefault();
+    if (window.isConnected && input.value.trim()) {
+      window.ws.send(JSON.stringify({type: "message", text: input.value}));
+      addMessage(input.value, "me");
+      input.value = "";
+      emojiPicker.classList.remove('show');
+      emojiPicker.style.display = 'none';
+      document.getElementById("emojiToggle").textContent = "😊";
+      document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
+      debouncedAdjustLayout();
+    }
+  };
+  
+  sendBtn.addEventListener("click", handleSend);
+  sendBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    handleSend(e);
+  }, { passive: false });
+
+  // Next button
+  const handleNext = (e) => {
+    console.log("Next button clicked");
+    e.preventDefault();
+    if (window.ws) window.ws.close();
+    connectStranger();
+    debouncedAdjustLayout();
+  };
+  
+  nextBtn.addEventListener("click", handleNext);
+  nextBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    handleNext(e);
+  }, { passive: false });
+
+  // Typing indicator
+  input.addEventListener("input", () => {
+    if (window.isConnected && window.ws && window.ws.readyState === WebSocket.OPEN) {
+      window.ws.send(JSON.stringify({type: "typing"}));
+    }
+  });
+
+  // Initial layout adjustment
+  debouncedAdjustLayout();
 });
 
-// Theme toggle
-const themeToggle = document.getElementById("themeToggle");
-const handleThemeToggle = (e) => {
-  console.log("Theme toggle clicked");
-  e.preventDefault();
-  document.body.classList.toggle("dark-mode");
-  themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
-  if (window._emojiPickerInstance) {
-    window._emojiPickerInstance.setOptions({
-      theme: document.body.classList.contains("dark-mode") ? "dark" : "light"
-    });
-  }
-  localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
-};
-themeToggle.removeEventListener("click", handleThemeToggle);
-themeToggle.removeEventListener("touchstart", handleThemeToggle);
-themeToggle.addEventListener("click", handleThemeToggle);
-themeToggle.addEventListener("touchstart", handleThemeToggle, { passive: false });
-
-// Share button
-const shareBtn = document.getElementById("shareBtn");
-const shareSheet = document.getElementById("shareSheet");
-const handleShareBtn = (e) => {
-  console.log("Share button clicked");
-  e.preventDefault();
-  const btnRect = shareBtn.getBoundingClientRect();
-  shareSheet.style.top = (btnRect.bottom + window.scrollY) + "px";
-  shareSheet.style.right = (window.innerWidth - btnRect.right) + "px";
-  shareSheet.classList.toggle('show');
-  shareSheet.style.display = shareSheet.classList.contains('show') ? 'flex' : 'none';
-};
-shareBtn.removeEventListener("click", handleShareBtn);
-shareBtn.removeEventListener("touchstart", handleShareBtn);
-shareBtn.addEventListener("click", handleShareBtn);
-shareBtn.addEventListener("touchstart", handleShareBtn, { passive: false });
-
-document.addEventListener("click", (e) => {
-  if (!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')) {
-    shareSheet.classList.remove('show');
-    shareSheet.style.display = 'none';
-  }
-});
-
+// Share app function
 function shareApp(platform) {
   console.log("Share app:", platform);
   let url = window.location.href;
@@ -765,8 +836,8 @@ function showCopyPopup(message) {
   popup.id = "copyLinkPopup";
   popup.textContent = message;
   document.body.appendChild(popup);
-  const shareBtnRect = shareBtn.getBoundingClientRect();
-  const sheetRect = shareSheet.getBoundingClientRect();
+  const shareBtnRect = document.getElementById("shareBtn").getBoundingClientRect();
+  const sheetRect = document.getElementById("shareSheet").getBoundingClientRect();
   popup.style.top = (sheetRect.bottom + window.scrollY + 10) + "px";
   popup.style.right = (window.innerWidth - sheetRect.right) + "px";
   popup.style.transform = 'translateY(-10px)';
@@ -774,11 +845,14 @@ function showCopyPopup(message) {
   popup.classList.add('show');
   setTimeout(() => {
     popup.classList.remove('show');
-    popup.remove();
+    setTimeout(() => {
+      if (popup.parentNode) popup.parentNode.removeChild(popup);
+    }, 300);
   }, 2000);
 }
 
-let ws, typingTimeout, isConnected = false, reconnectAttempts = 0, rafId;
+// WebSocket connection and messaging functions
+let typingTimeout, reconnectAttempts = 0, rafId;
 const maxReconnectAttempts = 5;
 let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
 
@@ -907,31 +981,29 @@ window.addEventListener("load", debouncedAdjustLayout);
 function scrollToBottom() {
   const chatDiv = document.getElementById("chat");
   const isNearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 100;
-  if (isNearBottom && messagesDiv.children.length > 0) {
+  if (isNearBottom && document.getElementById("messages").children.length > 0) {
     chatDiv.scrollTop = chatDiv.scrollHeight;
   }
 }
 
-const messagesDiv = document.getElementById("messages");
-const input = document.getElementById("messageInput");
-const sendBtn = document.getElementById("sendBtn");
-const startChattingBtn = document.getElementById("startChattingBtn");
-const nextBtn = document.getElementById("nextBtn");
-const typingIndicator = document.getElementById("typingIndicator");
-
 function addMessage(text, who) {
   console.log("Adding message:", text, who);
+  const messagesDiv = document.getElementById("messages");
   const div = document.createElement("div");
   div.className = "msg " + who;
   div.textContent = text;
   messagesDiv.appendChild(div);
   scrollToBottom();
-  startChattingBtn.style.display = 'none';
+  document.getElementById("startChattingBtn").style.display = 'none';
   debouncedAdjustLayout();
 }
 
 function showPopup(text) {
   console.log("Showing popup:", text);
+  const messagesDiv = document.getElementById("messages");
+  const startChattingBtn = document.getElementById("startChattingBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  
   messagesDiv.innerHTML = `<div class="popup">${text}</div>`;
   if (text.includes("Searching")) {
     messagesDiv.innerHTML = `
@@ -941,18 +1013,18 @@ function showPopup(text) {
           <div class="searching-text">Searching for a stranger...</div>
         </div>
       </div>`;
-    isConnected = false;
+    window.isConnected = false;
     startChattingBtn.style.display = 'none';
     nextBtn.style.display = 'none';
   } else if (text.includes("Connected")) {
-    isConnected = true;
+    window.isConnected = true;
     startChattingBtn.style.display = 'none';
     nextBtn.style.display = 'none';
     setTimeout(() => {
       if (messagesDiv.innerHTML.includes("Connected")) messagesDiv.innerHTML = '';
     }, 3000);
   } else {
-    isConnected = false;
+    window.isConnected = false;
     startChattingBtn.style.display = 'none';
     nextBtn.style.display = 'block';
   }
@@ -963,9 +1035,10 @@ function showPopup(text) {
 function connectStranger() {
   console.log("Connecting to stranger...");
   showPopup("🔍 Searching for a stranger...");
-  typingIndicator.style.display = "none";
+  document.getElementById("typingIndicator").style.display = "none";
   try {
-    ws = new WebSocket(window.TIKTALK_BACKEND.replace("https", "wss") + "/ws");
+    // Use the correct WebSocket URL for Render.com
+    window.ws = new WebSocket(window.TIKTALK_BACKEND.replace("https", "wss") + "/ws");
     console.log("WebSocket connecting to:", window.TIKTALK_BACKEND.replace("https", "wss") + "/ws");
   } catch (error) {
     console.error("WebSocket initialization failed:", error);
@@ -973,12 +1046,14 @@ function connectStranger() {
     return;
   }
 
-  ws.onopen = () => {
+  window.ws.onopen = () => {
     console.log("WebSocket connected");
     reconnectAttempts = 0;
+    // Send a message to indicate we're ready to chat
+    window.ws.send(JSON.stringify({ type: "join" }));
   };
 
-  ws.onmessage = (event) => {
+  window.ws.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data);
       console.log("WebSocket message received:", data);
@@ -991,13 +1066,13 @@ function connectStranger() {
           showPopup("❌ Stranger disconnected");
         }
       } else if (data.type === "message") {
-        typingIndicator.style.display = "none";
+        document.getElementById("typingIndicator").style.display = "none";
         addMessage(data.text, "stranger");
       } else if (data.type === "typing") {
-        typingIndicator.style.display = "block";
+        document.getElementById("typingIndicator").style.display = "block";
         clearTimeout(typingTimeout);
         typingTimeout = setTimeout(() => {
-          typingIndicator.style.display = "none";
+          document.getElementById("typingIndicator").style.display = "none";
         }, 1500);
       }
     } catch (error) {
@@ -1005,13 +1080,13 @@ function connectStranger() {
     }
   };
 
-  ws.onclose = () => {
+  window.ws.onclose = () => {
     console.log("WebSocket closed");
     showPopup("❌ Disconnected from server");
-    typingIndicator.style.display = "none";
-    isConnected = false;
-    startChattingBtn.style.display = 'block';
-    nextBtn.style.display = 'block';
+    document.getElementById("typingIndicator").style.display = "none";
+    window.isConnected = false;
+    document.getElementById("startChattingBtn").style.display = 'block';
+    document.getElementById("nextBtn").style.display = 'block';
     if (reconnectAttempts < maxReconnectAttempts) {
       setTimeout(() => {
         reconnectAttempts++;
@@ -1024,64 +1099,25 @@ function connectStranger() {
     debouncedAdjustLayout();
   };
 
-  ws.onerror = (error) => {
+  window.ws.onerror = (error) => {
     console.error("WebSocket error:", error);
-    ws.close();
+    window.ws.close();
   };
 }
 
-const handleStartChatting = (e) => {
-  console.log("Start Chatting clicked");
-  e.preventDefault();
-  if (ws) ws.close();
-  startChattingBtn.style.display = 'none';
-  connectStranger();
-};
-startChattingBtn.removeEventListener("click", handleStartChatting);
-startChattingBtn.removeEventListener("touchstart", handleStartChatting);
-startChattingBtn.addEventListener("click", handleStartChatting);
-startChattingBtn.addEventListener("touchstart", handleStartChatting, { passive: false });
-
-const handleSend = (e) => {
-  console.log("Send button clicked");
-  e.preventDefault();
-  if (isConnected && input.value.trim()) {
-    ws.send(JSON.stringify({type: "message", text: input.value}));
-    addMessage(input.value, "me");
-    input.value = "";
-    emojiPicker.classList.remove('show');
-    emojiPicker.style.display = 'none';
-    document.getElementById("emojiToggle").textContent = "😊";
-    document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
-    debouncedAdjustLayout();
+// Initialize connection when page loads
+window.addEventListener('load', () => {
+  // Check if we should automatically connect
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('autoConnect') === 'true') {
+    document.getElementById("startChattingBtn").click();
   }
-};
-sendBtn.removeEventListener("click", handleSend);
-sendBtn.removeEventListener("touchstart", handleSend);
-sendBtn.addEventListener("click", handleSend);
-sendBtn.addEventListener("touchstart", handleSend, { passive: false });
-
-const handleNext = (e) => {
-  console.log("Next button clicked");
-  e.preventDefault();
-  if (ws) ws.close();
-  connectStranger();
-  debouncedAdjustLayout();
-};
-nextBtn.removeEventListener("click", handleNext);
-nextBtn.removeEventListener("touchstart", handleNext);
-nextBtn.addEventListener("click", handleNext);
-nextBtn.addEventListener("touchstart", handleNext, { passive: false });
-
-input.addEventListener("input", () => {
-  if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
-    ws.send(JSON.stringify({type: "typing"}));
-  }
+  
+  // Set up mutation observer for auto-scroll
+  const messagesDiv = document.getElementById("messages");
+  const observer = new MutationObserver(scrollToBottom);
+  observer.observe(messagesDiv, { childList: true, subtree: true });
 });
-
-document.body.classList.add('auto-scroll-enabled');
-const observer = new MutationObserver(scrollToBottom);
-observer.observe(messagesDiv, { childList: true, subtree: true });
 </script>
 </body>
 </html>
