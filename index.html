@@ -1214,21 +1214,40 @@ const sendBtn = document.getElementById("sendBtn");
 const typingIndicator = document.getElementById("typingIndicator");
 const footer = document.querySelector("footer");
 const emojiPicker = document.getElementById("emojiPicker");
-let ws, typingTimeout, heartbeatInterval;
+let ws, typingTimeout, heartbeatInterval, pongTimeout;
 let isConnected = false;
 let reconnectAttempts = 0;
-const maxReconnectAttempts = 10; // बढ़ाया
-const reconnectDelay = 3000; // बेस डिले
+const maxReconnectAttempts = 15; // बढ़ाया
+const reconnectBaseDelay = 2000; // बेस डिले
 const heartbeatIntervalMs = 30000; // 30 सेकंड में पिंग
-const searchTimeoutMs = 60000; // 60 सेकंड सर्च टाइमआउट
+const pongTimeoutMs = 5000; // 5 सेकंड में पोंग की उम्मीद
+const searchTimeoutMs = 45000; // 45 सेकंड सर्च टाइमआउट
 const backendUrl = window.TIKTALK_BACKEND || "https://tiktalk-server-8dmz.onrender.com";
 const wsUrl = backendUrl.replace(/^http(s?)/, 'wss$1') + "/ws";
 let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
+
+async function checkServerStatus() {
+  try {
+    const response = await fetch(backendUrl, { method: 'GET', mode: 'cors' });
+    if (!response.ok) {
+      console.error(`Server check failed: HTTP ${response.status}`);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.error("Server check error:", error);
+    return false;
+  }
+}
 
 function sendPing() {
   if (ws && ws.readyState === WebSocket.OPEN) {
     ws.send(JSON.stringify({ type: "ping" }));
     console.log("Ping sent to keep connection alive");
+    pongTimeout = setTimeout(() => {
+      console.warn("Pong not received, closing connection");
+      if (ws) ws.close();
+    }, pongTimeoutMs);
   }
 }
 
@@ -1241,6 +1260,10 @@ function stopHeartbeat() {
   if (heartbeatInterval) {
     clearInterval(heartbeatInterval);
     heartbeatInterval = null;
+  }
+  if (pongTimeout) {
+    clearTimeout(pongTimeout);
+    pongTimeout = null;
   }
 }
 
@@ -1423,11 +1446,20 @@ function showPopup(text) {
   debouncedAdjustLayout();
 }
 
-function connectStranger() {
+async function connectStranger() {
   if (ws && ws.readyState !== WebSocket.CLOSED) {
     ws.close();
   }
   stopHeartbeat();
+  
+  // सर्वर स्टेटस चेक करें
+  const serverAvailable = await checkServerStatus();
+  if (!serverAvailable) {
+    showPopup("❌ Server is unavailable. Please try again later or refresh the page.");
+    nextBtn.style.display = 'block';
+    return;
+  }
+
   showPopup("🔍 Searching for a stranger...");
   typingIndicator.style.display = "none";
   ws = new WebSocket(wsUrl);
@@ -1435,8 +1467,10 @@ function connectStranger() {
     if (!isConnected) {
       showPopup("😕 No strangers available. Try again later.");
       nextBtn.style.display = 'block';
+      stopHeartbeat();
     }
-  }, searchTimeoutMs); // 60 सेकंड
+  }, searchTimeoutMs);
+
   ws.onopen = () => {
     clearTimeout(searchTimeout);
     reconnectAttempts = 0;
@@ -1446,16 +1480,19 @@ function connectStranger() {
       startChattingBtn.style.display = 'none';
     }
     nextBtn.style.display = 'block';
-    startHeartbeat(); // Heartbeat शुरू करें
+    startHeartbeat();
     debouncedAdjustLayout();
   };
+
   ws.onmessage = (event) => {
     try {
       const data = JSON.parse(event.data);
       clearTimeout(searchTimeout);
       if (data.type === "pong") {
         console.log("Pong received - connection alive");
-        return; // Pong को इग्नोर करें
+        clearTimeout(pongTimeout);
+        pongTimeout = null;
+        return;
       }
       if (data.type === "system") {
         if (data.text === "waiting") {
@@ -1491,6 +1528,7 @@ function connectStranger() {
       console.error("Error parsing WebSocket message:", error);
     }
   };
+
   ws.onclose = (event) => {
     clearTimeout(searchTimeout);
     stopHeartbeat();
@@ -1499,15 +1537,21 @@ function connectStranger() {
     console.log(`WebSocket closed with code: ${event.code}, reason: ${event.reason}`);
     let popupMsg = `❌ Disconnected from server (Code: ${event.code})`;
     if (event.code === 1006) {
-      popupMsg = "❌ Connection lost (Server sleep or network issue). Reconnecting...";
+      popupMsg = "❌ Connection lost (Server may be sleeping or network issue). Reconnecting...";
     }
     showPopup(popupMsg);
-    const delay = Math.min(reconnectDelay * Math.pow(2, reconnectAttempts), 30000); // एक्सपोनेंशियल बैकऑफ
+    const delay = Math.min(reconnectBaseDelay * Math.pow(2, reconnectAttempts), 30000);
     if (reconnectAttempts < maxReconnectAttempts && event.code !== 1000) {
-      setTimeout(() => {
+      setTimeout(async () => {
         reconnectAttempts++;
         console.log(`Reconnect attempt ${reconnectAttempts}/${maxReconnectAttempts} in ${delay}ms`);
-        connectStranger();
+        const serverAvailable = await checkServerStatus();
+        if (serverAvailable) {
+          connectStranger();
+        } else {
+          showPopup("❌ Server is still unavailable. Please try again later.");
+          nextBtn.style.display = 'block';
+        }
       }, delay);
     } else if (reconnectAttempts >= maxReconnectAttempts) {
       showPopup("❌ Failed to reconnect. Please refresh the page or check your internet.");
@@ -1515,6 +1559,7 @@ function connectStranger() {
     }
     debouncedAdjustLayout();
   };
+
   ws.onerror = (error) => {
     console.error("WebSocket error:", error);
     stopHeartbeat();
@@ -1544,17 +1589,23 @@ const handleSend = (e) => {
 sendBtn.addEventListener("click", handleSend);
 sendBtn.addEventListener("touchstart", handleSend, { passive: false });
 
-const handleNext = (e) => {
+const handleNext = async (e) => {
   e.preventDefault();
   e.stopImmediatePropagation();
   if (ws) {
     ws.close();
   }
   reconnectAttempts = 0;
-  connectStranger();
+  const serverAvailable = await checkServerStatus();
+  if (serverAvailable) {
+    connectStranger();
+  } else {
+    showPopup("❌ Server is unavailable. Please try again later.");
+    nextBtn.style.display = 'block';
+  }
   debouncedAdjustLayout();
 };
-nextBtn.addEventListener("click", handleNext); // केवल click
+nextBtn.addEventListener("click", handleNext);
 
 input.addEventListener("input", () => {
   if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
