@@ -1,0 +1,1 @@
+const socket = new WebSocket("wss://<your-railway-subdomain>.up.railway.app");
