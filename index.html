@@ -938,7 +938,7 @@
       <button id="themeToggle" class="icon-btn">🌙</button>
       <div style="position: relative;">
         <button id="shareBtn" class="share-btn">
-          <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
+          <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
             <path d="M18 8l-8 8-8-8"/>
             <animate attributeName="stroke" values="#007bff;#00eaff;#6a00ff;#007bff" dur="3s" repeatCount="indefinite"/>
             <animate attributeName="transform" values="scale(1);scale(1.1);scale(1)" dur="1.5s" repeatCount="indefinite"/>
@@ -991,16 +991,6 @@
     <svg class="button-icon" viewBox="0 0 24 24" fill="white" style="width: 24px; height: 24px; display: block; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); overflow: visible; shape-rendering: geometricPrecision;">
       <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
     </svg>
-    <!-- Original path (swap if needed):
-    <svg class="button-icon" viewBox="0 0 24 24" fill="white" style="width: 24px; height: 24px; display: block; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); overflow: visible; shape-rendering: geometricPrecision;">
-      <path d="M4 12a8 8 0 0 1 8-8v4l4-4-4-4v4c-4.42 0-8 3.58-8 8s3.58 8 8 8v-4l-4 4 4 4v-4a8 8 0 0 1 0-16"/>
-    </svg>
-    -->
-    <!-- Optional: Add stroke for boldness:
-    <svg class="button-icon" viewBox="0 0 24 24" fill="white" stroke="white" stroke-width="0.5" style="width: 24px; height: 24px; display: block; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); overflow: visible; shape-rendering: geometricPrecision;">
-      <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-    </svg>
-    -->
   </button>
   <div id="emojiPicker" aria-hidden="true"></div>
   <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
@@ -1012,6 +1002,7 @@
         timeout = setTimeout(() => func.apply(this, args), wait);
       };
     }
+
     document.addEventListener("DOMContentLoaded", () => {
       const shareBtn = document.getElementById("shareBtn");
       if (shareBtn) {
@@ -1125,6 +1116,7 @@
       });
       input.addEventListener("input", debouncedAdjustLayout);
     });
+
     const themeToggle = document.getElementById("themeToggle");
     const handleThemeToggle = (e) => {
       e.preventDefault();
@@ -1139,10 +1131,12 @@
     };
     themeToggle.addEventListener("click", handleThemeToggle);
     themeToggle.addEventListener("touchstart", handleThemeToggle, { passive: false });
+
     const shareBtn = document.getElementById("shareBtn");
     const shareSheet = document.getElementById("shareSheet");
     const startChattingBtn = document.getElementById("startChattingBtn");
     const nextBtn = document.getElementById("nextBtn");
+
     const handleShareBtn = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -1150,28 +1144,30 @@
       shareSheet.style.top = (btnRect.bottom + window.scrollY) + "px";
       shareSheet.style.right = (window.innerWidth - btnRect.right) + "px";
       shareSheet.classList.toggle('show');
-      if(shareSheet.classList.contains('show')) shareSheet.style.display = 'flex';
-      else setTimeout(()=>{shareSheet.style.display='none';},300);
+      if (shareSheet.classList.contains('show')) shareSheet.style.display = 'flex';
+      else setTimeout(() => { shareSheet.style.display = 'none'; }, 300);
     };
     shareBtn.addEventListener("click", handleShareBtn);
     shareBtn.addEventListener("touchstart", handleShareBtn, { passive: false });
+
     document.addEventListener("click", (e) => {
-      if(!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')){
+      if (!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')) {
         shareSheet.classList.remove('show');
-        setTimeout(()=>{shareSheet.style.display='none';},300);
+        setTimeout(() => { shareSheet.style.display = 'none'; }, 300);
       }
     });
     document.addEventListener("touchstart", (e) => {
-      if(!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')){
+      if (!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')) {
         shareSheet.classList.remove('show');
-        setTimeout(()=>{shareSheet.style.display='none';},300);
+        setTimeout(() => { shareSheet.style.display = 'none'; }, 300);
       }
     });
+
     let hasStartedChat = false;
     const handleStartChatting = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
-      if(ws) ws.close();
+      if (ws) ws.close();
       hasStartedChat = true;
       startChattingBtn.style.display = 'none';
       nextBtn.style.display = 'block';
@@ -1179,21 +1175,27 @@
     };
     startChattingBtn.addEventListener("click", handleStartChatting);
     startChattingBtn.addEventListener("touchstart", handleStartChatting, { passive: false });
-    function shareApp(platform){
+
+    function shareApp(platform) {
       let url = window.location.href;
-      if(platform==="whatsapp") window.open("https://wa.me/?text="+encodeURIComponent(url),"_blank");
-      else if(platform==="instagram") window.open("https://www.instagram.com/","_blank");
-      else if(platform==="facebook") window.open("https://www.facebook.com/sharer/sharer.php?u="+encodeURIComponent(url),"_blank");
-      else if(platform==="x") window.open("https://twitter.com/intent/tweet?url="+encodeURIComponent(url),"_blank");
-      else if(platform==="link"){
-        const tempInput=document.createElement('input');
-        tempInput.value=url; document.body.appendChild(tempInput); tempInput.select(); document.execCommand('copy'); document.body.removeChild(tempInput);
+      if (platform === "whatsapp") window.open("https://wa.me/?text=" + encodeURIComponent(url), "_blank");
+      else if (platform === "instagram") window.open("https://www.instagram.com/", "_blank");
+      else if (platform === "facebook") window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url), "_blank");
+      else if (platform === "x") window.open("https://twitter.com/intent/tweet?url=" + encodeURIComponent(url), "_blank");
+      else if (platform === "link") {
+        const tempInput = document.createElement('input');
+        tempInput.value = url;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand('copy');
+        document.body.removeChild(tempInput);
         showCopyPopup("✅ Copied!");
       }
     }
-    function showCopyPopup(message){
+
+    function showCopyPopup(message) {
       let existing = document.getElementById("copyLinkPopup");
-      if(existing) existing.remove();
+      if (existing) existing.remove();
       const popup = document.createElement("div");
       popup.id = "copyLinkPopup";
       popup.textContent = message;
@@ -1205,10 +1207,11 @@
       popup.style.transform = 'translateY(-10px)';
       void popup.offsetWidth;
       popup.classList.add('show');
-      setTimeout(()=>{
+      setTimeout(() => {
         popup.classList.remove('show');
-      },2000);
+      }, 2000);
     }
+
     function scrollToBottom() {
       const chatDiv = document.getElementById("chat");
       const isNearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 100;
@@ -1216,6 +1219,7 @@
         chatDiv.scrollTop = chatDiv.scrollHeight;
       }
     }
+
     window.TIKTALK_BACKEND = "https://tiktalkchat-backend-v2.onrender.com";
     const messagesDiv = document.getElementById("messages");
     const input = document.getElementById("messageInput");
@@ -1228,6 +1232,7 @@
     let reconnectAttempts = 0;
     const maxReconnectAttempts = 5;
     let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
+
     function adjustLayoutForKeyboard() {
       const header = document.querySelector("header");
       const chatDiv = document.getElementById("chat");
@@ -1303,6 +1308,7 @@
         scrollToBottom();
       });
     }
+
     const debouncedAdjustLayout = debounce(adjustLayoutForKeyboard, 50);
     let rafId;
     function updateLayout() {
@@ -1341,6 +1347,7 @@
     window.addEventListener("touchstart", debouncedAdjustLayout);
     window.addEventListener("touchmove", debouncedAdjustLayout);
     window.addEventListener("load", debouncedAdjustLayout);
+
     function addMessage(text, who) {
       const fragment = document.createDocumentFragment();
       const div = document.createElement("div");
@@ -1353,6 +1360,7 @@
       nextBtn.style.display = 'block';
       debouncedAdjustLayout();
     }
+
     function showPopup(text) {
       if (text.includes("Searching")) {
         messagesDiv.innerHTML = `
@@ -1371,7 +1379,11 @@
         isConnected = true;
         startChattingBtn.style.display = 'none';
         nextBtn.style.display = 'block';
-        setTimeout(() => { if (messagesDiv.innerHTML.includes("Connected")) messagesDiv.innerHTML = ''; }, 3000);
+        setTimeout(() => {
+          if (isConnected && messagesDiv.innerHTML.includes("Connected")) {
+            messagesDiv.innerHTML = '';
+          }
+        }, 3000);
       } else {
         messagesDiv.innerHTML = `<div class="popup">${text}</div>`;
         isConnected = false;
@@ -1380,75 +1392,88 @@
       }
       scrollToBottom();
       debouncedAdjustLayout();
+      updateInputState();
     }
+
+    function updateInputState() {
+      input.disabled = !isConnected;
+      sendBtn.disabled = !isConnected;
+    }
+
     function connectStranger() {
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+        ws.close();
+      }
+      messagesDiv.innerHTML = ''; 
       showPopup("🔍 Searching for a stranger...");
       typingIndicator.style.display = "none";
       nextBtn.style.display = 'block';
       ws = new WebSocket(window.TIKTALK_BACKEND.replace("http", "ws"));
+
       ws.onopen = () => {
         reconnectAttempts = 0;
-        nextBtn.style.display = 'block';
+        updateInputState();
       };
+
       ws.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          if (data.type === "system") {
-            if (data.text === "waiting") {
-              showPopup("🔍 Searching for a stranger...");
-            } else if (data.text === "connected") {
-              showPopup("✅ Connected! Say Hi 👋");
-              startChattingBtn.style.display = 'none';
-              nextBtn.style.display = 'block';
-            } else if (data.text === "disconnected") {
-              showPopup("❌ Stranger disconnected");
-              startChattingBtn.style.display = 'none';
-              nextBtn.style.display = 'block';
-            }
-          }
-          if (data.type === "message") {
-            typingIndicator.style.display = "none";
-            addMessage(data.text, "stranger");
-            nextBtn.style.display = 'block';
-          }
-          if (data.type === "typing") {
-            typingIndicator.style.display = "block";
-            clearTimeout(typingTimeout);
-            typingTimeout = setTimeout(() => {
+          switch(data.type) {
+            case "system":
+              if (data.text === "waiting" && !isConnected) {
+                showPopup("🔍 Searching for a stranger...");
+              } else if (data.text === "connected") {
+                showPopup("✅ Connected! Say Hi 👋");
+              } else if (data.text === "disconnected") {
+                if(isConnected) {
+                  showPopup("❌ Stranger disconnected");
+                  isConnected = false;
+                }
+              } else if (data.text === "timeout") {
+                 showPopup("No one was found. Click Next Button");
+                 isConnected = false;
+              }
+              break;
+            case "message":
               typingIndicator.style.display = "none";
-            }, 1500);
-            nextBtn.style.display = 'block';
+              addMessage(data.text, "stranger");
+              break;
+            case "typing":
+              if (isConnected) {
+                typingIndicator.style.display = "block";
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                  typingIndicator.style.display = "none";
+                }, 1500);
+              }
+              break;
           }
-        } catch {}
+        } catch (e) {
+          console.error("Error parsing WebSocket message:", e);
+        }
       };
+
       ws.onclose = () => {
-        showPopup("❌ Disconnected from server");
+        if (isConnected) {
+          showPopup("❌ Stranger disconnected");
+        }
         typingIndicator.style.display = "none";
         isConnected = false;
-        startChattingBtn.style.display = 'block';
-        nextBtn.style.display = 'block';
-        if (reconnectAttempts < maxReconnectAttempts) {
-          setTimeout(() => {
-            reconnectAttempts++;
-            connectStranger();
-          }, 2000 * reconnectAttempts);
-        } else {
-          showPopup("❌ Failed to reconnect. Please try again later.");
-          nextBtn.style.display = 'block';
-        }
-        debouncedAdjustLayout();
+        updateInputState();
       };
+
       ws.onerror = () => {
         ws.close();
       };
     }
+    
     const handleSend = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
-      if(isConnected && input.value.trim()){
-        ws.send(JSON.stringify({type:"message", text:input.value}));
-        addMessage(input.value,"me");
-        input.value="";
+      if (isConnected && input.value.trim()) {
+        ws.send(JSON.stringify({ type: "message", text: input.value }));
+        addMessage(input.value, "me");
+        input.value = "";
         emojiPicker.classList.remove('show');
         emojiPicker.style.display = 'none';
         document.getElementById("emojiToggle").textContent = "😊";
@@ -1459,25 +1484,36 @@
     };
     sendBtn.addEventListener("click", handleSend);
     sendBtn.addEventListener("touchstart", handleSend, { passive: false });
+
     const handleNext = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
-      if(ws) ws.close();
       connectStranger();
       debouncedAdjustLayout();
     };
     nextBtn.addEventListener("click", handleNext);
     nextBtn.addEventListener("touchstart", handleNext, { passive: false });
-    input.addEventListener("input", ()=>{
-      if(isConnected && ws && ws.readyState===WebSocket.OPEN) ws.send(JSON.stringify({type:"typing"}));
+
+    input.addEventListener("input", () => {
+      if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "typing" }));
+      }
     });
+
     document.body.classList.add('auto-scroll-enabled');
     const observer = new MutationObserver(() => {
       scrollToBottom();
     });
     observer.observe(messagesDiv, { childList: true, subtree: true });
-    startChattingBtn.style.display = 'block';
-    messagesDiv.innerHTML = '';
+
+    // Initial State
+    function setInitialState() {
+        startChattingBtn.style.display = 'block';
+        nextBtn.style.display = 'none';
+        messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
+        updateInputState();
+    }
+    setInitialState();
   </script>
 </body>
 </html>
