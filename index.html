@@ -6,7 +6,6 @@
 <title>TikTalk - Stranger Chat</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/emoji-mart@latest/css/emoji-mart.css" />
 <style>
-/* Your CSS remains mostly the same, just a few small fixes */
 * {
   margin: 0;
   padding: 0;
@@ -556,9 +555,23 @@ body.dark-mode .share-sheet button {
   </svg>
 </button>
 <div id="emojiPicker" aria-hidden="true"></div>
+
+<!-- Add Socket.io client library -->
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+
 <script>
-// Fixed WebSocket URL - use Render.com backend
-window.TIKTALK_BACKEND = "https://tiktalkchat-backend-v2.onrender.com";
+// Server configuration
+const SERVER_URL = "https://tiktalkchat-backend-v2.onrender.com";
+
+// Global variables
+let socket = null;
+let isConnected = false;
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 5;
+let typingTimeout = null;
+let rafId = null;
+let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
+let wasPickerOpenBeforeKeyboard = false;
 
 function debounce(func, wait) {
   let timeout;
@@ -568,7 +581,6 @@ function debounce(func, wait) {
   };
 }
 
-// Initialize everything when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
   console.log("DOM loaded, initializing UI...");
   
@@ -582,6 +594,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const sendBtn = document.getElementById("sendBtn");
   const nextBtn = document.getElementById("nextBtn");
   const themeToggle = document.getElementById("themeToggle");
+  const shareSheet = document.getElementById("shareSheet");
 
   // Theme toggle
   const savedTheme = localStorage.getItem("theme");
@@ -649,7 +662,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(initializeEmojiPicker, 500);
 
   // Emoji toggle
-  let wasPickerOpenBeforeKeyboard = false;
   const handleEmojiToggle = (e) => {
     console.log("Emoji toggle clicked");
     e.preventDefault();
@@ -722,7 +734,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }, { passive: false });
 
   // Share button
-  const shareSheet = document.getElementById("shareSheet");
   const handleShareBtn = (e) => {
     console.log("Share button clicked");
     e.preventDefault();
@@ -750,7 +761,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleStartChatting = (e) => {
     console.log("Start Chatting clicked");
     e.preventDefault();
-    if (window.ws) window.ws.close();
+    if (socket) socket.disconnect();
     startChattingBtn.style.display = 'none';
     connectStranger();
   };
@@ -765,8 +776,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleSend = (e) => {
     console.log("Send button clicked");
     e.preventDefault();
-    if (window.isConnected && input.value.trim()) {
-      window.ws.send(JSON.stringify({type: "message", text: input.value}));
+    if (isConnected && input.value.trim()) {
+      socket.emit('message', {
+        type: 'message',
+        text: input.value
+      });
       addMessage(input.value, "me");
       input.value = "";
       emojiPicker.classList.remove('show');
@@ -787,7 +801,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const handleNext = (e) => {
     console.log("Next button clicked");
     e.preventDefault();
-    if (window.ws) window.ws.close();
+    if (socket) socket.disconnect();
     connectStranger();
     debouncedAdjustLayout();
   };
@@ -800,8 +814,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Typing indicator
   input.addEventListener("input", () => {
-    if (window.isConnected && window.ws && window.ws.readyState === WebSocket.OPEN) {
-      window.ws.send(JSON.stringify({type: "typing"}));
+    if (isConnected && socket && socket.connected) {
+      socket.emit('message', {type: "typing"});
     }
   });
 
@@ -851,11 +865,83 @@ function showCopyPopup(message) {
   }, 2000);
 }
 
-// WebSocket connection and messaging functions
-let typingTimeout, reconnectAttempts = 0, rafId;
-const maxReconnectAttempts = 5;
-let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
+// Socket.io connection and messaging functions
+function connectStranger() {
+  console.log("Connecting to stranger...");
+  showPopup("🔍 Searching for a stranger...");
+  document.getElementById("typingIndicator").style.display = "none";
+  
+  // Initialize Socket.io connection
+  socket = io(SERVER_URL, {
+    transports: ['websocket', 'polling'],
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    timeout: 20000
+  });
 
+  socket.on('connect', () => {
+    console.log("Socket.io connected");
+    reconnectAttempts = 0;
+    // Send a message to indicate we're ready to chat
+    socket.emit('find-stranger');
+  });
+
+  socket.on('system', (data) => {
+    console.log("System message:", data);
+    if (data.text === 'waiting') {
+      showPopup("🔍 Searching for a stranger...");
+    } else if (data.text === 'connected') {
+      showPopup("✅ Connected! Say Hi 👋");
+      isConnected = true;
+    } else if (data.text === 'disconnected') {
+      showPopup("❌ Stranger disconnected");
+      isConnected = false;
+    }
+  });
+
+  socket.on('message', (data) => {
+    console.log("Message received:", data);
+    if (data.type === 'message') {
+      document.getElementById("typingIndicator").style.display = "none";
+      addMessage(data.text, "stranger");
+    } else if (data.type === 'typing') {
+      document.getElementById("typingIndicator").style.display = "block";
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        document.getElementById("typingIndicator").style.display = "none";
+      }, 1500);
+    }
+  });
+
+  socket.on('disconnect', (reason) => {
+    console.log("Socket.io disconnected:", reason);
+    showPopup("❌ Disconnected from server");
+    document.getElementById("typingIndicator").style.display = "none";
+    isConnected = false;
+    document.getElementById("startChattingBtn").style.display = 'block';
+    document.getElementById("nextBtn").style.display = 'block';
+    
+    if (reconnectAttempts < maxReconnectAttempts) {
+      setTimeout(() => {
+        reconnectAttempts++;
+        console.log(`Reconnect attempt ${reconnectAttempts} of ${maxReconnectAttempts}`);
+        connectStranger();
+      }, 2000 * reconnectAttempts);
+    } else {
+      showPopup("❌ Failed to reconnect. Please try again later.");
+    }
+    debouncedAdjustLayout();
+  });
+
+  socket.on('connect_error', (error) => {
+    console.log("Connection error:", error);
+    showPopup("❌ Connection error. Reconnecting...");
+  });
+}
+
+// Layout adjustment functions
 function adjustLayoutForKeyboard() {
   console.log("Adjusting layout for keyboard...");
   const header = document.querySelector("header");
@@ -1013,18 +1099,18 @@ function showPopup(text) {
           <div class="searching-text">Searching for a stranger...</div>
         </div>
       </div>`;
-    window.isConnected = false;
+    isConnected = false;
     startChattingBtn.style.display = 'none';
     nextBtn.style.display = 'none';
   } else if (text.includes("Connected")) {
-    window.isConnected = true;
+    isConnected = true;
     startChattingBtn.style.display = 'none';
     nextBtn.style.display = 'none';
     setTimeout(() => {
       if (messagesDiv.innerHTML.includes("Connected")) messagesDiv.innerHTML = '';
     }, 3000);
   } else {
-    window.isConnected = false;
+    isConnected = false;
     startChattingBtn.style.display = 'none';
     nextBtn.style.display = 'block';
   }
@@ -1032,87 +1118,8 @@ function showPopup(text) {
   debouncedAdjustLayout();
 }
 
-function connectStranger() {
-  console.log("Connecting to stranger...");
-  showPopup("🔍 Searching for a stranger...");
-  document.getElementById("typingIndicator").style.display = "none";
-  try {
-    // Use the correct WebSocket URL for Render.com
-    window.ws = new WebSocket(window.TIKTALK_BACKEND.replace("https", "wss") + "/ws");
-    console.log("WebSocket connecting to:", window.TIKTALK_BACKEND.replace("https", "wss") + "/ws");
-  } catch (error) {
-    console.error("WebSocket initialization failed:", error);
-    showPopup("❌ Failed to connect to server. Please try again.");
-    return;
-  }
-
-  window.ws.onopen = () => {
-    console.log("WebSocket connected");
-    reconnectAttempts = 0;
-    // Send a message to indicate we're ready to chat
-    window.ws.send(JSON.stringify({ type: "join" }));
-  };
-
-  window.ws.onmessage = (event) => {
-    try {
-      const data = JSON.parse(event.data);
-      console.log("WebSocket message received:", data);
-      if (data.type === "system") {
-        if (data.text === "waiting") {
-          showPopup("🔍 Searching for a stranger...");
-        } else if (data.text === "connected") {
-          showPopup("✅ Connected! Say Hi 👋");
-        } else if (data.text === "disconnected") {
-          showPopup("❌ Stranger disconnected");
-        }
-      } else if (data.type === "message") {
-        document.getElementById("typingIndicator").style.display = "none";
-        addMessage(data.text, "stranger");
-      } else if (data.type === "typing") {
-        document.getElementById("typingIndicator").style.display = "block";
-        clearTimeout(typingTimeout);
-        typingTimeout = setTimeout(() => {
-          document.getElementById("typingIndicator").style.display = "none";
-        }, 1500);
-      }
-    } catch (error) {
-      console.error("Error parsing WebSocket message:", error);
-    }
-  };
-
-  window.ws.onclose = () => {
-    console.log("WebSocket closed");
-    showPopup("❌ Disconnected from server");
-    document.getElementById("typingIndicator").style.display = "none";
-    window.isConnected = false;
-    document.getElementById("startChattingBtn").style.display = 'block';
-    document.getElementById("nextBtn").style.display = 'block';
-    if (reconnectAttempts < maxReconnectAttempts) {
-      setTimeout(() => {
-        reconnectAttempts++;
-        console.log(`Reconnect attempt ${reconnectAttempts} of ${maxReconnectAttempts}`);
-        connectStranger();
-      }, 2000 * reconnectAttempts);
-    } else {
-      showPopup("❌ Failed to reconnect. Please try again later.");
-    }
-    debouncedAdjustLayout();
-  };
-
-  window.ws.onerror = (error) => {
-    console.error("WebSocket error:", error);
-    window.ws.close();
-  };
-}
-
 // Initialize connection when page loads
 window.addEventListener('load', () => {
-  // Check if we should automatically connect
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('autoConnect') === 'true') {
-    document.getElementById("startChattingBtn").click();
-  }
-  
   // Set up mutation observer for auto-scroll
   const messagesDiv = document.getElementById("messages");
   const observer = new MutationObserver(scrollToBottom);
