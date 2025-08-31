@@ -105,6 +105,7 @@ header svg.logo {
 }
 body.dark-mode .me {
   background: #2a3d66;
+  color: #e5e7eb; /* Fixed for dark mode visibility */
 }
 .stranger {
   align-self: flex-start;
@@ -114,6 +115,7 @@ body.dark-mode .me {
 }
 body.dark-mode .stranger {
   background: #2d3748;
+  color: #e5e7eb; /* Fixed for dark mode visibility */
 }
 .popup {
   background: transparent;
@@ -132,7 +134,8 @@ body.dark-mode .popup {
 #typingIndicator {
   font-size: 13px;
   color: #888;
-  margin-top: 5px;
+  margin-top: 15px; /* Adjusted for better positioning */
+  padding-bottom: 10px; /* Added for spacing */
   text-align: left;
   display: none;
 }
@@ -821,7 +824,7 @@ body.dark-mode .searching-text {
   font-weight: bold;
   font-size: 16px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 15fishing: rgba(0,0,0,0.2);
   z-index: 10001;
   animation: pulse-glow 2s infinite;
   display: block;
@@ -1194,7 +1197,6 @@ function scrollToBottom() {
     chatDiv.scrollTop = chatDiv.scrollHeight;
   }
 }
-// 🛑 THIS IS THE ONLY LINE THAT WAS CHANGED 🛑
 window.TIKTALK_BACKEND = "https://tiktalkchat-backend-v2.onrender.com";
 const messagesDiv = document.getElementById("messages");
 const input = document.getElementById("messageInput");
@@ -1301,7 +1303,6 @@ if (window.visualViewport && !('virtualKeyboard' in navigator)) {
   });
   window.visualViewport.addEventListener("scroll", debouncedAdjustLayout);
 }
-// Fallback interval to check keyboard state
 setInterval(() => {
   const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
   const isEmojiPickerOpen = document.getElementById("emojiPicker").classList.contains('show');
