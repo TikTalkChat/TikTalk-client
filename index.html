@@ -1601,3 +1601,22 @@
       if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: "typing" }));
       }
+    });
+
+    document.body.classList.add('auto-scroll-enabled');
+    const observer = new MutationObserver(() => {
+      scrollToBottom();
+    });
+    observer.observe(messagesDiv, { childList: true, subtree: true });
+
+    function setInitialState() {
+      startChattingBtn.style.display = 'block';
+      nextBtn.style.display = 'none';
+      messagesDiv.innerHTML = '';
+      showPopup(isVideoMode ? "Welcome to TikTalk Video Chat" : "Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.", false);
+      updateInputState();
+    }
+    setInitialState();
+  </script>
+</body>
+</html>
