@@ -1257,4 +1257,347 @@
         footer.style.transition = 'bottom 0.3s ease';
         footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
         chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
-        footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboard
+        footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
+        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 60px)`;
+        nextBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 30px)`;
+        if (emojiPicker.classList.contains('show')) {
+          emojiPicker.classList.remove('show');
+          emojiPicker.style.display = 'none';
+          document.getElementById("emojiToggle").textContent = "😊";
+          document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
+        }
+      } else if (isEmojiPickerOpen) {
+        footer.style.transition = 'bottom 0.3s ease';
+        footer.style.bottom = `calc(${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+        chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+        footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 60px)`;
+        nextBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 30px)`;
+        emojiPicker.style.bottom = isDesktop ? `calc(56px + 10px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
+      } else {
+        footer.style.transition = 'none';
+        footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
+        chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
+        footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
+        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 60px + ${safeAreaBottom}px)`;
+        nextBtn.style.bottom = `calc(${footer.offsetHeight}px + 30px + ${safeAreaBottom}px)`;
+        emojiPicker.style.bottom = isDesktop ? `calc(56px + 10px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
+        footer.offsetHeight;
+        setTimeout(() => {
+          footer.style.transition = 'bottom 0.3s ease';
+        }, 0);
+      }
+      footer.style.position = 'fixed';
+      footer.style.transform = 'none';
+      footer.style.height = isDesktop ? "56px" : "56px";
+      chatDiv.style.marginTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
+      chatDiv.style.height = `calc(100vh - ${headerHeight}px - ${safeAreaBottom}px)`;
+      requestAnimationFrame(() => {
+        footer.offsetHeight;
+        scrollToBottom();
+      });
+    }
+
+    const debouncedAdjustLayout = debounce(adjustLayoutForKeyboard, 50);
+    let rafId;
+    function updateLayout() {
+      adjustLayoutForKeyboard();
+      rafId = requestAnimationFrame(updateLayout);
+    }
+    if (window.visualViewport && !('virtualKeyboard' in navigator)) {
+      window.visualViewport.addEventListener("resize", () => {
+        const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
+        const windowBottom = window.innerHeight;
+        const keyboardHeight = windowBottom - visualViewportBottom;
+        if (keyboardHeight === 0 && document.activeElement !== document.getElementById("messageInput")) {
+          adjustLayoutForKeyboard();
+        } else {
+          debouncedAdjustLayout();
+        }
+      });
+      window.visualViewport.addEventListener("scroll", debouncedAdjustLayout);
+    }
+    setInterval(() => {
+      const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
+      const isEmojiPickerOpen = document.getElementById("emojiPicker").classList.contains('show');
+      let keyboardHeight = 0;
+      if ('virtualKeyboard' in navigator) {
+        keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
+      } else if (window.visualViewport) {
+        const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
+        const windowBottom = window.innerHeight;
+        keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
+      }
+      if (!isKeyboardOpen && keyboardHeight === 0 && !isEmojiPickerOpen) {
+        adjustLayoutForKeyboard();
+      }
+    }, 500);
+    window.addEventListener("resize", debouncedAdjustLayout);
+    window.addEventListener("touchstart", debouncedAdjustLayout);
+    window.addEventListener("touchmove", debouncedAdjustLayout);
+    window.addEventListener("load", debouncedAdjustLayout);
+
+    function addMessage(text, who) {
+      const fragment = document.createDocumentFragment();
+      const div = document.createElement("div");
+      div.className = "msg " + who;
+      div.textContent = text;
+      fragment.appendChild(div);
+      messagesDiv.appendChild(fragment);
+      scrollToBottom();
+      startChattingBtn.style.display = 'none';
+      nextBtn.style.display = 'block';
+      debouncedAdjustLayout();
+    }
+
+    function updateInputState() {
+      input.disabled = !isConnected;
+      sendBtn.disabled = !isConnected;
+    }
+
+    function startVideoMode() {
+      console.log("Starting video mode...");
+      document.getElementById("videoControls").style.display = "flex";
+      document.getElementById("videoSection").style.display = "block";
+      navigator.mediaDevices
+        .getUserMedia({ video: true, audio: true })
+        .then((stream) => {
+          localStream = stream;
+          const localVideo = document.getElementById("localVideo");
+          localVideo.srcObject = stream;
+          console.log("Local stream set:", stream);
+          connectStranger();
+        })
+        .catch((err) => {
+          console.error("Error accessing media:", err);
+          showPopup("❌ Camera/Mic access denied", false);
+          toggleModeBtn.click();
+        });
+    }
+
+    function stopVideoMode() {
+      console.log("Stopping video mode...");
+      if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
+        localStream = null;
+      }
+      if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+      }
+      document.getElementById("videoControls").style.display = "none";
+      document.getElementById("localVideo").srcObject = null;
+      document.getElementById("remoteVideo").srcObject = null;
+      document.getElementById("videoSection").style.display = "none";
+    }
+
+    function startWebRTC() {
+      console.log("Starting WebRTC...");
+      peerConnection = new RTCPeerConnection(config);
+      localStream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, localStream);
+        console.log("Added track:", track);
+      });
+      peerConnection.ontrack = (event) => {
+        const remoteVideo = document.getElementById("remoteVideo");
+        remoteVideo.srcObject = event.streams[0];
+        console.log("Remote stream received:", event.streams[0]);
+      };
+      peerConnection.onicecandidate = (event) => {
+        if (event.candidate) {
+          ws.send(JSON.stringify({ type: "ice-candidate", candidate: event.candidate }));
+          console.log("Sent ICE candidate:", event.candidate);
+        }
+      };
+      peerConnection.oniceconnectionstatechange = () => {
+        console.log("ICE connection state:", peerConnection.iceConnectionState);
+        if (peerConnection.iceConnectionState === "disconnected" || peerConnection.iceConnectionState === "failed") {
+          showPopup("❌ Video call disconnected", false);
+          stopVideoMode();
+          connectStranger();
+        }
+      };
+      peerConnection.createOffer().then((offer) => {
+        peerConnection.setLocalDescription(offer);
+        ws.send(JSON.stringify({ type: "offer", offer }));
+        console.log("Sent offer:", offer);
+      }).catch((err) => {
+        console.error("Error creating offer:", err);
+      });
+    }
+
+    function handleOffer(offer) {
+      peerConnection.setRemoteDescription(new RTCSessionDescription(offer)).then(() => {
+        peerConnection.createAnswer().then((answer) => {
+          peerConnection.setLocalDescription(answer);
+          ws.send(JSON.stringify({ type: "answer", answer }));
+          console.log("Sent answer:", answer);
+        }).catch((err) => {
+          console.error("Error creating answer:", err);
+        });
+      }).catch((err) => {
+        console.error("Error setting remote description:", err);
+      });
+    }
+
+    function handleAnswer(answer) {
+      peerConnection.setRemoteDescription(new RTCSessionDescription(answer)).catch((err) => {
+        console.error("Error setting answer:", err);
+      });
+    }
+
+    function handleIceCandidate(candidate) {
+      peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch((err) => {
+        console.error("Error adding ICE candidate:", err);
+      });
+    }
+
+    document.getElementById("muteVideoBtn").addEventListener("click", () => {
+      if (localStream) {
+        const videoTrack = localStream.getVideoTracks()[0];
+        videoTrack.enabled = !videoTrack.enabled;
+        document.getElementById("muteVideoBtn").textContent = videoTrack.enabled ? "🎥" : "📷";
+      }
+    });
+
+    document.getElementById("muteAudioBtn").addEventListener("click", () => {
+      if (localStream) {
+        const audioTrack = localStream.getAudioTracks()[0];
+        audioTrack.enabled = !audioTrack.enabled;
+        document.getElementById("muteAudioBtn").textContent = audioTrack.enabled ? "🎤" : "🔇";
+      }
+    });
+
+    function connectStranger() {
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+        console.log("Closing existing WebSocket connection...");
+        ws.close();
+      }
+      messagesDiv.innerHTML = '';
+      showPopup(isVideoMode ? "🔍 Searching for a video chat..." : "🔍 Searching for a stranger...", true);
+      typingIndicator.style.display = "none";
+      nextBtn.style.display = 'block';
+      const wsUrl = window.TIKTALK_BACKEND.replace("https", "wss");
+      console.log("Attempting to connect to WebSocket:", wsUrl);
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        console.log("WebSocket connection opened");
+        reconnectAttempts = 0;
+        ws.send(JSON.stringify({ type: "mode", mode: isVideoMode ? "video" : "chat" }));
+        updateInputState();
+      };
+
+      ws.onmessage = (event) => {
+        console.log("Received WebSocket message:", event.data);
+        try {
+          const data = JSON.parse(event.data);
+          switch (data.type) {
+            case "system":
+              if (data.text === "waiting" && !isConnected) {
+                showPopup(isVideoMode ? "🔍 Searching for a video chat..." : "🔍 Searching for a stranger...", true);
+              } else if (data.text === "connected") {
+                isConnected = true;
+                showPopup(isVideoMode ? "✅ Connected! Video call started 📹" : "✅ Connected! Say Hi 👋", false);
+                if (isVideoMode) {
+                  startWebRTC();
+                } else {
+                  input.focus(); // चैट मोड में कीबोर्ड खोलें
+                }
+              } else if (data.text === "disconnected") {
+                if (isConnected) {
+                  showPopup(isVideoMode ? "❌ Video call disconnected" : "❌ Stranger disconnected", false);
+                  if (isVideoMode) stopVideoMode();
+                }
+                isConnected = false;
+                setInitialState();
+              } else if (data.text === "timeout") {
+                showPopup("No one was found. Click Next Button", false);
+                isConnected = false;
+                setInitialState();
+              }
+              break;
+            case "message":
+              typingIndicator.style.display = "none";
+              addMessage(data.text, "stranger");
+              break;
+            case "typing":
+              if (isConnected) {
+                typingIndicator.style.display = "block";
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => {
+                  typingIndicator.style.display = "none";
+                }, 1500);
+              }
+              break;
+            case "offer":
+              if (isVideoMode) handleOffer(data.offer);
+              break;
+            case "answer":
+              if (isVideoMode) handleAnswer(data.answer);
+              break;
+            case "ice-candidate":
+              if (isVideoMode) handleIceCandidate(data.candidate);
+              break;
+          }
+        } catch (e) {
+          console.error("Error parsing WebSocket message:", e);
+        }
+      };
+
+      ws.onclose = (event) => {
+        console.log("WebSocket closed:", event.code, event.reason);
+        if (isConnected) {
+          showPopup(isVideoMode ? "❌ Video call disconnected" : "❌ Stranger disconnected", false);
+          if (isVideoMode) stopVideoMode();
+        }
+        typingIndicator.style.display = "none";
+        isConnected = false;
+        if (reconnectAttempts < maxReconnectAttempts) {
+          console.log(`Reconnecting... Attempt ${reconnectAttempts + 1}`);
+          reconnectAttempts++;
+          setTimeout(connectStranger, 2000);
+        } else {
+          showPopup("Connection failed. Please try again later.", false);
+          setInitialState();
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+        ws.close();
+      };
+    }
+
+    const handleSend = (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (isConnected && input.value.trim()) {
+        ws.send(JSON.stringify({ type: "message", text: input.value }));
+        addMessage(input.value, "me");
+        input.value = "";
+        emojiPicker.classList.remove('show');
+        emojiPicker.style.display = 'none';
+        document.getElementById("emojiToggle").textContent = "😊";
+        document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
+        wasPickerOpenBeforeKeyboard = false;
+        debouncedAdjustLayout();
+      }
+    };
+    sendBtn.addEventListener("click", handleSend);
+    sendBtn.addEventListener("touchstart", handleSend, { passive: false });
+
+    const handleNext = (e) => {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (isVideoMode) stopVideoMode();
+      connectStranger();
+      debouncedAdjustLayout();
+    };
+    nextBtn.addEventListener("click", handleNext);
+    nextBtn.addEventListener("touchstart", handleNext, { passive: false });
+
+    input.addEventListener("input", () => {
+      if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "typing" }));
+      }
