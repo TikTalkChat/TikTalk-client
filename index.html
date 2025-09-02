@@ -413,7 +413,16 @@
       overflow-y: auto !important;
       height: auto !important;
     }
-    /* न्यू CSS: वीडियो सेक्शन */
+    /* Video Section */
+    #videoSection, #chatSection {
+      transition: opacity 0.3s ease;
+    }
+    #videoSection[style*="display: none"], #chatSection[style*="display: none"] {
+      opacity: 0;
+    }
+    #videoSection[style*="display: block"], #chatSection[style*="display: block"] {
+      opacity: 1;
+    }
     #videoSection {
       display: none;
       padding: 10px;
@@ -423,7 +432,7 @@
       border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
       margin: 5px;
-      background: #000; /* ब्लैक बैकग्राउंड अगर वीडियो लोड न हो */
+      background: #000;
     }
     #videoControls {
       display: flex;
@@ -443,10 +452,10 @@
         height: 200px;
       }
       #localVideo {
-        order: 2; /* नीचे */
+        order: 2;
       }
       #remoteVideo {
-        order: 1; /* ऊपर */
+        order: 1;
       }
     }
     @media (min-width: 768px) {
@@ -461,10 +470,10 @@
         height: 240px;
       }
       #localVideo {
-        order: 1; /* लेफ्ट */
+        order: 1;
       }
       #remoteVideo {
-        order: 2; /* राइट */
+        order: 2;
       }
       #emojiPicker {
         width: 360px;
@@ -473,7 +482,7 @@
         height: var(--emoji-picker-height, 350px);
         max-height: 350px;
         transform: translate(0, 30px) scale(0.98);
-        bottom: calc(56px + 10px + env(safe-area-inset-bottom)); /* फूटर के ऊपर */
+        bottom: calc(56px + 10px + env(safe-area-inset-bottom));
       }
       #emojiPicker.show {
         transform: translate(0, 0) scale(1);
@@ -1109,15 +1118,21 @@
       toggleModeBtn.textContent = isVideoMode ? "💬" : "📹";
       document.getElementById("chatSection").style.display = isVideoMode ? "none" : "block";
       document.getElementById("videoSection").style.display = isVideoMode ? "block" : "none";
+      document.getElementById("videoControls").style.display = isVideoMode ? "flex" : "none";
+      
       if (isVideoMode) {
         showPopup("Welcome to TikTalk Video Chat", false);
         startVideoMode();
       } else {
         stopVideoMode();
         setInitialState();
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: "mode", mode: "chat" }));
+        }
       }
-      startChattingBtn.style.display = 'block'; // मोड चेंज पर स्टार्ट बटन दिखाएं
-      nextBtn.style.display = 'none';
+      startChattingBtn.style.display = "block";
+      nextBtn.style.display = "none";
+      debouncedAdjustLayout();
     });
 
     let hasStartedChat = false;
@@ -1178,8 +1193,12 @@
     }
 
     function showPopup(text, isSearch = false) {
-      // केवल सर्च पॉपअप को स्टिकी रखें
-      if (!isSearch) {
+      if (isSearch) {
+        const existingSearchPopup = messagesDiv.querySelector(".popup .searching-container");
+        if (existingSearchPopup) {
+          existingSearchPopup.parentElement.remove();
+        }
+      } else {
         messagesDiv.innerHTML = '';
       }
       const fragment = document.createDocumentFragment();
@@ -1359,6 +1378,11 @@
       console.log("Starting video mode...");
       document.getElementById("videoControls").style.display = "flex";
       document.getElementById("videoSection").style.display = "block";
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        showPopup("❌ Video call not supported on this device", false);
+        toggleModeBtn.click();
+        return;
+      }
       navigator.mediaDevices
         .getUserMedia({ video: true, audio: true })
         .then((stream) => {
@@ -1370,7 +1394,7 @@
         })
         .catch((err) => {
           console.error("Error accessing media:", err);
-          showPopup("❌ Camera/Mic access denied", false);
+          showPopup("❌ Camera/Mic access denied. Please allow permissions.", false);
           toggleModeBtn.click();
         });
     }
@@ -1389,6 +1413,10 @@
       document.getElementById("localVideo").srcObject = null;
       document.getElementById("remoteVideo").srcObject = null;
       document.getElementById("videoSection").style.display = "none";
+      isConnected = false;
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.close();
+      }
     }
 
     function startWebRTC() {
@@ -1495,14 +1523,17 @@
           switch (data.type) {
             case "system":
               if (data.text === "waiting" && !isConnected) {
-                showPopup(isVideoMode ? "🔍 Searching for a video chat..." : "🔍 Searching for a stranger...", true);
+                const existingSearchPopup = messagesDiv.querySelector(".popup .searching-container");
+                if (!existingSearchPopup) {
+                  showPopup(isVideoMode ? "🔍 Searching for a video chat..." : "🔍 Searching for a stranger...", true);
+                }
               } else if (data.text === "connected") {
                 isConnected = true;
                 showPopup(isVideoMode ? "✅ Connected! Video call started 📹" : "✅ Connected! Say Hi 👋", false);
                 if (isVideoMode) {
                   startWebRTC();
                 } else {
-                  input.focus(); // चैट मोड में कीबोर्ड खोलें
+                  input.focus();
                 }
               } else if (data.text === "disconnected") {
                 if (isConnected) {
@@ -1566,6 +1597,7 @@
       ws.onerror = (error) => {
         console.error("WebSocket error:", error);
         ws.close();
+        showPopup("❌ Connection error. Please check your network and try again.", false);
       };
     }
 
