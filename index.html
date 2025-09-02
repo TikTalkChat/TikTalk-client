@@ -562,26 +562,53 @@
         height: 24px;
       }
     }
+
+    /* === ESTILOS MODIFICADOS PARA BOTONES === */
     .icon-btn {
       width: 28px;
       height: 28px;
-      font-size: 20px;
-      border-radius: 50%;
       cursor: pointer;
-      font-weight: 600;
-      transition: all 0.2s;
+      transition: all 0.2s, transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 10001;
       touch-action: manipulation;
-      background: transparent !important;
+      background: transparent;
       border: none;
-      box-shadow: none !important;
+      border-radius: 50%;
+      box-shadow: none;
+    }
+    
+    #themeToggle {
+        font-size: 20px;
+        color: #334155;
+    }
+    body.dark-mode #themeToggle {
+      color: #cbd5e1;
     }
     .icon-btn:active {
       transform: scale(0.95);
     }
+    
+    /* MODIFICACIÓN CLAVE: Ícono como Background Image */
+    #videoToggleBtn {
+      transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: 24px 24px; /* Icon size */
+      
+      /* Light mode icon */
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%23334155'%3E%3Cpath d='M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z'/%3E%3C/svg%3E");
+    }
+    body.dark-mode #videoToggleBtn {
+      /* Dark mode icon */
+       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='%23cbd5e1'%3E%3Cpath d='M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z'/%3E%3C/svg%3E");
+    }
+    #videoToggleBtn.rotating {
+      transform: rotate(360deg);
+    }
+
     .share-btn {
       padding: 0;
       background: transparent;
@@ -909,38 +936,38 @@
 
     /* === NUEVOS ESTILOS PARA EL MODO VIDEO === */
     #video-container {
-      display: none; /* Oculto por defecto */
+      display: none;
       flex-direction: column;
       position: absolute;
       top: 0;
       left: 0;
       right: 0;
       width: 100%;
-      height: 50vh; /* Ocupa la mitad superior de la pantalla */
+      height: 50vh;
       z-index: 100;
       background-color: #000;
     }
     body.video-mode #video-container {
-      display: flex; /* Se muestra cuando el modo video está activo */
+      display: flex;
     }
     #video-container video {
       width: 100%;
-      height: 50%; /* Cada video ocupa la mitad del contenedor */
+      height: 50%;
       object-fit: cover;
-      transform: scaleX(-1); /* Efecto espejo para el video local */
+    }
+    #localVideo {
+        transform: scaleX(-1);
     }
     #remoteVideo {
-        transform: scaleX(-1); /* Opcional: si quieres que el video remoto también tenga efecto espejo */
+        transform: scaleX(-1);
     }
-    /* Ajusta el padding del chat cuando el video está activo */
     body.video-mode #chat {
       padding-top: calc(50vh + 15px);
     }
-    /* Estilo para el botón de video activo */
     #videoToggleBtn.active {
-      color: #007bff; /* Color azul para indicar que está activo */
-      text-shadow: 0 0 8px #007bff;
+      filter: drop-shadow(0 0 4px #007bff); /* Glow effect for active state */
     }
+
   </style>
 </head>
 <body>
@@ -971,7 +998,7 @@
       </svg>
     </div>
     <div class="right">
-      <button id="videoToggleBtn" class="icon-btn">📹</button>
+      <button id="videoToggleBtn" class="icon-btn" title="Toggle Video Mode"></button>
       <button id="themeToggle" class="icon-btn">🌙</button>
       <div style="position: relative;">
         <button id="shareBtn" class="share-btn">
@@ -1036,9 +1063,8 @@
   <div id="emojiPicker" aria-hidden="true"></div>
   <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
   <script>
-    // === SCRIPT ORIGINAL (CON MODIFICACIONES) ===
+    // === SCRIPT (SIN CAMBIOS EN LA LÓGICA) ===
     
-    // -- Variables globales para video chat --
     let localStream;
     let peerConnection;
     let isVideoEnabled = false;
@@ -1046,7 +1072,6 @@
     const localVideo = document.getElementById('localVideo');
     const remoteVideo = document.getElementById('remoteVideo');
 
-    // Configuración de servidores STUN (necesarios para WebRTC)
     const stunServers = {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
@@ -1063,8 +1088,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
-      // --- El resto del código DOMContentLoaded original está aquí ---
-      // (sin cambios, omitido por brevedad)
       const shareBtn = document.getElementById("shareBtn");
       if (shareBtn) {
         shareBtn.style.display = "flex";
@@ -1074,6 +1097,7 @@
         console.error("Share Button not found in DOM!");
       }
       const savedTheme = localStorage.getItem("theme");
+      const themeToggle = document.getElementById("themeToggle");
       if (savedTheme === "dark") {
         document.body.classList.add("dark-mode");
         themeToggle.textContent = "☀️";
@@ -1183,6 +1207,7 @@
       e.preventDefault();
       document.body.classList.toggle("dark-mode");
       themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
+
       if (window._emojiPickerInstance) {
         window._emojiPickerInstance.setOptions({
           theme: document.body.classList.contains("dark-mode") ? "dark" : "light"
@@ -1231,7 +1256,7 @@
       if (ws) ws.close();
       hasStartedChat = true;
       startChattingBtn.style.display = 'none';
-      nextBtn.style.display = 'block';
+      nextBtn.style.display = 'flex';
       connectStranger();
     };
     startChattingBtn.addEventListener("click", handleStartChatting);
@@ -1294,7 +1319,6 @@
     const maxReconnectAttempts = 5;
     let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
 
-    // --- Función 'adjustLayoutForKeyboard' (sin cambios) ---
     function adjustLayoutForKeyboard() {
       const header = document.querySelector("header");
       const chatDiv = document.getElementById("chat");
@@ -1360,8 +1384,6 @@
           footer.style.transition = 'bottom 0.3s ease';
         }, 0);
       }
-      // Esta es la parte importante: si el modo video está activo, el chat no se superpone a la cabecera.
-      // Si el modo video NO está activo, se comporta como siempre.
       if (!document.body.classList.contains('video-mode')) {
         chatDiv.style.marginTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
         chatDiv.style.height = `calc(100vh - ${headerHeight}px - ${safeAreaBottom}px)`;
@@ -1421,7 +1443,7 @@
       messagesDiv.appendChild(fragment);
       scrollToBottom();
       startChattingBtn.style.display = 'none';
-      nextBtn.style.display = 'block';
+      nextBtn.style.display = 'flex';
       debouncedAdjustLayout();
     }
 
@@ -1436,13 +1458,13 @@
           </div>`;
         isConnected = false;
         startChattingBtn.style.display = 'none';
-        nextBtn.style.display = 'block';
+        nextBtn.style.display = 'flex';
       } else if (text.includes("Connected")) {
         messagesDiv.innerHTML = `
           <div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
         isConnected = true;
         startChattingBtn.style.display = 'none';
-        nextBtn.style.display = 'block';
+        nextBtn.style.display = 'flex';
         setTimeout(() => {
           if (isConnected && messagesDiv.innerHTML.includes("Connected")) {
             messagesDiv.innerHTML = '';
@@ -1452,7 +1474,7 @@
         messagesDiv.innerHTML = `<div class="popup">${text}</div>`;
         isConnected = false;
         startChattingBtn.style.display = 'none';
-        nextBtn.style.display = 'block';
+        nextBtn.style.display = 'flex';
       }
       scrollToBottom();
       debouncedAdjustLayout();
@@ -1464,8 +1486,13 @@
       sendBtn.disabled = !isConnected;
     }
 
-    // --- Lógica para el botón de Video ---
     videoToggleBtn.addEventListener('click', async () => {
+        if(videoToggleBtn.classList.contains('rotating')) return;
+        videoToggleBtn.classList.add('rotating');
+        videoToggleBtn.addEventListener('transitionend', () => {
+            videoToggleBtn.classList.remove('rotating');
+        }, { once: true });
+
         isVideoEnabled = !isVideoEnabled;
         videoToggleBtn.classList.toggle('active', isVideoEnabled);
         document.body.classList.toggle('video-mode', isVideoEnabled);
@@ -1485,12 +1512,10 @@
             stopAllStreams();
         }
         
-        // Avisar al servidor del cambio de modo
         if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
         }
         
-        // Re-ajustar el layout
         adjustLayoutForKeyboard();
     });
 
@@ -1509,17 +1534,16 @@
 
     function createPeerConnection() {
         peerConnection = new RTCPeerConnection(stunServers);
-
         peerConnection.onicecandidate = event => {
             if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
             }
         };
-
         peerConnection.ontrack = event => {
-            remoteVideo.srcObject = event.streams[0];
+            if (remoteVideo.srcObject !== event.streams[0]) {
+              remoteVideo.srcObject = event.streams[0];
+            }
         };
-
         if (localStream) {
             localStream.getTracks().forEach(track => {
                 peerConnection.addTrack(track, localStream);
@@ -1531,17 +1555,16 @@
       if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
         ws.close();
       }
-      stopAllStreams(); // Detener cualquier video anterior
+      stopAllStreams();
       messagesDiv.innerHTML = ''; 
       showPopup("🔍 Searching for a stranger...");
       typingIndicator.style.display = "none";
-      nextBtn.style.display = 'block';
+      nextBtn.style.display = 'flex';
       ws = new WebSocket(window.TIKTALK_BACKEND.replace("http", "ws"));
 
       ws.onopen = () => {
         reconnectAttempts = 0;
         updateInputState();
-        // Informar al servidor si queremos video desde el inicio
         ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
       };
 
@@ -1554,12 +1577,10 @@
                 showPopup("🔍 Searching for a stranger...");
               } else if (data.text === "connected") {
                 showPopup("✅ Connected! Say Hi 👋");
-                // Si estamos en modo video, iniciar la conexión WebRTC
                 if (isVideoEnabled) {
                   createPeerConnection();
                 }
               } else if (data.text === 'initiate_offer') {
-                // El servidor nos dice que creemos una oferta (solo un cliente lo hará)
                 if (peerConnection) {
                     const offer = await peerConnection.createOffer();
                     await peerConnection.setLocalDescription(offer);
@@ -1589,10 +1610,9 @@
                 }, 1500);
               }
               break;
-            // Casos para manejar la señalización de WebRTC
             case 'offer':
                 if (isVideoEnabled) {
-                    createPeerConnection();
+                    if (!peerConnection) createPeerConnection();
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
                     const answer = await peerConnection.createAnswer();
                     await peerConnection.setLocalDescription(answer);
@@ -1600,7 +1620,7 @@
                 }
                 break;
             case 'answer':
-                if (peerConnection) {
+                if (peerConnection && peerConnection.signalingState !== "stable") {
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
                 }
                 break;
@@ -1621,11 +1641,12 @@
         }
         typingIndicator.style.display = "none";
         isConnected = false;
-        stopAllStreams(); // Limpiar video al cerrar conexión
+        stopAllStreams();
         updateInputState();
       };
 
-      ws.onerror = () => {
+      ws.onerror = (err) => {
+        console.error("WebSocket error:", err);
         ws.close();
       };
     }
@@ -1669,7 +1690,6 @@
     });
     observer.observe(messagesDiv, { childList: true, subtree: true });
 
-    // Initial State
     function setInitialState() {
         startChattingBtn.style.display = 'block';
         nextBtn.style.display = 'none';
