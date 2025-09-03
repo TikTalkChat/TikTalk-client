@@ -50,6 +50,9 @@
       box-sizing: border-box;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       border-radius: 0 0 16px 16px;
+      /* MODIFIED: Added transition for smooth shrinking */
+      transition: height 0.3s ease, padding 0.3s ease;
+      height: 76px;
     }
     body.dark-mode header {
       background: #10161d;
@@ -64,6 +67,8 @@
       height: 60px;
       width: auto;
       display: block;
+      /* MODIFIED: Added transition for smooth shrinking */
+      transition: height 0.3s ease;
     }
     .chat-wrapper {
       position: relative;
@@ -79,8 +84,9 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       contain: strict;
-      padding: calc(70px + env(safe-area-inset-top)) 15px calc(70px + env(safe-area-inset-bottom));
+      padding: calc(76px + env(safe-area-inset-top)) 15px calc(70px + env(safe-area-inset-bottom));
       -webkit-overflow-scrolling: touch;
+      transition: padding-top 0.3s ease;
     }
     #messages {
       display: flex;
@@ -856,15 +862,14 @@
       display: none;
       flex-direction: column;
       position: absolute;
-      /* MODIFIED: Position below header */
-      top: calc(70px + env(safe-area-inset-top)); 
+      top: calc(76px + env(safe-area-inset-top)); 
       left: 0;
       right: 0;
       width: 100%;
-      /* MODIFIED: Adjust height to fit below header */
-      height: calc(50vh - 70px - env(safe-area-inset-top)); 
+      height: calc(50vh - 76px - env(safe-area-inset-top)); 
       z-index: 100;
       background-color: #000;
+      transition: top 0.3s ease, height 0.3s ease;
     }
     body.video-mode #video-container {
       display: flex;
@@ -880,9 +885,28 @@
     #remoteVideo {
         transform: scaleX(-1);
     }
+    
     body.video-mode #chat {
       padding-top: calc(50vh + 15px);
     }
+
+    /* === NEW STYLES FOR VIDEO MODE HEADER === */
+    body.video-mode header {
+        height: 44px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+    }
+    body.video-mode header svg.logo {
+        height: 36px;
+    }
+    body.video-mode #chat {
+        padding-top: calc(44px + env(safe-area-inset-top));
+    }
+    body.video-mode #video-container {
+        top: calc(44px + env(safe-area-inset-top));
+        height: calc(50vh - 44px - env(safe-area-inset-top));
+    }
+    
     #videoToggleBtn.active {
        filter: drop-shadow(0 0 4px #007bff);
     }
@@ -1266,7 +1290,7 @@
       const startChattingBtn = document.getElementById("startChattingBtn");
       const nextBtn = document.getElementById("nextBtn");
       const emojiPicker = document.getElementById("emojiPicker");
-      const headerHeight = header.offsetHeight || 70;
+      const headerHeight = header.offsetHeight || 76;
       let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)') || '0', 10);
       let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
       const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
@@ -1334,8 +1358,7 @@
       }
 
       if (!document.body.classList.contains('video-mode')) {
-        chatDiv.style.marginTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
-        chatDiv.style.height = `calc(100vh - ${headerHeight}px - ${safeAreaBottom}px)`;
+        chatDiv.style.paddingTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
       }
 
       requestAnimationFrame(() => {
@@ -1501,7 +1524,6 @@
             }
         };
         
-        // MODIFIED: More robust ontrack handler
         peerConnection.ontrack = event => {
             if (event.streams && event.streams[0]) {
               remoteVideo.srcObject = event.streams[0];
