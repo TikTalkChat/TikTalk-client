@@ -4,8 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>TikTalk - Stranger Chat</title>
+  <script type="module" src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"></script>
   <style>
-    /* === ESTILOS ORIGINALES (WITH EMOJI PICKER HEIGHT CHANGES) === */
+    /* === ESTILOS ORIGINALES (WITH REQUESTED CHANGES) === */
     * {
       margin: 0;
       padding: 0;
@@ -82,9 +83,9 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       contain: strict;
-      padding: calc(76px + env(safe-area-inset-top)) 15px calc(70px + env(safe-area-inset-bottom));
+      padding: calc(76px + env(safe-area-inset-top)) 15px calc(90px + env(safe-area-inset-bottom));
       -webkit-overflow-scrolling: touch;
-      transition: padding-top 0.3s ease;
+      transition: padding-top 0.3s ease, background 0.3s ease;
     }
     #messages {
       display: flex;
@@ -100,6 +101,13 @@
       line-height: 1.4;
       box-shadow: 0 1px 2px rgba(0,0,0,0.06);
       display: inline-block;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    /* MODIFIED: Allow messages with animations to have less padding */
+    .msg:has(dotlottie-player) {
+      background: transparent !important;
+      box-shadow: none;
+      padding: 0;
     }
     .me {
       align-self: flex-end;
@@ -135,17 +143,6 @@
       background: transparent;
       color: #e5e7eb;
     }
-    /* NEW: Styles for popup in video mode */
-    .popup.popup-video-mode {
-      background: rgba(0,0,0,0.1);
-      padding: 15px;
-      border-radius: 12px;
-      max-width: 280px;
-    }
-    body.dark-mode .popup.popup-video-mode {
-       background: rgba(255,255,255,0.1);
-    }
-
     #typingIndicator {
       font-size: 13px;
       color: #888;
@@ -213,7 +210,7 @@
       text-align: center;
       font-size: 14px;
       color: #555;
-      z-index: 9999;
+      z-index: 10010;
     }
     body.dark-mode .footerNote {
       color: #e5e7eb;
@@ -230,19 +227,23 @@
       max-height: 40px;
       overflow: hidden !important;
       box-sizing: border-box;
-      background: transparent !important;
+      background: #f0f2f5 !important;
+      border-radius: 20px;
+    }
+    body.dark-mode .inputWrapper {
+      background: #2d3748 !important;
     }
     textarea {
       width: 100%;
       resize: none;
-      padding: 10px 18px 10px 12px;
-      border: 1px solid #ccc !important;
+      padding: 10px 40px 10px 12px;
+      border: none !important;
       border-radius: 20px;
       font-size: 14px;
       outline: none;
       height: 40px;
       min-height: 40px;
-      max-height: 120px;
+      max-height: 200px;
       line-height: 18px;
       background: transparent !important;
       color: #0f172a;
@@ -253,7 +254,7 @@
       touch-action: manipulation;
     }
     body.dark-mode textarea {
-      border: 1px solid #4a5568 !important;
+      border: none !important;
       background: transparent !important;
       color: #e5e7eb;
     }
@@ -286,6 +287,29 @@
       background: transparent !important;
       box-shadow: none !important;
     }
+    .input-icon-btn {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent !important;
+      border: none !important;
+      padding: 0 !important;
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #5f6368;
+    }
+    body.dark-mode .input-icon-btn {
+      color: #bdc1c6;
+    }
+    .input-icon-btn svg {
+      width: 100%;
+      height: 100%;
+    }
     button {
       padding: 0 14px;
       border: none;
@@ -306,9 +330,8 @@
     button:active {
       opacity: 0.85;
     }
-    
     .footer-buttons {
-        margin-left: 8px;
+      margin-left: 8px;
     }
     #sendBtn, #nextBtn {
       width: 46px;
@@ -326,15 +349,13 @@
       box-shadow: 0 2px 8px rgba(0,123,255,0.4);
     }
     #nextBtn {
-       background: #007bff;
-       box-shadow: 0 2px 8px rgba(0,123,255,0.4);
+      background: #007bff;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.4);
     }
-
     #sendBtn svg, #nextBtn svg {
       width: 24px;
       height: 24px;
     }
-
     #emojiPicker {
       position: fixed;
       left: 8px;
@@ -377,6 +398,53 @@
       overflow-y: auto !important;
       height: auto !important;
     }
+    
+    /* MODIFIED: Renamed #gifPicker to #animationPicker and updated styles */
+    #animationPicker {
+      position: fixed;
+      left: 8px;
+      right: 8px;
+      margin: 0 auto;
+      width: calc(100% - 16px);
+      max-width: 400px;
+      height: var(--gif-picker-height, 350px);
+      max-height: var(--gif-picker-height, 70vh);
+      overflow-y: auto;
+      background: #fff;
+      border-radius: 16px;
+      z-index: 10001;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      will-change: transform, opacity, bottom;
+      display: none;
+      transform: translateY(30px) scale(0.98);
+      bottom: calc(10px + env(safe-area-inset-bottom));
+      padding: 10px;
+    }
+    #animationPicker.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      display: block;
+      bottom: calc(10px + env(safe-area-inset-bottom));
+    }
+    body.dark-mode #animationPicker {
+      background: #10161d;
+    }
+    .animation-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 10px;
+    }
+    .animation-item {
+      cursor: pointer;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f0f2f5;
+    }
+    body.dark-mode .animation-item {
+        background: #2d3748;
+    }
+    
     @media (min-width: 768px) {
       #emojiPicker {
         width: 360px;
@@ -385,128 +453,523 @@
         height: var(--emoji-picker-height, 350px);
         max-height: var(--emoji-picker-height, 350px);
         transform: translate(0, 30px) scale(0.98);
-        bottom: calc(56px + 15px + env(safe-area-inset-bottom)); 
+        bottom: calc(56px + 15px + env(safe-area-inset-bottom));
       }
       #emojiPicker.show {
         transform: translate(0, 0) scale(1);
         display: block;
         bottom: calc(56px + 15px + env(safe-area-inset-bottom));
       }
-      .share-btn { width: 24px; height: 24px; }
-      .share-btn svg.button-icon { width: 12px; height: 12px; }
-      .right { gap: 8px; padding-right: 10px; }
-      textarea { padding: 10px 18px 10px 12px; }
-      #sendBtn, #nextBtn { width: 46px; height: 46px; }
-      #sendBtn svg, #nextBtn svg { width: 24px; height: 24px; }
-      .inputWrapper { flex-grow: 3; }
+      #animationPicker {
+        width: 360px;
+        left: auto;
+        right: 8px;
+        height: var(--gif-picker-height, 350px);
+        max-height: var(--gif-picker-height, 350px);
+        transform: translate(0, 30px) scale(0.98);
+        bottom: calc(56px + 15px + env(safe-area-inset-bottom));
+      }
+      #animationPicker.show {
+        transform: translate(0, 0) scale(1);
+        display: block;
+        bottom: calc(56px + 15px + env(safe-area-inset-bottom));
+      }
+      .share-btn {
+        width: 24px;
+        height: 24px;
+      }
+      .share-btn svg.button-icon {
+        width: 12px;
+        height: 12px;
+      }
+      .right {
+        gap: 8px;
+        padding-right: 10px;
+      }
+      textarea {
+        padding: 10px 40px 10px 12px;
+      }
+      #sendBtn, #nextBtn {
+        width: 46px;
+        height: 46px;
+      }
+      #sendBtn svg, #nextBtn svg {
+        width: 24px;
+        height: 24px;
+      }
+      .inputWrapper {
+        flex-grow: 3;
+      }
     }
     @media (max-width: 767px) {
-      #emojiPicker { height: var(--emoji-picker-height, 350px); max-height: var(--emoji-picker-height, 70vh); }
-      .share-btn { padding: 0; background: transparent; border: none; border-radius: 50%; width: 24px; height: 24px; position: relative; color: #fff; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10005; visibility: visible; opacity: 1; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-      .share-btn svg.button-icon { width: 12px; height: 12px; }
-      .right { gap: 6px; padding-right: 8px; }
-      header { padding: 6px 8px; }
-      textarea { padding: 10px 18px 10px 12px; }
-      #sendBtn, #nextBtn { width: 46px; height: 46px; }
-      #sendBtn svg, #nextBtn svg { width: 24px; height: 24px; }
+      #emojiPicker, #animationPicker {
+        height: var(--emoji-picker-height, 350px);
+        max-height: var(--emoji-picker-height, 70vh);
+      }
+      .share-btn {
+        padding: 0;
+        background: transparent;
+        border: none;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        position: relative;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 10005;
+        visibility: visible;
+        opacity: 1;
+        overflow: hidden;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      }
+      .share-btn svg.button-icon {
+        width: 12px;
+        height: 12px;
+      }
+      .right {
+        gap: 6px;
+        padding-right: 8px;
+      }
+      header {
+        padding: 6px 8px;
+      }
+      textarea {
+        padding: 10px 40px 10px 12px;
+      }
+      #sendBtn, #nextBtn {
+        width: 46px;
+        height: 46px;
+      }
+      #sendBtn svg, #nextBtn svg {
+        width: 24px;
+        height: 24px;
+      }
     }
     @media (max-width: 480px) {
-      .msg { max-width: 85%; font-size: 14px; padding: 8px 12px; }
-      footer { padding: 6px; height: 56px; min-height: 56px; max-height: 56px; left: 8px; right: 8px; border-radius: 32px; }
-      .inputWrapper { height: 40px; min-height: 40px; max-height: 40px; }
-      textarea { height: 40px; min-height: 40px; max-height: 120px; font-size: 14px; padding: 10px 18px 10px 12px; }
-      #emojiToggle { font-size: 18px; width: 44px; height: 44px; }
-      #sendBtn, #nextBtn { width: 46px; height: 46px; }
-      #sendBtn svg, #nextBtn svg { width: 24px; height: 24px; }
+      .msg {
+        max-width: 85%;
+        font-size: 14px;
+        padding: 8px 12px;
+      }
+      footer {
+        padding: 6px;
+        height: 56px;
+        min-height: 56px;
+        max-height: 56px;
+        left: 8px;
+        right: 8px;
+        border-radius: 32px;
+      }
+      .inputWrapper {
+        height: 40px;
+        min-height: 40px;
+        max-height: 40px;
+      }
+      textarea {
+        height: 40px;
+        min-height: 40px;
+        max-height: 200px;
+        font-size: 14px;
+        padding: 10px 40px 10px 12px;
+      }
+      #emojiToggle, .input-icon-btn {
+        font-size: 18px;
+        width: 24px;
+        height: 24px;
+      }
+      #sendBtn, #nextBtn {
+        width: 46px;
+        height: 46px;
+      }
+      #sendBtn svg, #nextBtn svg {
+        width: 24px;
+        height: 24px;
+      }
     }
-    .icon-btn { width: 28px; height: 28px; cursor: pointer; transition: all 0.2s, transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); display: flex; align-items: center; justify-content: center; z-index: 10001; touch-action: manipulation; background: transparent; border: none; border-radius: 50%; box-shadow: none; color: #334155; position: relative; }
-    body.dark-mode .icon-btn { color: #cbd5e1; }
-    #themeToggle { font-size: 20px; }
-    .icon-btn:active { transform: scale(0.95); }
-    #videoToggleBtn svg { width: 24px; height: 24px; position: absolute; transition: opacity 0.2s; }
-    .share-btn { padding: 0; background: transparent; border: none; border-radius: 50%; width: 24px; height: 24px; position: relative; color: #fff; display: flex !important; align-items: center; justify-content: center; transition: all 0.3s ease; z-index: 10005; visibility: visible; opacity: 1; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    .share-btn svg.button-icon { width: 12px; height: 12px; }
-    .share-btn:hover { transform: scale(1.1); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-    body.dark-mode .share-btn { border-color: rgba(255,255,255,0.5); }
-    body.dark-mode .share-btn:hover { border-color: rgba(255,255,255,0.7); box-shadow: 0 4px 12px rgba(255,255,255,0.2); }
-    .right { position: relative; display: flex !important; align-items: center; gap: 8px; z-index: 10004; padding-right: 10px; }
-    .share-animation { position: absolute; top: -2px; left: -2px; right: -2px; bottom: -2px; border-radius: 50%; display: flex; align-items: center; justify-content: center; z-index: 10006; pointer-events: none; }
-    .share-animation::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; border-radius: 50%; padding: 2px; background: linear-gradient(45deg, #00eaff, #007bff, #6a00ff, #00eaff); background-size: 300% 300%; -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: shareBorderAnimation 3s ease infinite; }
-    @keyframes shareBorderAnimation { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-    .share-sheet { position: absolute; top: calc(100% + env(safe-area-inset-top)); right: 0; background: #fff !important; border-radius: 12px; padding: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); display: none; flex-direction: row; gap: 12px; z-index: 10006; margin-top: 5px; transform: translateY(-10px); opacity: 0; transition: all 0.3s ease; }
-    body.dark-mode .share-sheet { background: #1f2937 !important; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
-    .share-sheet.show { transform: translateY(0); opacity: 1; }
-    .share-sheet button { background: #f8f9fa !important; border: 1px solid #dee2e6 !important; border-radius: 50%; padding: 8px; width: 44px; height: 44px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s ease; z-index: 10001; }
-    .share-sheet button:hover { background: #e9ecef !important; transform: scale(1.05); }
-    body.dark-mode .share-sheet button { background: #2d3748 !important; border-color: #4a5568 !important; }
-    body.dark-mode .share-sheet button:hover { background: #4a5568 !important; }
-    .share-sheet button img { width: 24px; height: 24px; }
-    .share-sheet button svg { display: block; }
-    .share-sheet .link { border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; background: #f8f9fa !important; border: 1px solid #dee2e6 !important; color: #007bff !important; font-weight: 600; cursor: pointer; transition: all 0.2s ease; }
-    .share-sheet .link:hover { background: #e9ecef !important; transform: scale(1.05); }
-    button:focus, button:active, .icon-btn:focus, .icon-btn:active, .share-btn:focus, .share-btn:active, .share-sheet button:focus, .share-sheet button:active, button:focus-visible, .icon-btn:focus-visible, .share-btn:focus-visible, .share-sheet button:focus-visible { outline: none !important; box-shadow: none !important; }
-    #copyLinkPopup { position: absolute; top: calc(100% + 15px); right: 0; padding: 12px 20px; border-radius: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.25); font-size: 14px; font-weight: 600; opacity: 0; transition: opacity 0.3s ease; z-index: 10007; pointer-events: none; color: #fff; background: #007bff; transform: translateY(-10px); }
-    #copyLinkPopup.show { opacity: 1; transform: translateY(0); }
-    body.dark-mode #copyLinkPopup { background: #1d4ed8; color: #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
-    .bubble, .typing-dot, .pulse-dot { will-change: transform, opacity; }
-    .eye { transform-origin: center; animation: blink 4s infinite; }
-    @keyframes blink { 0%, 95% { opacity: 1; } 96%, 98% { opacity: 0.1; } 99%, 100% { opacity: 1; } }
-    .smile { transform-origin: center; cursor: pointer; transition: all 0.3s ease; }
-    .searching-container { display: flex; justify-content: center; align-items: center; padding: 15px 0; }
-    .pulse-dots { display: flex; align-items: center; justify-content: center; gap: 4px; }
-    .pulse-dot { width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(45deg,#00eaff,#6a00ff); animation: pulse 1.5s ease-in-out infinite; will-change: transform, opacity; }
-    .pulse-dot:nth-child(1) { animation-delay: 0s; } .pulse-dot:nth-child(2) { animation-delay: 0.2s; } .pulse-dot:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes pulse { 0%,100% { transform: scale(0.8); opacity: 0.7; } 50% { transform: scale(1.2); opacity: 1; } }
-    .searching-text { margin-left: 10px; font-weight: 500; color: #555; white-space: nowrap; }
-    body.dark-mode .searching-text { color: #e5e7eb; }
-    .connected-checkmark { display: inline-block; width: 20px; height: 20px; margin-right: 8px; }
-    .connected-checkmark::after { content: ""; display: block; width: 8px; height: 14px; border: solid #00c853; border-width: 0 3px 3px 0; transform: rotate(45deg); animation: checkmark-appear 0.5s ease-in-out; }
-    @keyframes checkmark-appear { 0% { opacity: 0; transform: rotate(45deg) scale(0); } 50% { transform: rotate(45deg) scale(1.2); } 100% { opacity: 1; transform: rotate(45deg) scale(1); } }
-    .start-chatting-btn { position: fixed; bottom: calc(130px + env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); padding: 12px 24px; background: #007bff; color: #fff; border: none; border-radius: 25px; font-weight: bold; font-size: 16px; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2); z-index: 10001; animation: pulse-glow 2s infinite; display: block; }
-    body.dark-mode .start-chatting-btn { background: #007bff; box-shadow: 0 4px 15px rgba(0,123,255,0.4); }
-    @keyframes pulse-glow { 0% { box-shadow: 0 4px 15px rgba(0,123,255,0.4); transform: translateX(-50%) scale(1); } 50% { box-shadow: 0 4px 20px rgba(0,123,255,0.7); transform: translateX(-50%) scale(1.05); } 100% { box-shadow: 0 4px 15px rgba(0,123,255,0.4); transform: translateX(-50%) scale(1); } }
-    .start-chatting-btn:hover { animation: none; box-shadow: 0 4px 20px rgba(0,123,255,0.8); transform: translateX(-50%) scale(1); }
-    .button-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; }
-    .auto-scroll-enabled #messages { scroll-behavior: smooth; }
-    footer { display: flex; align-items: center; justify-content: space-between; }
-    .inputWrapper { border: none !important; box-shadow: none !important; }
-    textarea::-webkit-scrollbar { width: 4px; }
-    textarea::-webkit-scrollbar-track { background: transparent; }
-    textarea::-webkit-scrollbar-thumb { background: #ccc; border-radius: 2px; }
-    body.dark-mode textarea::-webkit-scrollbar-thumb { background: #555; }
-    
+    .icon-btn {
+      width: 28px;
+      height: 28px;
+      cursor: pointer;
+      transition: all 0.2s, transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10001;
+      touch-action: manipulation;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      box-shadow: none;
+      color: #334155; 
+      position: relative;
+    }
+    body.dark-mode .icon-btn {
+      color: #cbd5e1;
+    }
+    #themeToggle {
+        font-size: 20px;
+    }
+    .icon-btn:active {
+      transform: scale(0.95);
+    }
+    #videoToggleBtn svg {
+        width: 24px;
+        height: 24px;
+        position: absolute;
+        transition: opacity 0.2s;
+    }
+    .share-btn {
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      position: relative;
+      color: #fff;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 10005;
+      visibility: visible;
+      opacity: 1;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .share-btn svg.button-icon {
+      width: 12px;
+      height: 12px;
+    }
+    .share-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    body.dark-mode .share-btn {
+      border-color: rgba(255,255,255,0.5);
+    }
+    body.dark-mode .share-btn:hover {
+      border-color: rgba(255,255,255,0.7);
+      box-shadow: 0 4px 12px rgba(255,255,255,0.2);
+    }
+    .right {
+      position: relative;
+      display: flex !important;
+      align-items: center;
+      gap: 8px;
+      z-index: 10004;
+      padding-right: 10px;
+    }
+    .share-animation {
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10006;
+      pointer-events: none;
+    }
+    .share-animation::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      padding: 2px;
+      background: linear-gradient(45deg, #00eaff, #007bff, #6a00ff, #00eaff);
+      background-size: 300% 300%;
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      animation: shareBorderAnimation 3s ease infinite;
+    }
+    @keyframes shareBorderAnimation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .share-sheet {
+      position: absolute;
+      top: calc(100% + env(safe-area-inset-top));
+      right: 0;
+      background: #fff !important;
+      border-radius: 12px;
+      padding: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      display: none;
+      flex-direction: row;
+      gap: 12px;
+      z-index: 10006;
+      margin-top: 5px;
+      transform: translateY(-10px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    body.dark-mode .share-sheet {
+      background: #1f2937 !important;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    }
+    .share-sheet.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    .share-sheet button {
+      background: #f8f9fa !important;
+      border: 1px solid #dee2e6 !important;
+      border-radius: 50%;
+      padding: 8px;
+      width: 44px;
+      height: 44px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      z-index: 10001;
+    }
+    .share-sheet button:hover {
+      background: #e9ecef !important;
+      transform: scale(1.05);
+    }
+    body.dark-mode .share-sheet button {
+      background: #2d3748 !important;
+      border-color: #4a5568 !important;
+    }
+    body.dark-mode .share-sheet button:hover {
+      background: #4a5568 !important;
+    }
+    .share-sheet button img {
+      width: 24px;
+      height: 24px;
+    }
+    .share-sheet button svg {
+      display: block;
+    }
+    .share-sheet .link {
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8f9fa !important;
+      border: 1px solid #dee2e6 !important;
+      color: #007bff !important;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .share-sheet .link:hover {
+      background: #e9ecef !important;
+      transform: scale(1.05);
+    }
+    button:focus, button:active,
+    .icon-btn:focus, .icon-btn:active,
+    .share-btn:focus, .share-btn:active,
+    .share-sheet button:focus, .share-sheet button:active,
+    button:focus-visible, .icon-btn:focus-visible,
+    .share-btn:focus-visible, .share-sheet button:focus-visible {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    #copyLinkPopup {
+      position: absolute;
+      top: calc(100% + 15px);
+      right: 0;
+      padding: 12px 20px;
+      border-radius: 25px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      font-size: 14px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 10007;
+      pointer-events: none;
+      color: #fff;
+      background: #007bff;
+      transform: translateY(-10px);
+    }
+    #copyLinkPopup.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    body.dark-mode #copyLinkPopup {
+      background: #1d4ed8;
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .bubble, .typing-dot, .pulse-dot {
+      will-change: transform, opacity;
+    }
+    .eye {
+      transform-origin: center;
+      animation: blink 4s infinite;
+    }
+    @keyframes blink {
+      0%, 95% { opacity: 1; }
+      96%, 98% { opacity: 0.1; }
+      99%, 100% { opacity: 1; }
+    }
+    .smile {
+      transform-origin: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .searching-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px 0;
+    }
+    .pulse-dots {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+    .pulse-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(45deg,#00eaff,#6a00ff);
+      animation: pulse 1.5s ease-in-out infinite;
+      will-change: transform, opacity;
+    }
+    .pulse-dot:nth-child(1) { animation-delay: 0s; }
+    .pulse-dot:nth-child(2) { animation-delay: 0.2s; }
+    .pulse-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes pulse {
+      0%,100% { transform: scale(0.8); opacity: 0.7; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+    .searching-text {
+      margin-left: 10px;
+      font-weight: 500;
+      color: #555;
+      white-space: nowrap;
+    }
+    body.dark-mode .searching-text {
+      color: #e5e7eb;
+    }
+    .connected-checkmark {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+    }
+    .connected-checkmark::after {
+      content: "";
+      display: block;
+      width: 8px;
+      height: 14px;
+      border: solid #00c853;
+      border-width: 0 3px 3px 0;
+      transform: rotate(45deg);
+      animation: checkmark-appear 0.5s ease-in-out;
+    }
+    @keyframes checkmark-appear {
+      0% { opacity: 0; transform: rotate(45deg) scale(0); }
+      50% { transform: rotate(45deg) scale(1.2); }
+      100% { opacity: 1; transform: rotate(45deg) scale(1); }
+    }
+    .start-chatting-btn {
+      position: fixed;
+      bottom: calc(95px + env(safe-area-inset-bottom));
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 24px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 25px;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      z-index: 10001;
+      animation: pulse-glow 2s infinite;
+      display: block;
+    }
+    body.dark-mode .start-chatting-btn {
+      background: #007bff;
+      box-shadow: 0 4px 15px rgba(0,123,255,0.4);
+    }
+    @keyframes pulse-glow {
+      0% { box-shadow: 0 4px 15px rgba(0,123,255,0.4); transform: translateX(-50%) scale(1); }
+      50% { box-shadow: 0 4px 20px rgba(0,123,255,0.7); transform: translateX(-50%) scale(1.05); }
+      100% { box-shadow: 0 4px 15px rgba(0,123,255,0.4); transform: translateX(-50%) scale(1); }
+    }
+    .start-chatting-btn:hover {
+      animation: none;
+      box-shadow: 0 4px 20px rgba(0,123,255,0.8);
+      transform: translateX(-50%) scale(1);
+    }
+    .button-icon {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .auto-scroll-enabled #messages {
+      scroll-behavior: smooth;
+    }
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .inputWrapper {
+      border: none !important;
+      box-shadow: none !important;
+    }
+    textarea::-webkit-scrollbar {
+      width: 4px;
+    }
+    textarea::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    textarea::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 2px;
+    }
+    body.dark-mode textarea::-webkit-scrollbar-thumb {
+      background: #555;
+    }
     #video-container {
       display: none;
       flex-direction: column;
       position: absolute;
-      top: calc(76px + env(safe-area-inset-top)); 
+      top: calc(76px + env(safe-area-inset-top));
       left: 0;
       right: 0;
       width: 100%;
-      height: calc(65vh - 76px - env(safe-area-inset-top)); 
+      bottom: calc(56px + env(safe-area-inset-bottom));
       z-index: 100;
       background-color: #000;
-      transition: top 0.3s ease, height 0.3s ease;
+      transition: top 0.3s ease, bottom 0.3s ease;
     }
     body.video-mode #video-container {
       display: flex;
     }
     #video-container video {
       width: 100%;
-      height: 50%;
+      height: 50%; 
       object-fit: cover;
+      transform: scaleX(-1);
     }
-    #localVideo {
-        transform: scaleX(-1);
-    }
-    #remoteVideo {
-        transform: scaleX(-1);
-    }
-    
     body.video-mode #chat {
-      padding-top: calc(65vh + 15px);
+      display: none;
     }
-
     body.video-mode header {
         height: 44px;
         padding-top: 4px;
@@ -517,9 +980,7 @@
     }
     body.video-mode #video-container {
         top: calc(44px + env(safe-area-inset-top));
-        height: calc(65vh - 44px - env(safe-area-inset-top));
     }
-    
     #videoToggleBtn.active {
        filter: drop-shadow(0 0 4px #007bff);
     }
@@ -534,27 +995,58 @@
     <div class="left">
       <svg class="logo" width="auto" height="60" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TikTalk animated logo">
         <defs>
-          <linearGradient id="gBubble" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#00eaff"><animate attributeName="stop-color" dur="6s" values="#00eaff;#007bff;#6a00ff;#00eaff" repeatCount="indefinite"/></stop><stop offset="100%" stop-color="#007bff"><animate attributeName="stop-color" dur="6s" values="#007bff;#6a00ff;#00eaff;#007bff" repeatCount="indefinite"/></stop></linearGradient>
-          <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          <linearGradient id="gBubble" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#00eaff">
+              <animate attributeName="stop-color" dur="6s" values="#00eaff;#007bff;#6a00ff;#00eaff" repeatCount="indefinite"/>
+            </stop>
+            <stop offset="100%" stop-color="#007bff">
+              <animate attributeName="stop-color" dur="6s" values="#007bff;#6a00ff;#00eaff;#007bff" repeatCount="indefinite"/>
+            </stop>
+          </linearGradient>
+          <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
         </defs>
         <g transform="translate(60,70) scale(1.2)">
-          <circle cx="0" cy="0" r="45" fill="url(#gBubble)"/><ellipse class="eye left" cx="-12" cy="-9" rx="4.5" ry="7" fill="#fff"/><path class="right" d="M 8 -9 Q 12 -13 16 -9" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/><path class="smile" d="M -10 10 Q 0 18 10 10" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <circle cx="0" cy="0" r="45" fill="url(#gBubble)"/>
+          <ellipse class="eye left" cx="-12" cy="-9" rx="4.5" ry="7" fill="#fff"/>
+          <path class="right" d="M 8 -9 Q 12 -13 16 -9" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <path class="smile" d="M -10 10 Q 0 18 10 10" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>
         </g>
         <text x="120" y="70" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="#007bff" dominant-baseline="middle" alignment-baseline="middle">TikTalk</text>
       </svg>
     </div>
     <div class="right">
-      <button id="videoToggleBtn" class="icon-btn" title="Toggle Video Mode"><svg class="video-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg><svg class="chat-icon" style="display: none;" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg></button>
+      <button id="videoToggleBtn" class="icon-btn" title="Toggle Video Mode">
+        <svg class="video-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+        </svg>
+        <svg class="chat-icon" style="display: none;" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+        </svg>
+      </button>
       <button id="themeToggle" class="icon-btn">🌙</button>
       <div style="position: relative;">
-        <button id="shareBtn" class="share-btn"><svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);"><path d="M18 8l-8 8-8-8"/><animate attributeName="stroke" values="#007bff;#00eaff;#6a00ff;#007bff" dur="3s" repeatCount="indefinite"/><animate attributeName="transform" values="scale(1);scale(1.1);scale(1)" dur="1.5s" repeatCount="indefinite"/></svg></button>
+        <button id="shareBtn" class="share-btn">
+          <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+            <path d="M18 8l-8 8-8-8"/>
+            <animate attributeName="stroke" values="#007bff;#00eaff;#6a00ff;#007bff" dur="3s" repeatCount="indefinite"/>
+            <animate attributeName="transform" values="scale(1);scale(1.1);scale(1)" dur="1.5s" repeatCount="indefinite"/>
+          </svg>
+        </button>
         <div class="share-animation"></div>
       </div>
       <div class="share-sheet" id="shareSheet">
         <button onclick="shareApp('whatsapp')"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></button>
         <button onclick="shareApp('instagram')"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram"></button>
         <button onclick="shareApp('facebook')"><img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Facebook"></button>
-        <button onclick="shareApp('x')" aria-label="Share on X"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20"><circle cx="50" cy="50" r="50" fill="#1DA1F2"/><path d="M30,30 L70,70 M70,30 L30,70" stroke="#fff" stroke-width="10" stroke-linecap="round"/></svg></button>
+        <button onclick="shareApp('x')" aria-label="Share on X">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20">
+            <circle cx="50" cy="50" r="50" fill="#1DA1F2"/>
+            <path d="M30,30 L70,70 M70,30 L30,70" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
+          </svg>
+        </button>
         <button class="link" onclick="shareApp('link')">🔗</button>
       </div>
     </div>
@@ -566,20 +1058,45 @@
     </div>
     <main id="chat">
       <div id="messages"></div>
-      <div id="typingIndicator" style="display:none;"><div class="typing-container"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>
+      <div id="typingIndicator" style="display:none;">
+        <div class="typing-container">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
     </main>
   </div>
   <button id="startChattingBtn" class="start-chatting-btn">Start Chat</button>
   <p class="footerNote">Made in India <span class="heart">♥️</span></p>
   <footer>
-    <button id="emojiToggle" aria-label="Toggle emoji picker" aria-expanded="false">😊</button>
-    <div class="inputWrapper"><textarea id="messageInput" placeholder="Type a message..."></textarea></div>
+    <button id="emojiToggle" aria-label="Toggle emoji picker">😊</button>
+    <div class="inputWrapper">
+      <textarea id="messageInput" placeholder="Type a message..."></textarea>
+      <button id="animationToggle" class="input-icon-btn" aria-label="Toggle Animation picker">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+          <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="4" fill="none"/>
+          <text x="50%" y="50%" text-anchor="middle" dy=".35em" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="currentColor">GIF</text>
+        </svg>
+      </button>
+    </div>
     <div class="footer-buttons">
-      <button id="nextBtn" title="Next" disabled><svg class="button-icon" viewBox="0 0 24 24" fill="white"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
-      <button id="sendBtn" title="Send"><svg class="button-icon" viewBox="0 0 24 24" fill="white"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
+      <button id="nextBtn" title="Next" disabled>
+        <svg class="button-icon" viewBox="0 0 24 24" fill="white">
+          <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+        </svg>
+      </button>
+      <button id="sendBtn" title="Send">
+        <svg class="button-icon" viewBox="0 0 24 24" fill="white">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
     </div>
   </footer>
   <div id="emojiPicker" aria-hidden="true"></div>
+  <div id="animationPicker" aria-hidden="true">
+    <div class="animation-grid" id="animationGrid"></div>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
   <script>
     let localStream;
@@ -593,10 +1110,12 @@
     const stunServers = {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' }
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' },
+        { urls: 'stun:stun3.l.google.com:19302' }
       ]
     };
-
+    
     function debounce(func, wait) {
       let timeout;
       return function (...args) {
@@ -648,15 +1167,62 @@
         }
       }
       initializeEmojiPicker();
+      
       const emojiToggle = document.getElementById("emojiToggle");
       const emojiPicker = document.getElementById("emojiPicker");
+      const animationToggle = document.getElementById("animationToggle");
+      const animationPicker = document.getElementById("animationPicker");
+      const animationGrid = document.getElementById("animationGrid");
       const input = document.getElementById("messageInput");
-      const footer = document.querySelector("footer");
       let wasPickerOpenBeforeKeyboard = false;
+
+      // --- Lottie Library Setup ---
+      const lottieAnimations = [
+          "https://lottie.host/808269e3-2391-41e7-9a67-9154af4222a7/5kG2p4lvoC.json", // Thumbs Up
+          "https://lottie.host/9c33b070-7667-4d7a-ab81-79e57833a696/i04a2WulSO.json", // Heart
+          "https://lottie.host/cf411776-e41c-43f3-a15e-e483a9588665/gI018HkX2p.json", // Laughing
+          "https://lottie.host/1749c0d4-d02f-410a-abd8-b11ff5a42828/sW0dYwwVEf.json", // Waving
+          "https://lottie.host/8254c00a-b333-40a1-a068-199188458628/bXv8jCM303.json", // Crying
+          "https://lottie.host/1589b275-c38d-4786-896e-1d542d948956/s5L5paCVib.json", // Dancing
+          "https://lottie.host/86127e70-a3ce-4217-a111-a83626e27b9c/032VsL3wZ6.json", // Rocket
+          "https://lottie.host/9d311893-6c84-4e94-969c-29d0f4d32049/2g9q6n7XvA.json", // Loading
+          "https://lottie.host/932050f5-b72e-436f-822e-2e45a05b6826/aG07y4X8Cf.json", // Party Popper
+          "https://lottie.host/b4f9d45e-57c5-4d74-916c-b3a51f04e132/z59tA7L7fG.json", // Thinking
+          "https://lottie.host/43e74c86-9a2c-49e3-9972-2d88734268e3/qJzZWtj7uU.json", // Sleeping
+          "https://lottie.host/985227ea-0738-468f-a396-93f538e1e780/jHnB5WJGk5.json"  // OK Hand
+      ];
+
+      function populateLottieLibrary() {
+        animationGrid.innerHTML = ''; // Clear previous items
+        lottieAnimations.forEach(url => {
+          const item = document.createElement('div');
+          item.className = 'animation-item';
+
+          const player = document.createElement('dotlottie-player');
+          player.setAttribute('src', url);
+          player.setAttribute('background', 'transparent');
+          player.setAttribute('speed', '1');
+          player.style.width = '100px';
+          player.style.height = '100px';
+          player.setAttribute('loop', '');
+          player.setAttribute('autoplay', '');
+
+          item.onclick = () => {
+            ws.send(JSON.stringify({ type: "message", text: url }));
+            addMessage(url, 'me');
+            animationPicker.classList.remove('show');
+            animationPicker.style.display = 'none';
+            debouncedAdjustLayout();
+          };
+          
+          item.appendChild(player);
+          animationGrid.appendChild(item);
+        });
+      }
+      // --- End of Lottie Setup ---
+
       const handleEmojiToggle = (e) => {
-        if (e.target !== emojiToggle || e.currentTarget !== emojiToggle) {
-          return;
-        }
+        if (e.target.closest('#emojiToggle') !== emojiToggle) return;
         e.preventDefault();
         e.stopImmediatePropagation();
         const isPickerOpen = emojiPicker.classList.contains('show');
@@ -664,44 +1230,69 @@
           emojiPicker.classList.remove('show');
           emojiPicker.style.display = 'none';
           emojiToggle.textContent = "😊";
-          emojiToggle.setAttribute('aria-expanded', 'false');
           wasPickerOpenBeforeKeyboard = false;
           input.focus();
         } else {
+          animationPicker.classList.remove('show');
+          animationPicker.style.display = 'none';
           emojiPicker.classList.add('show');
           emojiPicker.style.display = 'block';
           emojiToggle.textContent = "⌨️";
-          emojiToggle.setAttribute('aria-expanded', 'true');
           input.blur();
         }
         debouncedAdjustLayout();
       };
-      emojiToggle.removeEventListener("click", handleEmojiToggle);
-      emojiToggle.removeEventListener("touchstart", handleEmojiToggle);
-      emojiToggle.removeEventListener("pointerdown", handleEmojiToggle);
       emojiToggle.addEventListener("click", handleEmojiToggle, { passive: false });
       emojiToggle.addEventListener("touchstart", handleEmojiToggle, { passive: false });
+
+      const handleAnimationToggle = (e) => {
+        if (e.target.closest('#animationToggle') !== animationToggle) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        const isPickerOpen = animationPicker.classList.contains('show');
+        if (isPickerOpen) {
+          animationPicker.classList.remove('show');
+          animationPicker.style.display = 'none';
+        } else {
+          if (animationGrid.innerHTML === '') {
+            populateLottieLibrary();
+          }
+          emojiPicker.classList.remove('show');
+          emojiPicker.style.display = 'none';
+          emojiToggle.textContent = "😊";
+          animationPicker.classList.add('show');
+          animationPicker.style.display = 'block';
+          input.blur();
+        }
+        debouncedAdjustLayout();
+      };
+      animationToggle.addEventListener("click", handleAnimationToggle, { passive: false });
+      animationToggle.addEventListener("touchstart", handleAnimationToggle, { passive: false });
+
       const handleInputInteraction = (e) => {
         e.stopImmediatePropagation();
       };
-      input.removeEventListener("click", handleInputInteraction);
-      input.removeEventListener("touchstart", handleInputInteraction);
       input.addEventListener("click", handleInputInteraction, { passive: true });
       input.addEventListener("touchstart", handleInputInteraction, { passive: true });
+      
       input.addEventListener("focus", () => {
         if (emojiPicker.classList.contains('show')) {
           emojiPicker.classList.remove('show');
           emojiPicker.style.display = 'none';
           emojiToggle.textContent = "😊";
-          emojiToggle.setAttribute('aria-expanded', 'false');
           wasPickerOpenBeforeKeyboard = true;
+        }
+        if (animationPicker.classList.contains('show')) {
+          animationPicker.classList.remove('show');
+          animationPicker.style.display = 'none';
         }
         adjustLayoutForKeyboard();
         if (!rafId) rafId = requestAnimationFrame(updateLayout);
       });
+      
       input.addEventListener("blur", () => {
         setTimeout(() => {
-          const isStillFocused = document.activeElement === input || document.activeElement === emojiToggle;
+          const isStillFocused = document.activeElement === input || document.activeElement === emojiToggle || document.activeElement === animationToggle;
           if (!isStillFocused) {
             adjustLayoutForKeyboard();
           }
@@ -710,7 +1301,6 @@
           emojiPicker.classList.add('show');
           emojiPicker.style.display = 'block';
           emojiToggle.textContent = "⌨️";
-          emojiToggle.setAttribute('aria-expanded', 'true');
         }
         if (rafId) {
           cancelAnimationFrame(rafId);
@@ -725,7 +1315,6 @@
       e.preventDefault();
       document.body.classList.toggle("dark-mode");
       themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
-
       if (window._emojiPickerInstance) {
         window._emojiPickerInstance.setOptions({
           theme: document.body.classList.contains("dark-mode") ? "dark" : "light"
@@ -829,6 +1418,7 @@
 
     function scrollToBottom() {
       const chatDiv = document.getElementById("chat");
+      if (!chatDiv || getComputedStyle(chatDiv).display === 'none') return;
       const isNearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 100;
       if (isNearBottom && messagesDiv.children.length > 0) {
         chatDiv.scrollTop = chatDiv.scrollHeight;
@@ -850,69 +1440,122 @@
     function adjustLayoutForKeyboard() {
         const header = document.querySelector("header");
         const chatDiv = document.getElementById("chat");
-        const isKeyboardOpen = document.activeElement === input;
-        
+        const footerNote = document.querySelector(".footerNote");
+        const footer = document.querySelector("footer");
+        const startChattingBtn = document.getElementById("startChattingBtn");
+        const emojiPicker = document.getElementById("emojiPicker");
+        const animationPicker = document.getElementById("animationPicker");
         let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
+        const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
+        const isEmojiPickerOpen = emojiPicker.classList.contains('show');
+        const isAnimationPickerOpen = animationPicker.classList.contains('show');
+        const isDesktop = window.matchMedia("(min-width: 768px)").matches;
         let keyboardHeight = 0;
-        
-        if ('virtualKeyboard' in navigator && navigator.virtualKeyboard.boundingRect) {
+
+        if ('virtualKeyboard' in navigator) {
             keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
+        } else if (window.visualViewport) {
+            keyboardHeight = Math.max(0, window.innerHeight - window.visualViewport.height);
         }
 
-        if (isKeyboardOpen && keyboardHeight > 0) {
-            footer.style.bottom = `${keyboardHeight + safeAreaBottom}px`;
+        if (keyboardHeight > 0) {
+            lastKeyboardHeight = Math.max(keyboardHeight, 300);
+            localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
+        } else if (!isKeyboardOpen && !isEmojiPickerOpen && !isAnimationPickerOpen) {
+            lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
+        }
+
+        let pickerHeight = lastKeyboardHeight;
+        if (isDesktop) {
+            pickerHeight = Math.min(lastKeyboardHeight, 350);
+        } else {
+            pickerHeight = Math.min(lastKeyboardHeight, window.innerHeight * 0.7);
+        }
+        document.documentElement.style.setProperty('--emoji-picker-height', `${pickerHeight}px`);
+        document.documentElement.style.setProperty('--gif-picker-height', `${pickerHeight}px`);
+
+        const footerNoteHeight = 20;
+
+        if (isKeyboardOpen) {
+            footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px)`;
+            if (chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + ${footerNoteHeight}px)`;
+            footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px)`;
+            startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 25px)`;
+        } else if (isEmojiPickerOpen || isAnimationPickerOpen) {
+            if (!isDesktop) {
+                footer.style.bottom = `calc(${pickerHeight}px + ${safeAreaBottom}px + 10px)`;
+                if (chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${pickerHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
+                footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${pickerHeight}px + ${safeAreaBottom}px + 10px)`;
+                startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${pickerHeight}px + ${safeAreaBottom}px + 35px)`;
+            }
         } else {
             footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
+            if (chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px + ${footerNoteHeight}px)`;
+            footerNote.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px)`;
+            startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px + 25px)`;
         }
-        
         requestAnimationFrame(scrollToBottom);
     }
-
+    
     const debouncedAdjustLayout = debounce(adjustLayoutForKeyboard, 50);
-    let rafId;
-    function updateLayout() {
-      adjustLayoutForKeyboard();
-      rafId = requestAnimationFrame(updateLayout);
-    }
-    if (window.visualViewport && !('virtualKeyboard' in navigator)) {
-      window.visualViewport.addEventListener("resize", debouncedAdjustLayout);
-      window.visualViewport.addEventListener("scroll", debouncedAdjustLayout);
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", debouncedAdjustLayout);
     }
     window.addEventListener("resize", debouncedAdjustLayout);
+    document.addEventListener("DOMContentLoaded", debouncedAdjustLayout);
+
 
     function addMessage(text, who) {
       const fragment = document.createDocumentFragment();
       const div = document.createElement("div");
       div.className = "msg " + who;
-      div.textContent = text;
+
+      if (text.startsWith('https') && text.endsWith('.json')) {
+        const player = document.createElement('dotlottie-player');
+        player.setAttribute('src', text);
+        player.setAttribute('background', 'transparent');
+        player.setAttribute('speed', '1');
+        player.style.width = '150px';
+        player.style.height = '150px';
+        player.setAttribute('loop', '');
+        player.setAttribute('autoplay', '');
+        div.appendChild(player);
+      } else {
+        div.textContent = text;
+      }
+      
       fragment.appendChild(div);
-      messagesDiv.appendChild(div);
+      messagesDiv.appendChild(fragment);
+      scrollToBottom();
     }
 
     function showPopup(text) {
-        const isVidMode = document.body.classList.contains('video-mode');
-        const popupClass = `popup ${isVidMode ? 'popup-video-mode' : ''}`;
-        
-        if (text.includes("Searching")) {
-            messagesDiv.innerHTML = `<div class="${popupClass}"><div class="searching-container"><div class="pulse-dots"><div class="pulse-dot"></div><div class="pulse-dot"></div><div class="pulse-dot"></div></div><div class="searching-text">Searching for a stranger...</div></div></div>`;
-            isConnected = false;
-        } else if (text.includes("Connected")) {
-            messagesDiv.innerHTML = `<div class="${popupClass}"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
-            isConnected = true;
-            setTimeout(() => { if (isConnected && messagesDiv.innerHTML.includes("Connected")) { messagesDiv.innerHTML = ''; } }, 3000);
-        } else {
-            messagesDiv.innerHTML = `<div class="${popupClass}">${text}</div>`;
-            isConnected = false;
-        }
-        scrollToBottom();
-        updateInputState();
+        const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
+        if (!targetDiv) return;
+
+      if (text.includes("Searching")) {
+        targetDiv.innerHTML = `<div class="popup"><div class="searching-container"><div class="pulse-dots"><div class="pulse-dot"></div><div class="pulse-dot"></div><div class="pulse-dot"></div></div><div class="searching-text">Searching for a stranger...</div></div></div>`;
+        isConnected = false;
+      } else if (text.includes("Connected")) {
+        targetDiv.innerHTML = `<div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
+        isConnected = true;
+        setTimeout(() => {
+          if (isConnected && targetDiv.innerHTML.includes("Connected")) {
+            targetDiv.innerHTML = document.body.classList.contains('video-mode') ? '' : '';
+          }
+        }, 3000);
+      } else {
+        targetDiv.innerHTML = `<div class="popup">${text}</div>`;
+        isConnected = false;
+      }
+      scrollToBottom();
+      updateInputState();
     }
 
     function updateInputState() {
       const isInputDisabled = !isConnected;
       input.disabled = isInputDisabled;
       document.querySelector('footer').classList.toggle('disabled', isInputDisabled);
-      
       if (isConnected) {
           sendBtn.style.display = 'none';
           nextBtn.style.display = 'flex';
@@ -922,9 +1565,7 @@
     videoToggleBtn.addEventListener('click', async () => {
         const videoIcon = videoToggleBtn.querySelector('.video-icon');
         const chatIcon = videoToggleBtn.querySelector('.chat-icon');
-        
         isVideoEnabled = !isVideoEnabled;
-
         if (isVideoEnabled) {
             videoIcon.style.display = 'none';
             chatIcon.style.display = 'block';
@@ -932,37 +1573,37 @@
             videoIcon.style.display = 'block';
             chatIcon.style.display = 'none';
         }
-
         startChattingBtn.style.display = 'block';
         hasStartedChat = false;
         nextBtn.disabled = true;
-        messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect.</div>`;
-        
-        videoToggleBtn.classList.toggle('active', isVideoEnabled);
+        messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
         document.body.classList.toggle('video-mode', isVideoEnabled);
-        
         if (isVideoEnabled) {
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                const highQualityConstraints = {
+                  video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } },
+                  audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+                };
+                localStream = await navigator.mediaDevices.getUserMedia(highQualityConstraints);
                 localVideo.srcObject = localStream;
             } catch (error) {
                 console.error("Error accessing media devices.", error);
                 alert("Could not access camera/microphone. Please check permissions.");
                 isVideoEnabled = false;
-                videoToggleBtn.classList.remove('active');
                 document.body.classList.remove('video-mode');
                 videoIcon.style.display = 'block';
                 chatIcon.style.display = 'none';
                 startChattingBtn.style.display = 'block';
+                stopAllStreams();
             }
         } else {
             stopAllStreams();
         }
-        
         if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
             ws.close();
         }
+        debouncedAdjustLayout();
     });
 
     function stopAllStreams() {
@@ -985,18 +1626,14 @@
                 ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
             }
         };
-        
         peerConnection.ontrack = event => {
             if (event.streams && event.streams[0]) {
               remoteVideo.srcObject = event.streams[0];
             } else {
-                if (!remoteVideo.srcObject) {
-                    remoteVideo.srcObject = new MediaStream();
-                }
+                if (!remoteVideo.srcObject) remoteVideo.srcObject = new MediaStream();
                 remoteVideo.srcObject.addTrack(event.track);
             }
         };
-
         if (localStream) {
             localStream.getTracks().forEach(track => {
                 peerConnection.addTrack(track, localStream);
@@ -1005,13 +1642,12 @@
     }
     
     function connectStranger() {
-      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
-        ws.close();
-      }
+      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) ws.close();
       stopAllStreams();
-      messagesDiv.innerHTML = ''; 
+      const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
+      if (targetDiv) targetDiv.innerHTML = '';
       showPopup("🔍 Searching for a stranger...");
-      typingIndicator.style.display = "none";
+      if (typingIndicator) typingIndicator.style.display = "none";
       ws = new WebSocket(window.TIKTALK_BACKEND.replace("http", "ws"));
 
       ws.onopen = () => {
@@ -1021,75 +1657,59 @@
       };
 
       ws.onmessage = async (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          switch(data.type) {
-            case "system":
-              if (data.text === "waiting" && !isConnected) {
-                showPopup("🔍 Searching for a stranger...");
-              } else if (data.text === "connected") {
-                showPopup("✅ Connected! Say Hi 👋");
-              } else if (data.text === 'initiate_offer') {
-                if (isVideoEnabled) {
-                    if(!peerConnection) createPeerConnection();
-                    const offer = await peerConnection.createOffer();
-                    await peerConnection.setLocalDescription(offer);
-                    ws.send(JSON.stringify({ type: 'offer', offer: offer }));
-                }
-              } else if (data.text === "disconnected") {
-                if(isConnected) {
-                  showPopup("❌ Stranger disconnected");
-                  isConnected = false;
-                  stopAllStreams();
-                }
-              } else if (data.text === "timeout") {
-                 showPopup("No one was found. Click Next Button");
-                 isConnected = false;
-              }
-              break;
-            case "message":
-              typingIndicator.style.display = "none";
-              addMessage(data.text, "stranger");
-              break;
-            case "typing":
-              if (isConnected) {
-                typingIndicator.style.display = "block";
-                clearTimeout(typingTimeout);
-                typingTimeout = setTimeout(() => {
-                  typingIndicator.style.display = "none";
-                }, 1500);
-              }
-              break;
-            case 'offer':
-                if (isVideoEnabled) {
-                    if (!peerConnection) createPeerConnection();
-                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-                    const answer = await peerConnection.createAnswer();
-                    await peerConnection.setLocalDescription(answer);
-                    ws.send(JSON.stringify({ type: 'answer', answer: answer }));
-                }
-                break;
-            case 'answer':
-                if (peerConnection && peerConnection.signalingState !== "stable") {
-                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-                }
-                break;
-            case 'candidate':
-                if (peerConnection) {
-                    await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-                }
-                break;
-          }
-        } catch (e) {
-          console.error("Error parsing WebSocket message:", e);
+        const data = JSON.parse(event.data);
+        switch(data.type) {
+          case "system":
+            if (data.text === "waiting") showPopup("🔍 Searching for a stranger...");
+            else if (data.text === "connected") {
+              showPopup("✅ Connected! Say Hi 👋");
+              if (isVideoEnabled) createPeerConnection();
+            } else if (data.text === 'initiate_offer' && isVideoEnabled) {
+              if(!peerConnection) createPeerConnection();
+              const offer = await peerConnection.createOffer();
+              await peerConnection.setLocalDescription(offer);
+              ws.send(JSON.stringify({ type: 'offer', offer: offer }));
+            } else if (data.text === "disconnected") {
+              if(isConnected) showPopup("❌ Stranger disconnected");
+              isConnected = false;
+              stopAllStreams();
+            } else if (data.text === "timeout") {
+               showPopup("No one was found. Click Next Button");
+               isConnected = false;
+            }
+            break;
+          case "message":
+            if (typingIndicator) typingIndicator.style.display = "none";
+            addMessage(data.text, "stranger");
+            break;
+          case "typing":
+            if (isConnected && typingIndicator) {
+              typingIndicator.style.display = "block";
+              clearTimeout(typingTimeout);
+              typingTimeout = setTimeout(() => { typingIndicator.style.display = "none"; }, 1500);
+            }
+            break;
+          case 'offer':
+            if (isVideoEnabled) {
+              if (!peerConnection) createPeerConnection();
+              await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+              const answer = await peerConnection.createAnswer();
+              await peerConnection.setLocalDescription(answer);
+              ws.send(JSON.stringify({ type: 'answer', answer: answer }));
+            }
+            break;
+          case 'answer':
+            if (peerConnection) await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+            break;
+          case 'candidate':
+            if (peerConnection) await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+            break;
         }
       };
 
       ws.onclose = () => {
-        if (isConnected) {
-          showPopup("❌ Stranger disconnected");
-        }
-        typingIndicator.style.display = "none";
+        if (isConnected) showPopup("❌ Stranger disconnected");
+        if (typingIndicator) typingIndicator.style.display = "none";
         isConnected = false;
         stopAllStreams();
         updateInputState();
@@ -1108,14 +1728,14 @@
         ws.send(JSON.stringify({ type: "message", text: input.value }));
         addMessage(input.value, "me");
         input.value = "";
-        
         sendBtn.style.display = 'none';
         nextBtn.style.display = 'flex';
-
-        if(document.getElementById("emojiPicker").classList.contains('show')) {
-            const emojiToggle = document.getElementById("emojiToggle");
-            handleEmojiToggle({target: emojiToggle, currentTarget: emojiToggle, preventDefault:()=>{}, stopImmediatePropagation:()=>{}});
-        }
+        emojiPicker.classList.remove('show');
+        emojiPicker.style.display = 'none';
+        document.getElementById("emojiToggle").textContent = "😊";
+        document.getElementById("animationPicker").classList.remove('show');
+        document.getElementById("animationPicker").style.display = 'none';
+        wasPickerOpenBeforeKeyboard = false;
         debouncedAdjustLayout();
       }
     };
@@ -1138,10 +1758,8 @@
     });
 
     document.body.classList.add('auto-scroll-enabled');
-    const observer = new MutationObserver(() => {
-      scrollToBottom();
-    });
-    observer.observe(messagesDiv, { childList: true, subtree: true });
+    const observer = new MutationObserver(scrollToBottom);
+    if(messagesDiv) observer.observe(messagesDiv, { childList: true, subtree: true });
 
     function setInitialState() {
         startChattingBtn.style.display = 'block';
