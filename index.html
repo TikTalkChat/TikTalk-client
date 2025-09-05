@@ -83,7 +83,8 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       contain: strict;
-      padding: calc(76px + env(safe-area-inset-top)) 15px calc(90px + env(safe-area-inset-bottom));
+      /* === CHANGED PADDING (TOP AND BOTTOM) === */
+      padding: calc(90px + env(safe-area-inset-top)) 15px calc(120px + env(safe-area-inset-bottom));
       -webkit-overflow-scrolling: touch;
       transition: padding-top 0.3s ease, background 0.3s ease;
     }
@@ -203,7 +204,8 @@
     }
     .footerNote {
       position: fixed;
-      bottom: calc(72px + env(safe-area-inset-bottom));
+      /* === CHANGED BOTTOM POSITION === */
+      bottom: calc(82px + env(safe-area-inset-bottom));
       left: 0;
       right: 0;
       text-align: center;
@@ -946,7 +948,8 @@
       display: none;
       flex-direction: column;
       position: absolute;
-      top: calc(76px + env(safe-area-inset-top));
+      /* === CHANGED TOP POSITION === */
+      top: calc(90px + env(safe-area-inset-top));
       left: 0;
       right: 0;
       width: 100%;
@@ -976,7 +979,8 @@
         height: 36px;
     }
     body.video-mode #video-container {
-        top: calc(44px + env(safe-area-inset-top));
+        /* === CHANGED TOP POSITION FOR VIDEO MODE === */
+        top: calc(54px + env(safe-area-inset-top));
     }
     #videoToggleBtn.active {
        filter: drop-shadow(0 0 4px #007bff);
@@ -1480,7 +1484,8 @@
             }
         } else {
             footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
-            footerNote.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px)`;
+            // This calculation is now based on the new static position of footerNote
+            // footerNote.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px)`;
             startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px + 25px)`;
         }
         requestAnimationFrame(scrollToBottom);
@@ -1633,7 +1638,11 @@
     
     function connectStranger() {
       if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) ws.close();
-      stopAllStreams();
+      
+      if (!isVideoEnabled) {
+        stopAllStreams();
+      }
+
       const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
       if (targetDiv) targetDiv.innerHTML = '';
       showPopup("🔍 Searching for a stranger...");
@@ -1653,7 +1662,6 @@
             if (data.text === "waiting") showPopup("🔍 Searching for a stranger...");
             else if (data.text === "connected") {
               showPopup("✅ Connected! Say Hi 👋");
-              // DO NOT create peer connection here. Wait for offer/answer.
             } else if (data.text === 'initiate_offer' && isVideoEnabled) {
               if(!peerConnection) createPeerConnection();
               const offer = await peerConnection.createOffer();
