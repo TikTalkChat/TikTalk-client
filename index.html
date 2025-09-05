@@ -79,15 +79,15 @@ position: absolute;
 top: 0;
 left: 0;
 right: 0;
-bottom: 0;
+/* CHANGE 1: Chat area ends above the footer */
+bottom: calc(56px + 10px + env(safe-area-inset-bottom)); /* Footer height + its offset */
 overflow-y: auto;
 overscroll-behavior: contain;
 contain: strict;
-      /* === CHANGED PADDING (TOP AND BOTTOM) === */
-      /* Spacing added for header and footer area */
-padding: calc(90px + env(safe-area-inset-top)) 15px calc(120px + env(safe-area-inset-bottom));
+/* CHANGE 2: Added top padding for space below header and adjusted bottom padding */
+padding: calc(76px + 10px + env(safe-area-inset-top)) 15px 15px;
 -webkit-overflow-scrolling: touch;
-transition: padding-top 0.3s ease, background 0.3s ease;
+transition: padding-top 0.3s ease, background 0.3s ease, bottom 0.3s ease;
 }
 #messages {
 display: flex;
@@ -212,7 +212,8 @@ text-align: center;
 font-size: 14px;
 color: #555;
 z-index: 10010;
-transition: bottom 0.3s ease; /* Added transition for smooth movement */
+/* CHANGE 3: Added transition for smooth movement with keyboard */
+transition: bottom 0.3s ease;
 }
 body.dark-mode .footerNote {
 color: #e5e7eb;
@@ -949,13 +950,11 @@ background: #555;
 display: none;
 flex-direction: column;
 position: absolute;
-      /* === CHANGED TOP POSITION === */
-      /* Spacing added for header */
-top: calc(90px + env(safe-area-inset-top));
+top: calc(76px + env(safe-area-inset-top)); /* Adjusted for consistency */
 left: 0;
 right: 0;
 width: 100%;
-bottom: calc(56px + env(safe-area-inset-bottom));
+bottom: 0; /* Let videos fill the space */
 z-index: 100;
 background-color: #000;
 transition: top 0.3s ease, bottom 0.3s ease;
@@ -968,6 +967,7 @@ width: 100%;
 height: 50%; 
 object-fit: cover;
 transform: scaleX(-1);
+background-color: #222; /* Added background for when stream is loading */
 }
 body.video-mode #chat {
 display: none;
@@ -981,9 +981,7 @@ body.video-mode header svg.logo {
 height: 36px;
 }
 body.video-mode #video-container {
-        /* === CHANGED TOP POSITION FOR VIDEO MODE === */
-        /* Spacing added for smaller header in video mode */
-top: calc(54px + env(safe-area-inset-top));
+top: calc(44px + env(safe-area-inset-top)); /* Adjusted for smaller video header */
 }
 #videoToggleBtn.active {
 filter: drop-shadow(0 0 4px #007bff);
@@ -1439,7 +1437,7 @@ let isConnected = false;
 let reconnectAttempts = 0;
 const maxReconnectAttempts = 5;
 let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
-let rafId = null; 
+let rafId = null;
 
 function updateLayout() {
 adjustLayoutForKeyboard();
@@ -1483,7 +1481,7 @@ document.documentElement.style.setProperty('--gif-picker-height', `${pickerHeigh
 
 if (isKeyboardOpen) {
 footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px)`;
-footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`; 
+footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px)`;
 startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 25px)`;
 } else if (isEmojiPickerOpen || isGifPickerOpen) {
 if (!isDesktop) {
@@ -1493,6 +1491,7 @@ startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${pickerHeight}
 }
 } else {
 footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
+/* CHANGE 4: Restore footerNote position when keyboard closes */
 footerNote.style.bottom = `calc(72px + ${safeAreaBottom}px)`;
 startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px + 25px)`;
 }
@@ -1575,10 +1574,11 @@ chatIcon.style.display = 'block';
 videoIcon.style.display = 'block';
 chatIcon.style.display = 'none';
 }
+// CHANGE: Logic moved here to ensure UI is always reset on mode change
 startChattingBtn.style.display = 'block';
 hasStartedChat = false;
 nextBtn.disabled = true;
-messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
+messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect.</div>`;
 document.body.classList.toggle('video-mode', isVideoEnabled);
 if (isVideoEnabled) {
 try {
@@ -1588,7 +1588,6 @@ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
 };
 localStream = await navigator.mediaDevices.getUserMedia(highQualityConstraints);
 localVideo.srcObject = localStream;
-localVideo.play();
 } catch (error) {
 console.error("Error accessing media devices.", error);
 alert("Could not access camera/microphone. Please check permissions.");
@@ -1603,7 +1602,6 @@ stopAllStreams();
 stopAllStreams();
 }
 if (ws && ws.readyState === WebSocket.OPEN) {
-ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
 ws.close();
 }
 debouncedAdjustLayout();
@@ -1632,7 +1630,6 @@ ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
 peerConnection.ontrack = event => {
 if (remoteVideo.srcObject !== event.streams[0]) {
 remoteVideo.srcObject = event.streams[0];
-remoteVideo.play();
 }
 };
 if (localStream) {
@@ -1643,11 +1640,17 @@ peerConnection.addTrack(track, localStream);
 }
 
 function connectStranger() {
-if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) ws.close();
-
-if (!isVideoEnabled) {
-stopAllStreams();
+if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
+ws.close();
 }
+/* CHANGE 5: Removed stopAllStreams() to prevent video from stopping on new search */
+// Only clean up the previous remote connection, not the local camera stream
+if (peerConnection) {
+peerConnection.close();
+peerConnection = null;
+}
+if(remoteVideo) remoteVideo.srcObject = null;
+
 
 const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
 if (targetDiv) targetDiv.innerHTML = '';
@@ -1715,7 +1718,9 @@ ws.onclose = () => {
 if (isConnected) showPopup("❌ Stranger disconnected");
 if (typingIndicator) typingIndicator.style.display = "none";
 isConnected = false;
-stopAllStreams();
+// Don't call stopAllStreams() here to keep local video on disconnect
+if (peerConnection) peerConnection.close();
+if (remoteVideo) remoteVideo.srcObject = null;
 updateInputState();
 };
 
@@ -1726,8 +1731,8 @@ ws.close();
 }
 
 const handleSend = (e) => {
-if (e) e.preventDefault();
-if (e) e.stopImmediatePropagation();
+if(e) e.preventDefault();
+if(e) e.stopImmediatePropagation();
 if (isConnected && input.value.trim()) {
 ws.send(JSON.stringify({ type: "message", text: input.value }));
 addMessage(input.value, "me");
@@ -1746,11 +1751,12 @@ debouncedAdjustLayout();
 sendBtn.addEventListener("click", handleSend);
 sendBtn.addEventListener("touchstart", handleSend, { passive: false });
 
+// CHANGE 6: Added Enter key to send message
 input.addEventListener('keydown', (e) => {
-if (e.key === 'Enter' && !e.shiftKey) {
-e.preventDefault();
-handleSend();
-}
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault(); 
+        handleSend();
+    }
 });
 
 const handleNext = (e) => {
