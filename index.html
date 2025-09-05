@@ -83,7 +83,7 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       contain: strict;
-      /* === CHANGED PADDING (TOP AND BOTTOM) === */
+      /* Spacing added for header and footer area */
       padding: calc(90px + env(safe-area-inset-top)) 15px calc(120px + env(safe-area-inset-bottom));
       -webkit-overflow-scrolling: touch;
       transition: padding-top 0.3s ease, background 0.3s ease;
@@ -204,8 +204,8 @@
     }
     .footerNote {
       position: fixed;
-      /* === CHANGED BOTTOM POSITION === */
-      bottom: calc(82px + env(safe-area-inset-bottom));
+      /* === REVERTED to original position as requested === */
+      bottom: calc(72px + env(safe-area-inset-bottom));
       left: 0;
       right: 0;
       text-align: center;
@@ -948,7 +948,7 @@
       display: none;
       flex-direction: column;
       position: absolute;
-      /* === CHANGED TOP POSITION === */
+      /* Spacing added for header */
       top: calc(90px + env(safe-area-inset-top));
       left: 0;
       right: 0;
@@ -979,7 +979,7 @@
         height: 36px;
     }
     body.video-mode #video-container {
-        /* === CHANGED TOP POSITION FOR VIDEO MODE === */
+        /* Spacing added for smaller header in video mode */
         top: calc(54px + env(safe-area-inset-top));
     }
     #videoToggleBtn.active {
@@ -1484,8 +1484,6 @@
             }
         } else {
             footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
-            // This calculation is now based on the new static position of footerNote
-            // footerNote.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px)`;
             startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px + 25px)`;
         }
         requestAnimationFrame(scrollToBottom);
