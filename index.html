@@ -6,7 +6,6 @@
 <title>TikTalk - Stranger Chat</title>
 <script type="module" src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"></script>
 <style>
-/* === ESTILOS ORIGINALES (WITH REQUESTED CHANGES) === */
 * {
 margin: 0;
 padding: 0;
@@ -79,14 +78,14 @@ position: absolute;
 top: 0;
 left: 0;
 right: 0;
-bottom: calc(56px + 10px + env(safe-area-inset-bottom)); /* Reinforced to stay above footer */
+bottom: calc(56px + 10px + env(safe-area-inset-bottom));
 overflow-y: auto;
 overscroll-behavior: contain;
-contain: strict;
+contain: layout;
 padding: calc(76px + 10px + env(safe-area-inset-top)) 15px 15px;
 -webkit-overflow-scrolling: touch;
 transition: padding-top 0.3s ease, background 0.3s ease, bottom 0.3s ease;
-z-index: 9999; /* Added to ensure it's below footer but above other content */
+z-index: 9999;
 }
 #messages {
 display: flex;
@@ -440,10 +439,9 @@ border-radius: 8px;
 overflow: hidden;
 background: #f0f2f5;
 }
-body.dark-mode .gif-item {
+body.dark-mode ..gif-item {
 background: #2d3748;
 }
-
 @media (min-width: 768px) {
 #emojiPicker {
 width: 360px;
@@ -602,7 +600,7 @@ background: transparent;
 border: none;
 border-radius: 50%;
 box-shadow: none;
-color: #334155; 
+color: #334155;
 position: relative;
 }
 body.dark-mode .icon-btn {
@@ -952,17 +950,19 @@ top: calc(76px + env(safe-area-inset-top));
 left: 0;
 right: 0;
 width: 100%;
-bottom: calc(56px + 10px + env(safe-area-inset-bottom)); /* Reinforced to stay above footer */
-z-index: 9999; /* Added to ensure it's below footer but above other content */
+bottom: env(safe-area-inset-bottom);
+z-index: 10001;
 background-color: #000;
 transition: top 0.3s ease, bottom 0.3s ease;
 }
 body.video-mode #video-container {
 display: flex;
+bottom: env(safe-area-inset-bottom);
+z-index: 10001;
 }
 #video-container video {
 width: 100%;
-height: 50%; 
+height: 50%;
 object-fit: cover;
 transform: scaleX(-1);
 background-color: #222;
@@ -1176,28 +1176,26 @@ const gifGrid = document.getElementById("gifGrid");
 const input = document.getElementById("messageInput");
 let wasPickerOpenBeforeKeyboard = false;
 
-// --- Lottie Library Setup ---
 const lottieAnimations = [
-"https://lottie.host/808269e3-2391-41e7-9a67-9154af4222a7/5kG2p4lvoC.json", // Thumbs Up
-"https://lottie.host/9c33b070-7667-4d7a-ab81-79e57833a696/i04a2WulSO.json", // Heart
-"https://lottie.host/cf411776-e41c-43f3-a15e-e483a9588665/gI018HkX2p.json", // Laughing
-"https://lottie.host/1749c0d4-d02f-410a-abd8-b11ff5a42828/sW0dYwwVEf.json", // Waving
-"https://lottie.host/8254c00a-b333-40a1-a068-199188458628/bXv8jCM303.json", // Crying
-"https://lottie.host/1589b275-c38d-4786-896e-1d542d948956/s5L5paCVib.json", // Dancing
-"https://lottie.host/86127e70-a3ce-4217-a111-a83626e27b9c/032VsL3wZ6.json", // Rocket
-"https://lottie.host/9d311893-6c84-4e94-969c-29d0f4d32049/2g9q6n7XvA.json", // Loading
-"https://lottie.host/932050f5-b72e-436f-822e-2e45a05b6826/aG07y4X8Cf.json", // Party Popper
-"https://lottie.host/b4f9d45e-57c5-4d74-916c-b3a51f04e132/z59tA7L7fG.json", // Thinking
-"https://lottie.host/43e74c86-9a2c-49e3-9972-2d88734268e3/qJzZWtj7uU.json", // Sleeping
-"https://lottie.host/985227ea-0738-468f-a396-93f538e1e780/jHnB5WJGk5.json"  // OK Hand
+"https://lottie.host/808269e3-2391-41e7-9a67-9154af4222a7/5kG2p4lvoC.json",
+"https://lottie.host/9c33b070-7667-4d7a-ab81-79e57833a696/i04a2WulSO.json",
+"https://lottie.host/cf411776-e41c-43f3-a15e-e483a9588665/gI018HkX2p.json",
+"https://lottie.host/1749c0d4-d02f-410a-abd8-b11ff5a42828/sW0dYwwVEf.json",
+"https://lottie.host/8254c00a-b333-40a1-a068-199188458628/bXv8jCM303.json",
+"https://lottie.host/1589b275-c38d-4786-896e-1d542d948956/s5L5paCVib.json",
+"https://lottie.host/86127e70-a3ce-4217-a111-a83626e27b9c/032VsL3wZ6.json",
+"https://lottie.host/9d311893-6c84-4e94-969c-29d0f4d32049/2g9q6n7XvA.json",
+"https://lottie.host/932050f5-b72e-436f-822e-2e45a05b6826/aG07y4X8Cf.json",
+"https://lottie.host/b4f9d45e-57c5-4d74-916c-b3a51f04e132/z59tA7L7fG.json",
+"https://lottie.host/43e74c86-9a2c-49e3-9972-2d88734268e3/qJzZWtj7uU.json",
+"https://lottie.host/985227ea-0738-468f-a396-93f538e1e780/jHnB5WJGk5.json"
 ];
 
 function populateLottieLibrary() {
-gifGrid.innerHTML = ''; 
+gifGrid.innerHTML = '';
 lottieAnimations.forEach(url => {
 const item = document.createElement('div');
 item.className = 'gif-item';
-
 const player = document.createElement('dotlottie-player');
 player.setAttribute('src', url);
 player.setAttribute('background', 'transparent');
@@ -1206,7 +1204,6 @@ player.style.width = '100px';
 player.style.height = '100px';
 player.setAttribute('loop', '');
 player.setAttribute('autoplay', '');
-
 item.onclick = () => {
 ws.send(JSON.stringify({ type: "message", text: url }));
 addMessage(url, 'me');
@@ -1214,12 +1211,10 @@ gifPicker.classList.remove('show');
 gifPicker.style.display = 'none';
 debouncedAdjustLayout();
 };
-
 item.appendChild(player);
 gifGrid.appendChild(item);
 });
 }
-// --- End of Lottie Setup ---
 
 const handleEmojiToggle = (e) => {
 if (e.target.closest('#emojiToggle') !== emojiToggle) return;
@@ -1443,67 +1438,68 @@ rafId = requestAnimationFrame(updateLayout);
 }
 
 function adjustLayoutForKeyboard() {
-    const chat = document.getElementById("chat");
-    const videoContainer = document.getElementById("video-container");
-    const footer = document.querySelector("footer");
-    const footerNote = document.querySelector(".footerNote");
-    const startChattingBtn = document.getElementById("startChattingBtn");
-    const emojiPicker = document.getElementById("emojiPicker");
-    const gifPicker = document.getElementById("gifPicker");
-    let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
-    const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
-    const isEmojiPickerOpen = emojiPicker.classList.contains('show');
-    const isGifPickerOpen = gifPicker.classList.contains('show');
-    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-    let keyboardHeight = 0;
+const chat = document.getElementById("chat");
+const videoContainer = document.getElementById("video-container");
+const footer = document.querySelector("footer");
+const footerNote = document.querySelector(".footerNote");
+const startChattingBtn = document.getElementById("startChattingBtn");
+const emojiPicker = document.getElementById("emojiPicker");
+const gifPicker = document.getElementById("gifPicker");
+let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
+const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
+const isEmojiPickerOpen = emojiPicker.classList.contains('show');
+const isGifPickerOpen = gifPicker.classList.contains('show');
+const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+const isVideoMode = document.body.classList.contains('video-mode');
+let keyboardHeight = 0;
 
-    if ('virtualKeyboard' in navigator) {
-        keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
-    } else if (window.visualViewport) {
-        keyboardHeight = Math.max(0, window.innerHeight - window.visualViewport.height);
-    }
+if ('virtualKeyboard' in navigator) {
+keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
+} else if (window.visualViewport) {
+keyboardHeight = Math.max(0, window.innerHeight - window.visualViewport.height);
+}
 
-    if (keyboardHeight > 0) {
-        lastKeyboardHeight = Math.max(keyboardHeight, 300);
-        localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
-    } else if (!isKeyboardOpen && !isEmojiPickerOpen && !isGifPickerOpen) {
-        lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
-    }
+if (keyboardHeight > 0) {
+lastKeyboardHeight = Math.max(keyboardHeight, 300);
+localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
+} else if (!isKeyboardOpen && !isEmojiPickerOpen && !isGifPickerOpen) {
+lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
+}
 
-    let pickerHeight = lastKeyboardHeight;
-    if (isDesktop) {
-        pickerHeight = Math.min(lastKeyboardHeight, 350);
-    } else {
-        pickerHeight = Math.min(lastKeyboardHeight, window.innerHeight * 0.7);
-    }
-    document.documentElement.style.setProperty('--emoji-picker-height', `${pickerHeight}px`);
-    document.documentElement.style.setProperty('--gif-picker-height', `${pickerHeight}px`);
+let pickerHeight = lastKeyboardHeight;
+if (isDesktop) {
+pickerHeight = Math.min(lastKeyboardHeight, 350);
+} else {
+pickerHeight = Math.min(lastKeyboardHeight, window.innerHeight * 0.7);
+}
+document.documentElement.style.setProperty('--emoji-picker-height', `${pickerHeight}px`);
+document.documentElement.style.setProperty('--gif-picker-height', `${pickerHeight}px`);
 
-    if (isKeyboardOpen) {
-        footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px)`;
-        footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px)`;
-        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 25px)`;
-        const newBottom = `calc(56px + ${keyboardHeight}px + ${safeAreaBottom}px)`;
-        chat.style.bottom = newBottom;
-        videoContainer.style.bottom = newBottom;
-    } else if (isEmojiPickerOpen || isGifPickerOpen) {
-        if (!isDesktop) {
-            footer.style.bottom = `calc(${pickerHeight}px + ${safeAreaBottom}px + 10px)`;
-            footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${pickerHeight}px + ${safeAreaBottom}px + 10px)`;
-            startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${pickerHeight}px + ${safeAreaBottom}px + 35px)`;
-            const newBottom = `calc(56px + ${pickerHeight}px + ${safeAreaBottom}px + 10px)`;
-            chat.style.bottom = newBottom;
-            videoContainer.style.bottom = newBottom;
-        }
-    } else {
-        footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
-        footerNote.style.bottom = `calc(72px + ${safeAreaBottom}px)`;
-        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px + 25px)`;
-        const newBottom = `calc(56px + 10px + ${safeAreaBottom}px)`;
-        chat.style.bottom = newBottom;
-        videoContainer.style.bottom = newBottom;
-    }
-    requestAnimationFrame(scrollToBottom);
+if (isKeyboardOpen) {
+footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px)`;
+footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px)`;
+startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 25px)`;
+const newChatBottom = `calc(56px + ${keyboardHeight}px + ${safeAreaBottom}px)`;
+chat.style.bottom = newChatBottom;
+videoContainer.style.bottom = isVideoMode ? `env(safe-area-inset-bottom)` : newChatBottom;
+} else if (isEmojiPickerOpen || isGifPickerOpen) {
+if (!isDesktop) {
+footer.style.bottom = `calc(${pickerHeight}px + ${safeAreaBottom}px + 10px)`;
+footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${pickerHeight}px + ${safeAreaBottom}px + 10px)`;
+startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${pickerHeight}px + ${safeAreaBottom}px + 35px)`;
+const newChatBottom = `calc(56px + ${pickerHeight}px + ${safeAreaBottom}px + 10px)`;
+chat.style.bottom = newChatBottom;
+videoContainer.style.bottom = isVideoMode ? `env(safe-area-inset-bottom)` : newChatBottom;
+}
+} else {
+footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
+footerNote.style.bottom = `calc(72px + ${safeAreaBottom}px)`;
+startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px + 25px)`;
+const newChatBottom = `calc(56px + 10px + ${safeAreaBottom}px)`;
+chat.style.bottom = newChatBottom;
+videoContainer.style.bottom = isVideoMode ? `env(safe-area-inset-bottom)` : newChatBottom;
+}
+requestAnimationFrame(scrollToBottom);
 }
 
 const debouncedAdjustLayout = debounce(adjustLayoutForKeyboard, 50);
@@ -1517,7 +1513,6 @@ function addMessage(text, who) {
 const fragment = document.createDocumentFragment();
 const div = document.createElement("div");
 div.className = "msg " + who;
-
 if (text.startsWith('https') && text.endsWith('.json')) {
 const player = document.createElement('dotlottie-player');
 player.setAttribute('src', text);
@@ -1531,7 +1526,6 @@ div.appendChild(player);
 } else {
 div.textContent = text;
 }
-
 fragment.appendChild(div);
 messagesDiv.appendChild(fragment);
 scrollToBottom();
@@ -1540,7 +1534,6 @@ scrollToBottom();
 function showPopup(text) {
 const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
 if (!targetDiv) return;
-
 if (text.includes("Searching")) {
 targetDiv.innerHTML = `<div class="popup"><div class="searching-container"><div class="pulse-dots"><div class="pulse-dot"></div><div class="pulse-dot"></div><div class="pulse-dot"></div></div><div class="searching-text">Searching for a stranger...</div></div></div>`;
 isConnected = false;
@@ -1579,228 +1572,3 @@ videoIcon.style.display = 'none';
 chatIcon.style.display = 'block';
 } else {
 videoIcon.style.display = 'block';
-chatIcon.style.display = 'none';
-}
-startChattingBtn.style.display = 'block';
-hasStartedChat = false;
-nextBtn.disabled = true;
-messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect.</div>`;
-document.body.classList.toggle('video-mode', isVideoEnabled);
-if (isVideoEnabled) {
-try {
-const highQualityConstraints = {
-video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } },
-audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
-};
-localStream = await navigator.mediaDevices.getUserMedia(highQualityConstraints);
-localVideo.srcObject = localStream;
-} catch (error) {
-console.error("Error accessing media devices.", error);
-alert("Could not access camera/microphone. Please check permissions.");
-isVideoEnabled = false;
-document.body.classList.remove('video-mode');
-videoIcon.style.display = 'block';
-chatIcon.style.display = 'none';
-startChattingBtn.style.display = 'block';
-stopAllStreams();
-}
-} else {
-stopAllStreams();
-}
-if (ws && ws.readyState === WebSocket.OPEN) {
-ws.close();
-}
-debouncedAdjustLayout();
-});
-
-function stopAllStreams() {
-if (localStream) {
-localStream.getTracks().forEach(track => track.stop());
-localStream = null;
-}
-if (peerConnection) {
-peerConnection.close();
-peerConnection = null;
-}
-localVideo.srcObject = null;
-remoteVideo.srcObject = null;
-}
-
-function createPeerConnection() {
-peerConnection = new RTCPeerConnection(stunServers);
-peerConnection.onicecandidate = event => {
-if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
-ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
-}
-};
-peerConnection.ontrack = event => {
-if (remoteVideo.srcObject !== event.streams[0]) {
-remoteVideo.srcObject = event.streams[0];
-}
-};
-if (localStream) {
-localStream.getTracks().forEach(track => {
-peerConnection.addTrack(track, localStream);
-});
-}
-}
-
-function connectStranger() {
-if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
-ws.close();
-}
-if (peerConnection) {
-peerConnection.close();
-peerConnection = null;
-}
-if (remoteVideo) remoteVideo.srcObject = null;
-
-const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
-if (targetDiv) targetDiv.innerHTML = '';
-showPopup("🔍 Searching for a stranger...");
-if (typingIndicator) typingIndicator.style.display = "none";
-ws = new WebSocket(window.TIKTALK_BACKEND.replace("http", "ws"));
-
-ws.onopen = () => {
-reconnectAttempts = 0;
-updateInputState();
-ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
-// Re-attach localStream to new peerConnection if in video mode
-if (isVideoEnabled && localStream) {
-createPeerConnection(); // Create new peer connection without stopping localStream
-}
-};
-
-ws.onmessage = async (event) => {
-const data = JSON.parse(event.data);
-switch(data.type) {
-case "system":
-if (data.text === "waiting") showPopup("🔍 Searching for a stranger...");
-else if (data.text === "connected") {
-showPopup("✅ Connected! Say Hi 👋");
-} else if (data.text === 'initiate_offer' && isVideoEnabled) {
-if (!peerConnection) createPeerConnection();
-const offer = await peerConnection.createOffer();
-await peerConnection.setLocalDescription(offer);
-ws.send(JSON.stringify({ type: 'offer', offer: offer }));
-} else if (data.text === "disconnected") {
-if (isConnected) showPopup("❌ Stranger disconnected");
-isConnected = false;
-// Only stop remote stream, keep localStream intact
-if (peerConnection) {
-peerConnection.close();
-peerConnection = null;
-}
-if (remoteVideo) remoteVideo.srcObject = null;
-} else if (data.text === "timeout") {
-showPopup("No one was found. Click Next Button");
-isConnected = false;
-}
-break;
-case "message":
-if (typingIndicator) typingIndicator.style.display = "none";
-addMessage(data.text, "stranger");
-break;
-case "typing":
-if (isConnected && typingIndicator) {
-typingIndicator.style.display = "block";
-clearTimeout(typingTimeout);
-typingTimeout = setTimeout(() => { typingIndicator.style.display = "none"; }, 1500);
-}
-break;
-case 'offer':
-if (isVideoEnabled) {
-if (!peerConnection) createPeerConnection();
-await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-const answer = await peerConnection.createAnswer();
-await peerConnection.setLocalDescription(answer);
-ws.send(JSON.stringify({ type: 'answer', answer: answer }));
-}
-break;
-case 'answer':
-if (peerConnection) await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-break;
-case 'candidate':
-if (peerConnection) await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-break;
-}
-};
-
-ws.onclose = () => {
-if (isConnected) showPopup("❌ Stranger disconnected");
-if (typingIndicator) typingIndicator.style.display = "none";
-isConnected = false;
-// Clean up only the remote connection parts
-if (peerConnection) {
-peerConnection.close();
-peerConnection = null;
-}
-if (remoteVideo) remoteVideo.srcObject = null;
-updateInputState();
-};
-
-ws.onerror = (err) => {
-console.error("WebSocket error:", err);
-ws.close();
-};
-}
-
-const handleSend = (e) => {
-if(e) e.preventDefault();
-if(e) e.stopImmediatePropagation();
-if (isConnected && input.value.trim()) {
-ws.send(JSON.stringify({ type: "message", text: input.value }));
-addMessage(input.value, "me");
-input.value = "";
-sendBtn.style.display = 'none';
-nextBtn.style.display = 'flex';
-emojiPicker.classList.remove('show');
-emojiPicker.style.display = 'none';
-document.getElementById("emojiToggle").textContent = "😊";
-document.getElementById("gifPicker").classList.remove('show');
-document.getElementById("gifPicker").style.display = 'none';
-wasPickerOpenBeforeKeyboard = false;
-debouncedAdjustLayout();
-}
-};
-sendBtn.addEventListener("click", handleSend);
-sendBtn.addEventListener("touchstart", handleSend, { passive: false });
-
-input.addEventListener('keydown', (e) => {
-if (e.key === 'Enter' && !e.shiftKey) {
-e.preventDefault(); 
-handleSend();
-}
-});
-
-const handleNext = (e) => {
-e.preventDefault();
-e.stopImmediatePropagation();
-connectStranger();
-debouncedAdjustLayout();
-};
-nextBtn.addEventListener("click", handleNext);
-nextBtn.addEventListener("touchstart", handleNext, { passive: false });
-
-input.addEventListener("input", () => {
-if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
-ws.send(JSON.stringify({ type: "typing" }));
-}
-});
-
-document.body.classList.add('auto-scroll-enabled');
-const observer = new MutationObserver(scrollToBottom);
-if(messagesDiv) observer.observe(messagesDiv, { childList: true, subtree: true });
-
-function setInitialState() {
-startChattingBtn.style.display = 'block';
-sendBtn.style.display = 'none';
-nextBtn.style.display = 'flex';
-nextBtn.disabled = true;
-messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
-updateInputState();
-}
-setInitialState();
-</script>
-</body>
-</html>
