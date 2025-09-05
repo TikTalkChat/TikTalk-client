@@ -79,14 +79,14 @@ position: absolute;
 top: 0;
 left: 0;
 right: 0;
-/* FIX 1: Set bottom to stay above the footer */
-bottom: calc(56px + 10px + env(safe-area-inset-bottom));
+bottom: calc(56px + 10px + env(safe-area-inset-bottom)); /* Reinforced to stay above footer */
 overflow-y: auto;
 overscroll-behavior: contain;
 contain: strict;
 padding: calc(76px + 10px + env(safe-area-inset-top)) 15px 15px;
 -webkit-overflow-scrolling: touch;
 transition: padding-top 0.3s ease, background 0.3s ease, bottom 0.3s ease;
+z-index: 9999; /* Added to ensure it's below footer but above other content */
 }
 #messages {
 display: flex;
@@ -952,9 +952,8 @@ top: calc(76px + env(safe-area-inset-top));
 left: 0;
 right: 0;
 width: 100%;
-/* FIX 1: Set bottom to stay above the footer */
-bottom: calc(56px + 10px + env(safe-area-inset-bottom));
-z-index: 100;
+bottom: calc(56px + 10px + env(safe-area-inset-bottom)); /* Reinforced to stay above footer */
+z-index: 9999; /* Added to ensure it's below footer but above other content */
 background-color: #000;
 transition: top 0.3s ease, bottom 0.3s ease;
 }
@@ -1514,7 +1513,6 @@ window.visualViewport.addEventListener("resize", debouncedAdjustLayout);
 window.addEventListener("resize", debouncedAdjustLayout);
 document.addEventListener("DOMContentLoaded", debouncedAdjustLayout);
 
-
 function addMessage(text, who) {
 const fragment = document.createDocumentFragment();
 const div = document.createElement("div");
@@ -1655,8 +1653,7 @@ if (peerConnection) {
 peerConnection.close();
 peerConnection = null;
 }
-if(remoteVideo) remoteVideo.srcObject = null;
-
+if (remoteVideo) remoteVideo.srcObject = null;
 
 const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
 if (targetDiv) targetDiv.innerHTML = '';
@@ -1668,6 +1665,10 @@ ws.onopen = () => {
 reconnectAttempts = 0;
 updateInputState();
 ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
+// Re-attach localStream to new peerConnection if in video mode
+if (isVideoEnabled && localStream) {
+createPeerConnection(); // Create new peer connection without stopping localStream
+}
 };
 
 ws.onmessage = async (event) => {
@@ -1678,14 +1679,19 @@ if (data.text === "waiting") showPopup("🔍 Searching for a stranger...");
 else if (data.text === "connected") {
 showPopup("✅ Connected! Say Hi 👋");
 } else if (data.text === 'initiate_offer' && isVideoEnabled) {
-if(!peerConnection) createPeerConnection();
+if (!peerConnection) createPeerConnection();
 const offer = await peerConnection.createOffer();
 await peerConnection.setLocalDescription(offer);
 ws.send(JSON.stringify({ type: 'offer', offer: offer }));
 } else if (data.text === "disconnected") {
-if(isConnected) showPopup("❌ Stranger disconnected");
+if (isConnected) showPopup("❌ Stranger disconnected");
 isConnected = false;
-stopAllStreams();
+// Only stop remote stream, keep localStream intact
+if (peerConnection) {
+peerConnection.close();
+peerConnection = null;
+}
+if (remoteVideo) remoteVideo.srcObject = null;
 } else if (data.text === "timeout") {
 showPopup("No one was found. Click Next Button");
 isConnected = false;
@@ -1720,18 +1726,17 @@ break;
 }
 };
 
-// FIX 2: Corrected onclose handler to NOT stop local video stream
 ws.onclose = () => {
-    if (isConnected) showPopup("❌ Stranger disconnected");
-    if (typingIndicator) typingIndicator.style.display = "none";
-    isConnected = false;
-    // Clean up only the remote connection parts
-    if (peerConnection) {
-        peerConnection.close();
-        peerConnection = null;
-    }
-    if (remoteVideo) remoteVideo.srcObject = null;
-    updateInputState();
+if (isConnected) showPopup("❌ Stranger disconnected");
+if (typingIndicator) typingIndicator.style.display = "none";
+isConnected = false;
+// Clean up only the remote connection parts
+if (peerConnection) {
+peerConnection.close();
+peerConnection = null;
+}
+if (remoteVideo) remoteVideo.srcObject = null;
+updateInputState();
 };
 
 ws.onerror = (err) => {
@@ -1762,10 +1767,10 @@ sendBtn.addEventListener("click", handleSend);
 sendBtn.addEventListener("touchstart", handleSend, { passive: false });
 
 input.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault(); 
-        handleSend();
-    }
+if (e.key === 'Enter' && !e.shiftKey) {
+e.preventDefault(); 
+handleSend();
+}
 });
 
 const handleNext = (e) => {
