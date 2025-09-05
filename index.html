@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>TikTalk - Stranger Chat</title>
-  <script type="module" src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs"></script>
+  <script type="module" src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js" defer></script>
   <style>
-    /* === ESTILOS ORIGINALES (WITH REQUESTED CHANGES) === */
     * {
       margin: 0;
       padding: 0;
@@ -37,7 +37,7 @@
       color: #e5e7eb;
     }
     header {
-      position: fixed !important;
+      position: fixed;
       top: env(safe-area-inset-top);
       left: 0;
       right: 0;
@@ -48,7 +48,6 @@
       background: #fff;
       z-index: 10003;
       width: 100%;
-      box-sizing: border-box;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       border-radius: 0 0 16px 16px;
       transition: height 0.3s ease, padding 0.3s ease;
@@ -66,7 +65,6 @@
     header svg.logo {
       height: 60px;
       width: auto;
-      display: block;
       transition: height 0.3s ease;
     }
     .chat-wrapper {
@@ -79,12 +77,10 @@
       top: 0;
       left: 0;
       right: 0;
-      bottom: 0;
+      bottom: calc(56px + env(safe-area-inset-bottom) + 10px); /* Footer ke top tak limit */
       overflow-y: auto;
       overscroll-behavior: contain;
-      contain: strict;
-      /* Spacing added for header and footer area */
-      padding: calc(90px + env(safe-area-inset-top)) 15px calc(120px + env(safe-area-inset-bottom));
+      padding: calc(76px + env(safe-area-inset-top) + 10px) 15px 15px; /* Extra padding for header */
       -webkit-overflow-scrolling: touch;
       transition: padding-top 0.3s ease, background 0.3s ease;
     }
@@ -92,6 +88,8 @@
       display: flex;
       flex-direction: column;
       gap: 8px;
+      min-height: 100%;
+      padding-top: 10px; /* Avoid touching header */
     }
     .msg {
       max-width: 75%;
@@ -105,7 +103,7 @@
       transition: background-color 0.3s ease, color 0.3s ease;
     }
     .msg:has(dotlottie-player) {
-      background: transparent !important;
+      background: transparent;
       box-shadow: none;
       padding: 0;
     }
@@ -140,7 +138,6 @@
       font-size: 14px;
     }
     body.dark-mode .popup {
-      background: transparent;
       color: #e5e7eb;
     }
     #typingIndicator {
@@ -166,7 +163,6 @@
       border-radius: 50%;
       background: linear-gradient(45deg, #007bff, #00eaff);
       animation: typingBounce 1.2s ease-in-out infinite;
-      will-change: transform, opacity;
     }
     .typing-dot:nth-child(1) { animation-delay: 0s; }
     .typing-dot:nth-child(2) { animation-delay: 0.2s; }
@@ -176,7 +172,7 @@
       50% { transform: translateY(-6px); }
     }
     footer {
-      position: fixed !important;
+      position: fixed;
       bottom: calc(10px + env(safe-area-inset-bottom));
       left: 8px;
       right: 8px;
@@ -187,13 +183,6 @@
       background: #fff;
       z-index: 10000;
       height: 56px;
-      min-height: 56px;
-      max-height: 56px;
-      overflow: hidden !important;
-      -webkit-overflow-scrolling: none;
-      contain: strict;
-      box-sizing: border-box;
-      -webkit-appearance: none;
       border-radius: 35px;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
       transition: bottom 0.3s ease;
@@ -204,7 +193,6 @@
     }
     .footerNote {
       position: fixed;
-      /* === REVERTED to original position as requested === */
       bottom: calc(72px + env(safe-area-inset-bottom));
       left: 0;
       right: 0;
@@ -218,98 +206,62 @@
     }
     .inputWrapper {
       flex: 1;
-      flex-grow: 5;
-      flex-basis: 0;
       position: relative;
       display: flex;
       align-items: center;
       height: 40px;
-      min-height: 40px;
-      max-height: 40px;
-      overflow: hidden !important;
-      box-sizing: border-box;
-      background: #f0f2f5 !important;
+      background: #f0f2f5;
       border-radius: 20px;
     }
     body.dark-mode .inputWrapper {
-      background: #2d3748 !important;
+      background: #2d3748;
     }
     textarea {
       width: 100%;
       resize: none;
       padding: 10px 40px 10px 12px;
-      border: none !important;
+      border: none;
       border-radius: 20px;
       font-size: 14px;
       outline: none;
       height: 40px;
-      min-height: 40px;
-      max-height: 200px;
-      line-height: 18px;
-      background: transparent !important;
+      background: transparent;
       color: #0f172a;
-      overflow-y: auto !important;
-      box-sizing: border-box;
+      overflow-y: auto;
       -webkit-appearance: none;
-      z-index: 10002;
-      touch-action: manipulation;
     }
     body.dark-mode textarea {
-      border: none !important;
-      background: transparent !important;
       color: #e5e7eb;
     }
     #emojiToggle {
       border: none;
       font-size: 20px;
       cursor: pointer;
-      line-height: 1;
       width: 44px;
       height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
-      -webkit-tap-highlight-color: transparent !important;
-      z-index: 10000;
-      overflow: hidden;
-      pointer-events: auto;
-      touch-action: manipulation;
-      margin-right: 8px;
+      background: transparent;
       color: #0f172a;
-      background: transparent !important;
-      box-shadow: none !important;
     }
     body.dark-mode #emojiToggle {
       color: #e5e7eb;
-      background: transparent !important;
-      box-shadow: none !important;
-    }
-    #emojiToggle:hover, #emojiToggle:active, #emojiToggle:focus {
-      background: transparent !important;
-      box-shadow: none !important;
     }
     .input-icon-btn {
       position: absolute;
       right: 10px;
       top: 50%;
       transform: translateY(-50%);
-      background: transparent !important;
-      border: none !important;
-      padding: 0 !important;
+      background: transparent;
+      border: none;
       cursor: pointer;
       width: 24px;
       height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       color: #5f6368;
     }
     body.dark-mode .input-icon-btn {
       color: #bdc1c6;
-    }
-    .input-icon-btn svg {
-      width: 100%;
-      height: 100%;
     }
     button {
       padding: 0 14px;
@@ -320,44 +272,18 @@
       font-weight: bold;
       cursor: pointer;
       font-size: 14px;
-      white-space: nowrap;
-      -webkit-tap-highlight-color: transparent !important;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 10001;
-      touch-action: manipulation;
-    }
-    button:active {
-      opacity: 0.85;
-    }
-    .footer-buttons {
-      margin-left: 8px;
     }
     #sendBtn, #nextBtn {
       width: 46px;
       height: 46px;
       border-radius: 50%;
-      padding: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10001;
-      overflow: hidden;
-    }
-    #sendBtn {
       background: #007bff;
       box-shadow: 0 2px 8px rgba(0,123,255,0.4);
     }
-    #nextBtn {
-      background: #007bff;
-      box-shadow: 0 2px 8px rgba(0,123,255,0.4);
-    }
-    #sendBtn svg, #nextBtn svg {
-      width: 24px;
-      height: 24px;
-    }
-    #emojiPicker {
+    #emojiPicker, #gifPicker {
       position: fixed;
       left: 8px;
       right: 8px;
@@ -365,68 +291,21 @@
       width: calc(100% - 16px);
       max-width: 400px;
       height: var(--emoji-picker-height, 350px);
-      max-height: var(--emoji-picker-height, 70vh);
-      overflow-y: auto;
-      background: transparent !important;
-      border-radius: 16px;
-      z-index: 10001;
-      opacity: 0;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      will-change: transform, opacity, bottom;
-      display: none;
-      transform: translateY(30px) scale(0.98);
-      bottom: calc(10px + env(safe-area-inset-bottom));
-    }
-    #emojiPicker.show {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-      display: block;
-      bottom: calc(10px + env(safe-area-inset-bottom));
-    }
-    body.dark-mode #emojiPicker {
-      background: transparent !important;
-    }
-    .emoji-mart {
-      width: 100% !important;
-      height: 100% !important;
-      overflow-y: auto !important;
-      font-family: "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", sans-serif !important;
-      box-sizing: border-box !important;
-      border-radius: 16px;
-      background: transparent !important;
-    }
-    .emoji-mart-scroll {
-      overflow-y: auto !important;
-      height: auto !important;
-    }
-    #gifPicker {
-      position: fixed;
-      left: 8px;
-      right: 8px;
-      margin: 0 auto;
-      width: calc(100% - 16px);
-      max-width: 400px;
-      height: var(--gif-picker-height, 350px);
-      max-height: var(--gif-picker-height, 70vh);
       overflow-y: auto;
       background: #fff;
       border-radius: 16px;
       z-index: 10001;
       opacity: 0;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      will-change: transform, opacity, bottom;
-      display: none;
       transform: translateY(30px) scale(0.98);
-      bottom: calc(10px + env(safe-area-inset-bottom));
-      padding: 10px;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      display: none;
     }
-    #gifPicker.show {
+    #emojiPicker.show, #gifPicker.show {
       opacity: 1;
       transform: translateY(0) scale(1);
       display: block;
-      bottom: calc(10px + env(safe-area-inset-bottom));
     }
-    body.dark-mode #gifPicker {
+    body.dark-mode #emojiPicker, body.dark-mode #gifPicker {
       background: #10161d;
     }
     .gif-grid {
@@ -441,39 +320,22 @@
       background: #f0f2f5;
     }
     body.dark-mode .gif-item {
-        background: #2d3748;
+      background: #2d3748;
     }
-    
     @media (min-width: 768px) {
-      #emojiPicker {
+      #emojiPicker, #gifPicker {
         width: 360px;
         left: auto;
         right: 8px;
         height: var(--emoji-picker-height, 350px);
-        max-height: var(--emoji-picker-height, 350px);
         transform: translate(0, 30px) scale(0.98);
         bottom: calc(56px + 15px + env(safe-area-inset-bottom));
       }
-      #emojiPicker.show {
+      #emojiPicker.show, #gifPicker.show {
         transform: translate(0, 0) scale(1);
-        display: block;
         bottom: calc(56px + 15px + env(safe-area-inset-bottom));
       }
-      #gifPicker {
-        width: 360px;
-        left: auto;
-        right: 8px;
-        height: var(--gif-picker-height, 350px);
-        max-height: var(--gif-picker-height, 350px);
-        transform: translate(0, 30px) scale(0.98);
-        bottom: calc(56px + 15px + env(safe-area-inset-bottom));
-      }
-      #gifPicker.show {
-        transform: translate(0, 0) scale(1);
-        display: block;
-        bottom: calc(56px + 15px + env(safe-area-inset-bottom));
-      }
-      .share-btn {
+      .share-btn, .input-icon-btn, #emojiToggle {
         width: 24px;
         height: 24px;
       }
@@ -492,13 +354,6 @@
         width: 46px;
         height: 46px;
       }
-      #sendBtn svg, #nextBtn svg {
-        width: 24px;
-        height: 24px;
-      }
-      .inputWrapper {
-        flex-grow: 3;
-      }
     }
     @media (max-width: 767px) {
       #emojiPicker, #gifPicker {
@@ -506,27 +361,15 @@
         max-height: var(--emoji-picker-height, 70vh);
       }
       .share-btn {
-        padding: 0;
         background: transparent;
         border: none;
         border-radius: 50%;
         width: 24px;
         height: 24px;
-        position: relative;
-        color: #fff;
         display: flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.3s ease;
-        z-index: 10005;
-        visibility: visible;
-        opacity: 1;
-        overflow: hidden;
         box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      }
-      .share-btn svg.button-icon {
-        width: 12px;
-        height: 12px;
       }
       .right {
         gap: 6px;
@@ -534,17 +377,6 @@
       }
       header {
         padding: 6px 8px;
-      }
-      textarea {
-        padding: 10px 40px 10px 12px;
-      }
-      #sendBtn, #nextBtn {
-        width: 46px;
-        height: 46px;
-      }
-      #sendBtn svg, #nextBtn svg {
-        width: 24px;
-        height: 24px;
       }
     }
     @media (max-width: 480px) {
@@ -556,111 +388,52 @@
       footer {
         padding: 6px;
         height: 56px;
-        min-height: 56px;
-        max-height: 56px;
         left: 8px;
         right: 8px;
         border-radius: 32px;
       }
       .inputWrapper {
         height: 40px;
-        min-height: 40px;
-        max-height: 40px;
       }
       textarea {
         height: 40px;
-        min-height: 40px;
-        max-height: 200px;
         font-size: 14px;
         padding: 10px 40px 10px 12px;
-      }
-      #emojiToggle, .input-icon-btn {
-        font-size: 18px;
-        width: 24px;
-        height: 24px;
-      }
-      #sendBtn, #nextBtn {
-        width: 46px;
-        height: 46px;
-      }
-      #sendBtn svg, #nextBtn svg {
-        width: 24px;
-        height: 24px;
       }
     }
     .icon-btn {
       width: 28px;
       height: 28px;
       cursor: pointer;
-      transition: all 0.2s, transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 10001;
-      touch-action: manipulation;
       background: transparent;
       border: none;
       border-radius: 50%;
-      box-shadow: none;
-      color: #334155; 
-      position: relative;
+      color: #334155;
     }
     body.dark-mode .icon-btn {
       color: #cbd5e1;
     }
     #themeToggle {
-        font-size: 20px;
-    }
-    .icon-btn:active {
-      transform: scale(0.95);
-    }
-    #videoToggleBtn svg {
-        width: 24px;
-        height: 24px;
-        position: absolute;
-        transition: opacity 0.2s;
+      font-size: 20px;
     }
     .share-btn {
-      padding: 0;
       background: transparent;
       border: none;
       border-radius: 50%;
       width: 24px;
       height: 24px;
-      position: relative;
-      color: #fff;
-      display: flex !important;
+      display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.3s ease;
-      z-index: 10005;
-      visibility: visible;
-      opacity: 1;
-      overflow: hidden;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    .share-btn svg.button-icon {
-      width: 12px;
-      height: 12px;
     }
     .share-btn:hover {
       transform: scale(1.1);
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    body.dark-mode .share-btn {
-      border-color: rgba(255,255,255,0.5);
-    }
-    body.dark-mode .share-btn:hover {
-      border-color: rgba(255,255,255,0.7);
-      box-shadow: 0 4px 12px rgba(255,255,255,0.2);
-    }
-    .right {
-      position: relative;
-      display: flex !important;
-      align-items: center;
-      gap: 8px;
-      z-index: 10004;
-      padding-right: 10px;
     }
     .share-animation {
       position: absolute;
@@ -672,7 +445,6 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 10006;
       pointer-events: none;
     }
     .share-animation::before {
@@ -700,7 +472,7 @@
       position: absolute;
       top: calc(100% + env(safe-area-inset-top));
       right: 0;
-      background: #fff !important;
+      background: #fff;
       border-radius: 12px;
       padding: 12px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
@@ -708,22 +480,22 @@
       flex-direction: row;
       gap: 12px;
       z-index: 10006;
-      margin-top: 5px;
       transform: translateY(-10px);
       opacity: 0;
       transition: all 0.3s ease;
     }
     body.dark-mode .share-sheet {
-      background: #1f2937 !important;
+      background: #1f2937;
       box-shadow: 0 4px 20px rgba(0,0,0,0.4);
     }
     .share-sheet.show {
       transform: translateY(0);
       opacity: 1;
+      display: flex;
     }
     .share-sheet button {
-      background: #f8f9fa !important;
-      border: 1px solid #dee2e6 !important;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
       border-radius: 50%;
       padding: 8px;
       width: 44px;
@@ -732,53 +504,24 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
-      z-index: 10001;
     }
     .share-sheet button:hover {
-      background: #e9ecef !important;
+      background: #e9ecef;
       transform: scale(1.05);
     }
     body.dark-mode .share-sheet button {
-      background: #2d3748 !important;
-      border-color: #4a5568 !important;
-    }
-    body.dark-mode .share-sheet button:hover {
-      background: #4a5568 !important;
+      background: #2d3748;
+      border-color: #4a5568;
     }
     .share-sheet button img {
       width: 24px;
       height: 24px;
     }
-    .share-sheet button svg {
-      display: block;
-    }
     .share-sheet .link {
-      border-radius: 50%;
-      width: 44px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #f8f9fa !important;
-      border: 1px solid #dee2e6 !important;
-      color: #007bff !important;
+      background: #f8f9fa;
+      border: 1px solid #dee2e6;
+      color: #007bff;
       font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .share-sheet .link:hover {
-      background: #e9ecef !important;
-      transform: scale(1.05);
-    }
-    button:focus, button:active,
-    .icon-btn:focus, .icon-btn:active,
-    .share-btn:focus, .share-btn:active,
-    .share-sheet button:focus, .share-sheet button:active,
-    button:focus-visible, .icon-btn:focus-visible,
-    .share-btn:focus-visible, .share-sheet button:focus-visible {
-      outline: none !important;
-      box-shadow: none !important;
     }
     #copyLinkPopup {
       position: absolute;
@@ -803,11 +546,6 @@
     }
     body.dark-mode #copyLinkPopup {
       background: #1d4ed8;
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-    }
-    .bubble, .typing-dot, .pulse-dot {
-      will-change: transform, opacity;
     }
     .eye {
       transform-origin: center;
@@ -839,22 +577,20 @@
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: linear-gradient(45deg,#00eaff,#6a00ff);
+      background: linear-gradient(45deg, #00eaff, #6a00ff);
       animation: pulse 1.5s ease-in-out infinite;
-      will-change: transform, opacity;
     }
     .pulse-dot:nth-child(1) { animation-delay: 0s; }
     .pulse-dot:nth-child(2) { animation-delay: 0.2s; }
     .pulse-dot:nth-child(3) { animation-delay: 0.4s; }
     @keyframes pulse {
-      0%,100% { transform: scale(0.8); opacity: 0.7; }
+      0%, 100% { transform: scale(0.8); opacity: 0.7; }
       50% { transform: scale(1.2); opacity: 1; }
     }
     .searching-text {
       margin-left: 10px;
       font-weight: 500;
       color: #555;
-      white-space: nowrap;
     }
     body.dark-mode .searching-text {
       color: #e5e7eb;
@@ -896,7 +632,6 @@
       box-shadow: 0 4px 15px rgba(0,0,0,0.2);
       z-index: 10001;
       animation: pulse-glow 2s infinite;
-      display: block;
     }
     body.dark-mode .start-chatting-btn {
       background: #007bff;
@@ -922,15 +657,6 @@
     .auto-scroll-enabled #messages {
       scroll-behavior: smooth;
     }
-    footer {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .inputWrapper {
-      border: none !important;
-      box-shadow: none !important;
-    }
     textarea::-webkit-scrollbar {
       width: 4px;
     }
@@ -948,8 +674,7 @@
       display: none;
       flex-direction: column;
       position: absolute;
-      /* Spacing added for header */
-      top: calc(90px + env(safe-area-inset-top));
+      top: calc(76px + env(safe-area-inset-top));
       left: 0;
       right: 0;
       width: 100%;
@@ -963,7 +688,7 @@
     }
     #video-container video {
       width: 100%;
-      height: 50%; 
+      height: 50%;
       object-fit: cover;
       transform: scaleX(-1);
     }
@@ -971,19 +696,18 @@
       display: none;
     }
     body.video-mode header {
-        height: 44px;
-        padding-top: 4px;
-        padding-bottom: 4px;
+      height: 44px;
+      padding-top: 4px;
+      padding-bottom: 4px;
     }
     body.video-mode header svg.logo {
-        height: 36px;
+      height: 36px;
     }
     body.video-mode #video-container {
-        /* Spacing added for smaller header in video mode */
-        top: calc(54px + env(safe-area-inset-top));
+      top: calc(44px + env(safe-area-inset-top));
     }
     #videoToggleBtn.active {
-       filter: drop-shadow(0 0 4px #007bff);
+      filter: drop-shadow(0 0 4px #007bff);
     }
     #nextBtn:disabled {
       opacity: 0.5;
@@ -1015,22 +739,22 @@
           <path class="right" d="M 8 -9 Q 12 -13 16 -9" stroke="#fff" stroke-width="2.5" stroke-linecap="round" fill="none"/>
           <path class="smile" d="M -10 10 Q 0 18 10 10" stroke="#fff" stroke-width="2" stroke-linecap="round" fill="none"/>
         </g>
-        <text x="120" y="70" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="#007bff" dominant-baseline="middle" alignment-baseline="middle">TikTalk</text>
+        <text x="120" y="70" font-size="56" font-family="Segoe UI, Arial, sans-serif" font-weight="800" fill="#007bff" dominant-baseline="middle">TikTalk</text>
       </svg>
     </div>
     <div class="right">
-      <button id="videoToggleBtn" class="icon-btn" title="Toggle Video Mode">
+      <button id="videoToggleBtn" class="icon-btn" title="Toggle Video Mode" aria-label="Toggle video mode">
         <svg class="video-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+          <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
         </svg>
         <svg class="chat-icon" style="display: none;" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+          <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
         </svg>
       </button>
-      <button id="themeToggle" class="icon-btn">🌙</button>
+      <button id="themeToggle" class="icon-btn" aria-label="Toggle dark mode">🌙</button>
       <div style="position: relative;">
-        <button id="shareBtn" class="share-btn">
-          <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <button id="shareBtn" class="share-btn" aria-label="Share options">
+          <svg class="button-icon" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2">
             <path d="M18 8l-8 8-8-8"/>
             <animate attributeName="stroke" values="#007bff;#00eaff;#6a00ff;#007bff" dur="3s" repeatCount="indefinite"/>
             <animate attributeName="transform" values="scale(1);scale(1.1);scale(1)" dur="1.5s" repeatCount="indefinite"/>
@@ -1039,23 +763,23 @@
         <div class="share-animation"></div>
       </div>
       <div class="share-sheet" id="shareSheet">
-        <button onclick="shareApp('whatsapp')"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></button>
-        <button onclick="shareApp('instagram')"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram"></button>
-        <button onclick="shareApp('facebook')"><img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Facebook"></button>
+        <button onclick="shareApp('whatsapp')" aria-label="Share on WhatsApp"><img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"></button>
+        <button onclick="shareApp('instagram')" aria-label="Share on Instagram"><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram"></button>
+        <button onclick="shareApp('facebook')" aria-label="Share on Facebook"><img src="https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png" alt="Facebook"></button>
         <button onclick="shareApp('x')" aria-label="Share on X">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20">
             <circle cx="50" cy="50" r="50" fill="#1DA1F2"/>
             <path d="M30,30 L70,70 M70,30 L30,70" stroke="#fff" stroke-width="10" stroke-linecap="round"/>
           </svg>
         </button>
-        <button class="link" onclick="shareApp('link')">🔗</button>
+        <button class="link" onclick="shareApp('link')" aria-label="Copy link">🔗</button>
       </div>
     </div>
   </header>
   <div class="chat-wrapper">
     <div id="video-container">
-        <video id="remoteVideo" playsinline autoplay></video>
-        <video id="localVideo" playsinline autoplay muted></video>
+      <video id="remoteVideo" playsinline autoplay></video>
+      <video id="localVideo" playsinline autoplay muted></video>
     </div>
     <main id="chat">
       <div id="messages"></div>
@@ -1073,7 +797,7 @@
   <footer>
     <button id="emojiToggle" aria-label="Toggle emoji picker">😊</button>
     <div class="inputWrapper">
-      <textarea id="messageInput" placeholder="Type a message..."></textarea>
+      <textarea id="messageInput" placeholder="Type a message..." aria-label="Type a message"></textarea>
       <button id="gifToggle" class="input-icon-btn" aria-label="Toggle GIF picker">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
           <circle cx="32" cy="32" r="30" stroke="currentColor" stroke-width="4" fill="none"/>
@@ -1082,12 +806,12 @@
       </button>
     </div>
     <div class="footer-buttons">
-      <button id="nextBtn" title="Next" disabled>
+      <button id="nextBtn" title="Next" disabled aria-label="Next chat">
         <svg class="button-icon" viewBox="0 0 24 24" fill="white">
           <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
         </svg>
       </button>
-      <button id="sendBtn" title="Send">
+      <button id="sendBtn" title="Send" aria-label="Send message">
         <svg class="button-icon" viewBox="0 0 24 24" fill="white">
           <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
         </svg>
@@ -1098,7 +822,6 @@
   <div id="gifPicker" aria-hidden="true">
     <div class="gif-grid" id="gifGrid"></div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
   <script>
     let localStream;
     let peerConnection;
@@ -1116,7 +839,7 @@
         { urls: 'stun:stun3.l.google.com:19302' }
       ]
     };
-    
+
     function debounce(func, wait) {
       let timeout;
       return function (...args) {
@@ -1168,7 +891,7 @@
         }
       }
       initializeEmojiPicker();
-      
+
       const emojiToggle = document.getElementById("emojiToggle");
       const emojiPicker = document.getElementById("emojiPicker");
       const gifToggle = document.getElementById("gifToggle");
@@ -1177,28 +900,26 @@
       const input = document.getElementById("messageInput");
       let wasPickerOpenBeforeKeyboard = false;
 
-      // --- Lottie Library Setup ---
       const lottieAnimations = [
-          "https://lottie.host/808269e3-2391-41e7-9a67-9154af4222a7/5kG2p4lvoC.json", // Thumbs Up
-          "https://lottie.host/9c33b070-7667-4d7a-ab81-79e57833a696/i04a2WulSO.json", // Heart
-          "https://lottie.host/cf411776-e41c-43f3-a15e-e483a9588665/gI018HkX2p.json", // Laughing
-          "https://lottie.host/1749c0d4-d02f-410a-abd8-b11ff5a42828/sW0dYwwVEf.json", // Waving
-          "https://lottie.host/8254c00a-b333-40a1-a068-199188458628/bXv8jCM303.json", // Crying
-          "https://lottie.host/1589b275-c38d-4786-896e-1d542d948956/s5L5paCVib.json", // Dancing
-          "https://lottie.host/86127e70-a3ce-4217-a111-a83626e27b9c/032VsL3wZ6.json", // Rocket
-          "https://lottie.host/9d311893-6c84-4e94-969c-29d0f4d32049/2g9q6n7XvA.json", // Loading
-          "https://lottie.host/932050f5-b72e-436f-822e-2e45a05b6826/aG07y4X8Cf.json", // Party Popper
-          "https://lottie.host/b4f9d45e-57c5-4d74-916c-b3a51f04e132/z59tA7L7fG.json", // Thinking
-          "https://lottie.host/43e74c86-9a2c-49e3-9972-2d88734268e3/qJzZWtj7uU.json", // Sleeping
-          "https://lottie.host/985227ea-0738-468f-a396-93f538e1e780/jHnB5WJGk5.json"  // OK Hand
+        "https://lottie.host/808269e3-2391-41e7-9a67-9154af4222a7/5kG2p4lvoC.json",
+        "https://lottie.host/9c33b070-7667-4d7a-ab81-79e57833a696/i04a2WulSO.json",
+        "https://lottie.host/cf411776-e41c-43f3-a15e-e483a9588665/gI018HkX2p.json",
+        "https://lottie.host/1749c0d4-d02f-410a-abd8-b11ff5a42828/sW0dYwwVEf.json",
+        "https://lottie.host/8254c00a-b333-40a1-a068-199188458628/bXv8jCM303.json",
+        "https://lottie.host/1589b275-c38d-4786-896e-1d542d948956/s5L5paCVib.json",
+        "https://lottie.host/86127e70-a3ce-4217-a111-a83626e27b9c/032VsL3wZ6.json",
+        "https://lottie.host/9d311893-6c84-4e94-969c-29d0f4d32049/2g9q6n7XvA.json",
+        "https://lottie.host/932050f5-b72e-436f-822e-2e45a05b6826/aG07y4X8Cf.json",
+        "https://lottie.host/b4f9d45e-57c5-4d74-916c-b3a51f04e132/z59tA7L7fG.json",
+        "https://lottie.host/43e74c86-9a2c-49e3-9972-2d88734268e3/qJzZWtj7uU.json",
+        "https://lottie.host/985227ea-0738-468f-a396-93f538e1e780/jHnB5WJGk5.json"
       ];
 
       function populateLottieLibrary() {
-        gifGrid.innerHTML = ''; 
+        gifGrid.innerHTML = '';
         lottieAnimations.forEach(url => {
           const item = document.createElement('div');
           item.className = 'gif-item';
-
           const player = document.createElement('dotlottie-player');
           player.setAttribute('src', url);
           player.setAttribute('background', 'transparent');
@@ -1207,7 +928,6 @@
           player.style.height = '100px';
           player.setAttribute('loop', '');
           player.setAttribute('autoplay', '');
-
           item.onclick = () => {
             ws.send(JSON.stringify({ type: "message", text: url }));
             addMessage(url, 'me');
@@ -1215,12 +935,10 @@
             gifPicker.style.display = 'none';
             debouncedAdjustLayout();
           };
-          
           item.appendChild(player);
           gifGrid.appendChild(item);
         });
       }
-      // --- End of Lottie Setup ---
 
       const handleEmojiToggle = (e) => {
         if (e.target.closest('#emojiToggle') !== emojiToggle) return;
@@ -1275,7 +993,7 @@
       };
       input.addEventListener("click", handleInputInteraction, { passive: true });
       input.addEventListener("touchstart", handleInputInteraction, { passive: true });
-      
+
       input.addEventListener("focus", () => {
         if (emojiPicker.classList.contains('show')) {
           emojiPicker.classList.remove('show');
@@ -1288,9 +1006,8 @@
           gifPicker.style.display = 'none';
         }
         adjustLayoutForKeyboard();
-        if (!rafId) rafId = requestAnimationFrame(updateLayout);
       });
-      
+
       input.addEventListener("blur", () => {
         setTimeout(() => {
           const isStillFocused = document.activeElement === input || document.activeElement === emojiToggle || document.activeElement === gifToggle;
@@ -1302,10 +1019,6 @@
           emojiPicker.classList.add('show');
           emojiPicker.style.display = 'block';
           emojiToggle.textContent = "⌨️";
-        }
-        if (rafId) {
-          cancelAnimationFrame(rafId);
-          rafId = null;
         }
       });
       input.addEventListener("input", debouncedAdjustLayout);
@@ -1334,13 +1047,13 @@
     const messageInput = document.getElementById("messageInput");
 
     messageInput.addEventListener('input', () => {
-        if (messageInput.value.trim().length > 0) {
-            sendBtn.style.display = 'flex';
-            nextBtn.style.display = 'none';
-        } else {
-            sendBtn.style.display = 'none';
-            nextBtn.style.display = 'flex';
-        }
+      if (messageInput.value.trim().length > 0) {
+        sendBtn.style.display = 'flex';
+        nextBtn.style.display = 'none';
+      } else {
+        sendBtn.style.display = 'none';
+        nextBtn.style.display = 'flex';
+      }
     });
 
     const handleShareBtn = (e) => {
@@ -1438,64 +1151,64 @@
     let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
 
     function adjustLayoutForKeyboard() {
-        const footer = document.querySelector("footer");
-        const footerNote = document.querySelector(".footerNote");
-        const startChattingBtn = document.getElementById("startChattingBtn");
-        const emojiPicker = document.getElementById("emojiPicker");
-        const gifPicker = document.getElementById("gifPicker");
-        let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
-        const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
-        const isEmojiPickerOpen = emojiPicker.classList.contains('show');
-        const isGifPickerOpen = gifPicker.classList.contains('show');
-        const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-        let keyboardHeight = 0;
+      const footer = document.querySelector("footer");
+      const footerNote = document.querySelector(".footerNote");
+      const startChattingBtn = document.getElementById("startChattingBtn");
+      const emojiPicker = document.getElementById("emojiPicker");
+      const gifPicker = document.getElementById("gifPicker");
+      let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
+      const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
+      const isEmojiPickerOpen = emojiPicker.classList.contains('show');
+      const isGifPickerOpen = gifPicker.classList.contains('show');
+      const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+      let keyboardHeight = 0;
 
-        if ('virtualKeyboard' in navigator) {
-            keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
-        } else if (window.visualViewport) {
-            keyboardHeight = Math.max(0, window.innerHeight - window.visualViewport.height);
-        }
+      if ('virtualKeyboard' in navigator) {
+        keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
+      } else if (window.visualViewport) {
+        keyboardHeight = Math.max(0, window.innerHeight - window.visualViewport.height);
+      }
 
-        if (keyboardHeight > 0) {
-            lastKeyboardHeight = Math.max(keyboardHeight, 300);
-            localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
-        } else if (!isKeyboardOpen && !isEmojiPickerOpen && !isGifPickerOpen) {
-            lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
-        }
+      if (keyboardHeight > 0) {
+        lastKeyboardHeight = Math.max(keyboardHeight, 300);
+        localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
+      } else if (!isKeyboardOpen && !isEmojiPickerOpen && !isGifPickerOpen) {
+        lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
+      }
 
-        let pickerHeight = lastKeyboardHeight;
-        if (isDesktop) {
-            pickerHeight = Math.min(lastKeyboardHeight, 350);
-        } else {
-            pickerHeight = Math.min(lastKeyboardHeight, window.innerHeight * 0.7);
-        }
-        document.documentElement.style.setProperty('--emoji-picker-height', `${pickerHeight}px`);
-        document.documentElement.style.setProperty('--gif-picker-height', `${pickerHeight}px`);
+      let pickerHeight = lastKeyboardHeight;
+      if (isDesktop) {
+        pickerHeight = Math.min(lastKeyboardHeight, 350);
+      } else {
+        pickerHeight = Math.min(lastKeyboardHeight, window.innerHeight * 0.7);
+      }
+      document.documentElement.style.setProperty('--emoji-picker-height', `${pickerHeight}px`);
+      document.documentElement.style.setProperty('--gif-picker-height', `${pickerHeight}px`);
 
-        if (isKeyboardOpen) {
-            footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px)`;
-            footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px)`;
-            startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 25px)`;
-        } else if (isEmojiPickerOpen || isGifPickerOpen) {
-            if (!isDesktop) {
-                footer.style.bottom = `calc(${pickerHeight}px + ${safeAreaBottom}px + 10px)`;
-                footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${pickerHeight}px + ${safeAreaBottom}px + 10px)`;
-                startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${pickerHeight}px + ${safeAreaBottom}px + 35px)`;
-            }
-        } else {
-            footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
-            startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px + 25px)`;
+      if (isKeyboardOpen) {
+        footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px)`;
+        footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px)`;
+        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 25px)`;
+      } else if (isEmojiPickerOpen || isGifPickerOpen) {
+        if (!isDesktop) {
+          footer.style.bottom = `calc(${pickerHeight}px + ${safeAreaBottom}px + 10px)`;
+          footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${pickerHeight}px + ${safeAreaBottom}px + 10px)`;
+          startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${pickerHeight}px + ${safeAreaBottom}px + 35px)`;
         }
-        requestAnimationFrame(scrollToBottom);
+      } else {
+        footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
+        footerNote.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px)`;
+        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 10px + ${safeAreaBottom}px + 25px)`;
+      }
+      requestAnimationFrame(scrollToBottom);
     }
-    
+
     const debouncedAdjustLayout = debounce(adjustLayoutForKeyboard, 50);
     if (window.visualViewport) {
-        window.visualViewport.addEventListener("resize", debouncedAdjustLayout);
+      window.visualViewport.addEventListener("resize", debouncedAdjustLayout);
     }
     window.addEventListener("resize", debouncedAdjustLayout);
     document.addEventListener("DOMContentLoaded", debouncedAdjustLayout);
-
 
     function addMessage(text, who) {
       const fragment = document.createDocumentFragment();
@@ -1515,15 +1228,15 @@
       } else {
         div.textContent = text;
       }
-      
+
       fragment.appendChild(div);
       messagesDiv.appendChild(fragment);
       scrollToBottom();
     }
 
     function showPopup(text) {
-        const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
-        if (!targetDiv) return;
+      const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
+      if (!targetDiv) return;
 
       if (text.includes("Searching")) {
         targetDiv.innerHTML = `<div class="popup"><div class="searching-container"><div class="pulse-dots"><div class="pulse-dot"></div><div class="pulse-dot"></div><div class="pulse-dot"></div></div><div class="searching-text">Searching for a stranger...</div></div></div>`;
@@ -1549,98 +1262,96 @@
       input.disabled = isInputDisabled;
       document.querySelector('footer').classList.toggle('disabled', isInputDisabled);
       if (isConnected) {
-          sendBtn.style.display = 'none';
-          nextBtn.style.display = 'flex';
+        sendBtn.style.display = 'none';
+        nextBtn.style.display = 'flex';
       }
     }
 
     videoToggleBtn.addEventListener('click', async () => {
-        const videoIcon = videoToggleBtn.querySelector('.video-icon');
-        const chatIcon = videoToggleBtn.querySelector('.chat-icon');
-        isVideoEnabled = !isVideoEnabled;
-        if (isVideoEnabled) {
-            videoIcon.style.display = 'none';
-            chatIcon.style.display = 'block';
-        } else {
-            videoIcon.style.display = 'block';
-            chatIcon.style.display = 'none';
+      const videoIcon = videoToggleBtn.querySelector('.video-icon');
+      const chatIcon = videoToggleBtn.querySelector('.chat-icon');
+      isVideoEnabled = !isVideoEnabled;
+      if (isVideoEnabled) {
+        videoIcon.style.display = 'none';
+        chatIcon.style.display = 'block';
+      } else {
+        videoIcon.style.display = 'block';
+        chatIcon.style.display = 'none';
+      }
+      startChattingBtn.style.display = 'block';
+      hasStartedChat = false;
+      nextBtn.disabled = true;
+      messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
+      document.body.classList.toggle('video-mode', isVideoEnabled);
+      if (isVideoEnabled) {
+        try {
+          const highQualityConstraints = {
+            video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } },
+            audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+          };
+          localStream = await navigator.mediaDevices.getUserMedia(highQualityConstraints);
+          console.log("Local stream obtained:", localStream);
+          localVideo.srcObject = localStream;
+          console.log("Local stream assigned to video element.");
+        } catch (error) {
+          console.error("Error accessing media devices.", error);
+          alert("Could not access camera/microphone. Please check permissions.");
+          isVideoEnabled = false;
+          document.body.classList.remove('video-mode');
+          videoIcon.style.display = 'block';
+          chatIcon.style.display = 'none';
+          startChattingBtn.style.display = 'block';
+          stopAllStreams();
         }
-        startChattingBtn.style.display = 'block';
-        hasStartedChat = false;
-        nextBtn.disabled = true;
-        messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
-        document.body.classList.toggle('video-mode', isVideoEnabled);
-        if (isVideoEnabled) {
-            try {
-                const highQualityConstraints = {
-                  video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 30 } },
-                  audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
-                };
-                localStream = await navigator.mediaDevices.getUserMedia(highQualityConstraints);
-                console.log("Local stream obtained:", localStream);
-                localVideo.srcObject = localStream;
-                console.log("Local stream assigned to video element.");
-            } catch (error) {
-                console.error("Error accessing media devices.", error);
-                alert("Could not access camera/microphone. Please check permissions.");
-                isVideoEnabled = false;
-                document.body.classList.remove('video-mode');
-                videoIcon.style.display = 'block';
-                chatIcon.style.display = 'none';
-                startChattingBtn.style.display = 'block';
-                stopAllStreams();
-            }
-        } else {
-            stopAllStreams();
-        }
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
-            ws.close();
-        }
-        debouncedAdjustLayout();
+      } else {
+        stopAllStreams();
+      }
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
+        ws.close();
+      }
+      debouncedAdjustLayout();
     });
 
     function stopAllStreams() {
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localStream = null;
-        }
-        if (peerConnection) {
-            peerConnection.close();
-            peerConnection = null;
-        }
-        localVideo.srcObject = null;
-        remoteVideo.srcObject = null;
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+      }
+      if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+      }
+      localVideo.srcObject = null;
+      remoteVideo.srcObject = null;
     }
 
     function createPeerConnection() {
-        peerConnection = new RTCPeerConnection(stunServers);
-        peerConnection.onicecandidate = event => {
-            if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
-                ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
-            }
-        };
-        peerConnection.ontrack = event => {
-            console.log('Remote track received:', event.track);
-            if (remoteVideo.srcObject !== event.streams[0]) {
-                remoteVideo.srcObject = event.streams[0];
-                console.log("Remote stream assigned to video element.");
-            }
-        };
-        if (localStream) {
-            localStream.getTracks().forEach(track => {
-                peerConnection.addTrack(track, localStream);
-            });
+      peerConnection = new RTCPeerConnection(stunServers);
+      peerConnection.onicecandidate = event => {
+        if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
         }
+      };
+      peerConnection.ontrack = event => {
+        console.log('Remote track received:', event.track);
+        if (remoteVideo.srcObject !== event.streams[0]) {
+          remoteVideo.srcObject = event.streams[0];
+          console.log("Remote stream assigned to video element.");
+        }
+      };
+      if (localStream) {
+        localStream.getTracks().forEach(track => {
+          peerConnection.addTrack(track, localStream);
+        });
+      }
     }
-    
+
     function connectStranger() {
       if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) ws.close();
-      
       if (!isVideoEnabled) {
         stopAllStreams();
       }
-
       const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
       if (targetDiv) targetDiv.innerHTML = '';
       showPopup("🔍 Searching for a stranger...");
@@ -1670,8 +1381,8 @@
               isConnected = false;
               stopAllStreams();
             } else if (data.text === "timeout") {
-               showPopup("No one was found. Click Next Button");
-               isConnected = false;
+              showPopup("No one was found. Click Next Button");
+              isConnected = false;
             }
             break;
           case "message":
@@ -1716,7 +1427,7 @@
         ws.close();
       };
     }
-    
+
     const handleSend = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -1758,12 +1469,12 @@
     if(messagesDiv) observer.observe(messagesDiv, { childList: true, subtree: true });
 
     function setInitialState() {
-        startChattingBtn.style.display = 'block';
-        sendBtn.style.display = 'none';
-        nextBtn.style.display = 'flex';
-        nextBtn.disabled = true;
-        messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
-        updateInputState();
+      startChattingBtn.style.display = 'block';
+      sendBtn.style.display = 'none';
+      nextBtn.style.display = 'flex';
+      nextBtn.disabled = true;
+      messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
+      updateInputState();
     }
     setInitialState();
   </script>
