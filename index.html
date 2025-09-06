@@ -937,15 +937,6 @@
     #on-screen-console .log-entry:nth-child(odd) {
         background: rgba(255,255,255,0.05);
     }
-    /* FIX: Adjust button position to be above the on-screen console */
-    #on-screen-console ~ .start-chatting-btn {
-      bottom: calc(25% + 35px + env(safe-area-inset-bottom));
-      transition: bottom 0.3s ease;
-    }
-    #on-screen-console ~ .footerNote {
-       bottom: calc(25% + 10px + env(safe-area-inset-bottom));
-       transition: bottom 0.3s ease;
-    }
   </style>
 </head>
 <body>
@@ -1360,6 +1351,11 @@
       const startChattingBtn = document.getElementById("startChattingBtn");
       const nextBtn = document.getElementById("nextBtn");
       const emojiPicker = document.getElementById("emojiPicker");
+      
+      // FIX: Get console height to offset the start button
+      const consoleDiv = document.getElementById('on-screen-console');
+      const consoleHeight = consoleDiv ? consoleDiv.offsetHeight : 0;
+
       const headerHeight = header.offsetHeight || 76;
       let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)') || '0', 10);
       let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
@@ -1398,7 +1394,7 @@
         footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
         if(chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
         footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
-        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 35px)`;
+        startChattingBtn.style.bottom = `calc(${consoleHeight}px + ${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 35px)`;
         if (emojiPicker.classList.contains('show')) {
           emojiPicker.classList.remove('show');
           emojiPicker.style.display = 'none';
@@ -1411,7 +1407,7 @@
             footer.style.bottom = `calc(${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
             if(chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
             footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
-            startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 35px)`;
+            startChattingBtn.style.bottom = `calc(${consoleHeight}px + ${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 35px)`;
         }
         emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
       } else {
@@ -1419,7 +1415,7 @@
         footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
         if(chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
         footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
-        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 35px)`;
+        startChattingBtn.style.bottom = `calc(${consoleHeight}px + ${footer.offsetHeight}px + ${safeAreaBottom}px + 35px)`;
         emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
         footer.offsetHeight;
         setTimeout(() => {
