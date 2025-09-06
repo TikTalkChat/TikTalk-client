@@ -291,8 +291,6 @@
     button:active {
       opacity: 0.85;
     }
-    
-    /* Send and Next Button Styles */
     .footer-buttons {
         margin-left: 8px;
     }
@@ -315,12 +313,10 @@
        background: #007bff;
        box-shadow: 0 2px 8px rgba(0,123,255,0.4);
     }
-
     #sendBtn svg, #nextBtn svg {
       width: 24px;
       height: 24px;
     }
-
     #emojiPicker {
       position: fixed;
       left: 8px;
@@ -513,21 +509,18 @@
     body.dark-mode .icon-btn {
       color: #cbd5e1;
     }
-    
     #themeToggle {
         font-size: 20px;
     }
     .icon-btn:active {
       transform: scale(0.95);
     }
-    
     #videoToggleBtn svg {
         width: 24px;
         height: 24px;
         position: absolute;
         transition: opacity 0.2s;
     }
-    
     .share-btn {
       padding: 0;
       background: transparent;
@@ -856,12 +849,10 @@
       display: none;
       flex-direction: column;
       position: absolute;
-      /* MODIFIED: Position below header */
       top: calc(70px + env(safe-area-inset-top)); 
       left: 0;
       right: 0;
       width: 100%;
-      /* MODIFIED: Adjust height to fit below header */
       height: calc(50vh - 70px - env(safe-area-inset-top)); 
       z-index: 100;
       background-color: #000;
@@ -1153,7 +1144,6 @@
     const sendBtn = document.getElementById("sendBtn");
     const messageInput = document.getElementById("messageInput");
 
-    // Logic for Next/Send button toggle
     messageInput.addEventListener('input', () => {
         if (messageInput.value.trim().length > 0) {
             sendBtn.style.display = 'flex';
@@ -1246,12 +1236,8 @@
       }
     }
 
-    // ==========================================================
-    // ===>>> THE IMPORTANT CHANGE IS IN THE TWO LINES BELOW <<<===
-    // ==========================================================
     window.TIKTALK_BACKEND = "https://tiktalkchat-backend-v2.onrender.com";
     const wsUrl = window.TIKTALK_BACKEND.replace("https", "wss");
-
     const messagesDiv = document.getElementById("messages");
     const input = document.getElementById("messageInput");
     const typingIndicator = document.getElementById("typingIndicator");
@@ -1269,7 +1255,6 @@
       const footerNote = document.querySelector(".footerNote");
       const footer = document.querySelector("footer");
       const startChattingBtn = document.getElementById("startChattingBtn");
-      const nextBtn = document.getElementById("nextBtn");
       const emojiPicker = document.getElementById("emojiPicker");
       const headerHeight = header.offsetHeight || 70;
       let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)') || '0', 10);
@@ -1279,7 +1264,6 @@
       const isDesktop = window.matchMedia("(min-width: 768px)").matches;
       let keyboardHeight = 0;
 
-      // Calculate keyboard height
       if ('virtualKeyboard' in navigator) {
         keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
       } else if (window.visualViewport) {
@@ -1288,7 +1272,6 @@
         keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
       }
 
-      // Update lastKeyboardHeight only if keyboard is open
       if (keyboardHeight > 0) {
         lastKeyboardHeight = Math.max(keyboardHeight, 300);
         localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
@@ -1296,7 +1279,6 @@
         lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
       }
 
-      // Set emoji picker height to match keyboard height
       let emojiPickerHeight = lastKeyboardHeight;
       if (isDesktop) {
         emojiPickerHeight = Math.min(lastKeyboardHeight, 350);
@@ -1305,7 +1287,6 @@
       }
       document.documentElement.style.setProperty('--emoji-picker-height', `${emojiPickerHeight}px`);
 
-      // Adjust layout based on keyboard or emoji picker state
       if (isKeyboardOpen) {
         footer.style.transition = 'bottom 0.3s ease';
         footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
@@ -1399,17 +1380,10 @@
 
     function showPopup(text) {
       if (text.includes("Searching")) {
-        messagesDiv.innerHTML = `
-          <div class="popup">
-            <div class="searching-container">
-              <div class="pulse-dots"><div class="pulse-dot"></div><div class="pulse-dot"></div><div class="pulse-dot"></div></div>
-              <div class="searching-text">Searching for a stranger...</div>
-            </div>
-          </div>`;
+        messagesDiv.innerHTML = `<div class="popup"><div class="searching-container"><div class="pulse-dots"><div class="pulse-dot"></div><div class="pulse-dot"></div><div class="pulse-dot"></div></div><div class="searching-text">Searching for a stranger...</div></div></div>`;
         isConnected = false;
       } else if (text.includes("Connected")) {
-        messagesDiv.innerHTML = `
-          <div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
+        messagesDiv.innerHTML = `<div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
         isConnected = true;
         setTimeout(() => {
           if (isConnected && messagesDiv.innerHTML.includes("Connected")) {
@@ -1429,7 +1403,6 @@
       const isInputDisabled = !isConnected;
       input.disabled = isInputDisabled;
       document.querySelector('footer').classList.toggle('disabled', isInputDisabled);
-      
       if (isConnected) {
           sendBtn.style.display = 'none';
           nextBtn.style.display = 'flex';
@@ -1439,7 +1412,6 @@
     videoToggleBtn.addEventListener('click', async () => {
         const videoIcon = videoToggleBtn.querySelector('.video-icon');
         const chatIcon = videoToggleBtn.querySelector('.chat-icon');
-        
         isVideoEnabled = !isVideoEnabled;
 
         if (isVideoEnabled) {
@@ -1450,7 +1422,6 @@
             chatIcon.style.display = 'none';
         }
 
-        // Show Start Chatting button on mode change and reset chat state
         startChattingBtn.style.display = 'block';
         hasStartedChat = false;
         nextBtn.disabled = true;
@@ -1474,62 +1445,73 @@
                 startChattingBtn.style.display = 'block';
             }
         } else {
-            stopAllStreams();
+            stopAllStreams(true); // Turn off camera when toggling video mode off
         }
         
         if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
             ws.close();
         }
-        
         adjustLayoutForKeyboard();
     });
 
-    function stopAllStreams() {
-        if (localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localStream = null;
-        }
+    // ==========================================================
+    // ===>>> START OF UPDATED CODE FOR BLACK SCREEN FIX <<<===
+    // ==========================================================
+
+    function stopAllStreams(stopLocal = true) {
+        // Sirf peer connection ko band karein
         if (peerConnection) {
             peerConnection.close();
             peerConnection = null;
         }
-        localVideo.srcObject = null;
+        // Remote video ko saaf karein
         remoteVideo.srcObject = null;
+
+        // Agar kaha gaya hai, tabhi local stream (camera) ko band karein
+        if (stopLocal && localStream) {
+            localStream.getTracks().forEach(track => track.stop());
+            localStream = null;
+            localVideo.srcObject = null;
+        }
     }
 
     function createPeerConnection() {
+        // Purana connection band karein agar maujood hai
+        if (peerConnection) {
+            peerConnection.close();
+        }
+
         peerConnection = new RTCPeerConnection(stunServers);
+
         peerConnection.onicecandidate = event => {
             if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
             }
         };
         
-        // MODIFIED: More robust ontrack handler
         peerConnection.ontrack = event => {
-            if (event.streams && event.streams[0]) {
+            if (remoteVideo.srcObject !== event.streams[0]) {
               remoteVideo.srcObject = event.streams[0];
-            } else {
-                if (!remoteVideo.srcObject) {
-                    remoteVideo.srcObject = new MediaStream();
-                }
-                remoteVideo.srcObject.addTrack(event.track);
             }
         };
 
+        // Local stream se tracks ko naye connection me add karein
         if (localStream) {
             localStream.getTracks().forEach(track => {
                 peerConnection.addTrack(track, localStream);
             });
         }
     }
-    
+
     function connectStranger() {
       if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
         ws.close();
       }
-      stopAllStreams();
+      
+      // Connection reset karein lekin local stream (camera) band na karein
+      stopAllStreams(false); 
+      
       messagesDiv.innerHTML = ''; 
       showPopup("🔍 Searching for a stranger...");
       typingIndicator.style.display = "none";
@@ -1550,6 +1532,9 @@
                 showPopup("🔍 Searching for a stranger...");
               } else if (data.text === "connected") {
                 showPopup("✅ Connected! Say Hi 👋");
+                if (isVideoEnabled && !peerConnection) {
+                    createPeerConnection();
+                }
               } else if (data.text === 'initiate_offer') {
                 if (isVideoEnabled) {
                     if(!peerConnection) createPeerConnection();
@@ -1561,7 +1546,7 @@
                 if(isConnected) {
                   showPopup("❌ Stranger disconnected");
                   isConnected = false;
-                  stopAllStreams();
+                  stopAllStreams(false);
                 }
               } else if (data.text === "timeout") {
                  showPopup("No one was found. Click Next Button");
@@ -1597,7 +1582,7 @@
                 break;
             case 'candidate':
                 if (peerConnection) {
-                    await peerConnection.addIceCandidate(new RTCIcecandidate(data.candidate));
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
                 }
                 break;
           }
@@ -1612,7 +1597,7 @@
         }
         typingIndicator.style.display = "none";
         isConnected = false;
-        stopAllStreams();
+        stopAllStreams(false);
         updateInputState();
       };
 
@@ -1622,6 +1607,10 @@
       };
     }
     
+    // ========================================================
+    // ===>>> END OF UPDATED CODE FOR BLACK SCREEN FIX <<<===
+    // ========================================================
+
     const handleSend = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
