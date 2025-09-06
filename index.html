@@ -1896,7 +1896,7 @@
     const observer = new MutationObserver(() => {
       scrollToBottom();
     });
-    if(messagesDiv) observer.observe(messagesDiv, { childList: true, subtree: true });
+    if (messagesDiv) observer.observe(messagesDiv, { childList: true, subtree: true });
 
     function setInitialState() {
         startChattingBtn.style.display = 'block';
