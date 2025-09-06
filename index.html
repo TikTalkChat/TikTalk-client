@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>TikTalk - Stranger Chat</title>
   <style>
-    /* === ESTILOS ORIGINALES (WITH EMOJI PICKER HEIGHT CHANGES) === */
+    /* === ESTILOS ORIGINALES (SIN CAMBIOS) === */
     * {
       margin: 0;
       padding: 0;
@@ -50,9 +50,6 @@
       box-sizing: border-box;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       border-radius: 0 0 16px 16px;
-      /* MODIFIED: Added transition for smooth shrinking */
-      transition: height 0.3s ease, padding 0.3s ease;
-      height: 76px;
     }
     body.dark-mode header {
       background: #10161d;
@@ -67,8 +64,6 @@
       height: 60px;
       width: auto;
       display: block;
-      /* MODIFIED: Added transition for smooth shrinking */
-      transition: height 0.3s ease;
     }
     .chat-wrapper {
       position: relative;
@@ -84,9 +79,8 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       contain: strict;
-      padding: calc(76px + env(safe-area-inset-top)) 15px calc(70px + env(safe-area-inset-bottom));
+      padding: calc(70px + env(safe-area-inset-top)) 15px calc(70px + env(safe-area-inset-bottom));
       -webkit-overflow-scrolling: touch;
-      transition: padding-top 0.3s ease;
     }
     #messages {
       display: flex;
@@ -226,7 +220,7 @@
     textarea {
       width: 100%;
       resize: none;
-      padding: 10px 18px 10px 12px;
+      padding: 10px 40px 10px 12px; /* Aumentado el padding derecho para el icono GIF */
       border: 1px solid #ccc !important;
       border-radius: 20px;
       font-size: 14px;
@@ -297,11 +291,7 @@
     button:active {
       opacity: 0.85;
     }
-    
-    /* Send and Next Button Styles */
-    .footer-buttons {
-        margin-left: 8px;
-    }
+    /* Estilos para los botones Send y Next */
     #sendBtn, #nextBtn {
       width: 46px;
       height: 46px;
@@ -312,21 +302,20 @@
       justify-content: center;
       z-index: 10001;
       overflow: hidden;
+      margin-left: 8px;
     }
     #sendBtn {
       background: #007bff;
       box-shadow: 0 2px 8px rgba(0,123,255,0.4);
     }
     #nextBtn {
-       background: #007bff;
-       box-shadow: 0 2px 8px rgba(0,123,255,0.4);
+       background: #ff3b30;
+       box-shadow: 0 2px 8px rgba(255,59,48,0.4);
     }
-
     #sendBtn svg, #nextBtn svg {
       width: 24px;
       height: 24px;
     }
-
     #emojiPicker {
       position: fixed;
       left: 8px;
@@ -335,7 +324,7 @@
       width: calc(100% - 16px);
       max-width: 400px;
       height: var(--emoji-picker-height, 350px);
-      max-height: var(--emoji-picker-height, 70vh);
+      max-height: 50vh;
       overflow-y: auto;
       background: transparent !important;
       border-radius: 16px;
@@ -375,14 +364,14 @@
         left: auto;
         right: 8px;
         height: var(--emoji-picker-height, 350px);
-        max-height: var(--emoji-picker-height, 350px);
+        max-height: 350px;
         transform: translate(0, 30px) scale(0.98);
-        bottom: calc(56px + 15px + env(safe-area-inset-bottom)); 
+        bottom: calc(56px + 10px + env(safe-area-inset-bottom));
       }
       #emojiPicker.show {
         transform: translate(0, 0) scale(1);
         display: block;
-        bottom: calc(56px + 15px + env(safe-area-inset-bottom));
+        bottom: calc(56px + 10px + env(safe-area-inset-bottom));
       }
       .share-btn {
         width: 24px;
@@ -397,7 +386,7 @@
         padding-right: 10px;
       }
       textarea {
-        padding: 10px 18px 10px 12px;
+        padding: 10px 40px 10px 12px;
       }
       #sendBtn, #nextBtn {
         width: 46px;
@@ -413,8 +402,14 @@
     }
     @media (max-width: 767px) {
       #emojiPicker {
-        height: var(--emoji-picker-height, 350px);
-        max-height: var(--emoji-picker-height, 70vh);
+        height: var(--emoji-picker-height, 350px) !important;
+        max-height: 50vh !important;
+        bottom: calc(10px + env(safe-area-inset-bottom));
+      }
+      #emojiPicker.show {
+        transform: translate(0, 0) scale(1);
+        display: block;
+        bottom: calc(10px + env(safe-area-inset-bottom));
       }
       .share-btn {
         padding: 0;
@@ -447,7 +442,7 @@
         padding: 6px 8px;
       }
       textarea {
-        padding: 10px 18px 10px 12px;
+        padding: 10px 40px 10px 12px;
       }
       #sendBtn, #nextBtn {
         width: 46px;
@@ -483,18 +478,18 @@
         min-height: 40px;
         max-height: 120px;
         font-size: 14px;
-        padding: 10px 18px 10px 12px;
+        padding: 10px 40px 10px 12px;
       }
       #emojiToggle {
         font-size: 18px;
         width: 44px;
         height: 44px;
       }
-      #sendBtn, #nextBtn {
+       #sendBtn, #nextBtn {
         width: 46px;
         height: 46px;
       }
-      #sendBtn svg, #nextBtn svg {
+       #sendBtn svg, #nextBtn svg {
         width: 24px;
         height: 24px;
       }
@@ -502,38 +497,23 @@
     .icon-btn {
       width: 28px;
       height: 28px;
+      font-size: 20px;
+      border-radius: 50%;
       cursor: pointer;
-      transition: all 0.2s, transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      font-weight: 600;
+      transition: all 0.2s;
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 10001;
       touch-action: manipulation;
-      background: transparent;
+      background: transparent !important;
       border: none;
-      border-radius: 50%;
-      box-shadow: none;
-      color: #334155; 
-      position: relative;
-    }
-    body.dark-mode .icon-btn {
-      color: #cbd5e1;
-    }
-    
-    #themeToggle {
-        font-size: 20px;
+      box-shadow: none !important;
     }
     .icon-btn:active {
       transform: scale(0.95);
     }
-    
-    #videoToggleBtn svg {
-        width: 24px;
-        height: 24px;
-        position: absolute;
-        transition: opacity 0.2s;
-    }
-    
     .share-btn {
       padding: 0;
       background: transparent;
@@ -858,62 +838,63 @@
     body.dark-mode textarea::-webkit-scrollbar-thumb {
       background: #555;
     }
+
+    /* === NUEVOS ESTILOS PARA EL MODO VIDEO Y GIF === */
     #video-container {
-      display: none;
+      display: none; /* Oculto por defecto */
       flex-direction: column;
       position: absolute;
-      top: calc(76px + env(safe-area-inset-top)); 
+      top: 0;
       left: 0;
       right: 0;
       width: 100%;
-      height: calc(50vh - 76px - env(safe-area-inset-top)); 
+      height: 50vh; /* Ocupa la mitad superior de la pantalla */
       z-index: 100;
       background-color: #000;
-      transition: top 0.3s ease, height 0.3s ease;
     }
     body.video-mode #video-container {
-      display: flex;
+      display: flex; /* Se muestra cuando el modo video está activo */
     }
     #video-container video {
       width: 100%;
-      height: 50%;
+      height: 50%; /* Cada video ocupa la mitad del contenedor */
       object-fit: cover;
-    }
-    #localVideo {
-        transform: scaleX(-1);
+      transform: scaleX(-1); /* Efecto espejo para el video local */
     }
     #remoteVideo {
-        transform: scaleX(-1);
+        transform: scaleX(-1); /* Opcional: si quieres que el video remoto también tenga efecto espejo */
     }
-    
+    /* Ajusta el padding del chat cuando el video está activo */
     body.video-mode #chat {
       padding-top: calc(50vh + 15px);
     }
-
-    /* === NEW STYLES FOR VIDEO MODE HEADER === */
-    body.video-mode header {
-        height: 44px;
-        padding-top: 4px;
-        padding-bottom: 4px;
-    }
-    body.video-mode header svg.logo {
-        height: 36px;
-    }
-    body.video-mode #chat {
-        padding-top: calc(44px + env(safe-area-inset-top));
-    }
-    body.video-mode #video-container {
-        top: calc(44px + env(safe-area-inset-top));
-        height: calc(50vh - 44px - env(safe-area-inset-top));
+    /* Estilo para el botón de video activo */
+    #videoToggleBtn.active {
+      color: #007bff; /* Color azul para indicar que está activo */
+      text-shadow: 0 0 8px #007bff;
     }
     
-    #videoToggleBtn.active {
-       filter: drop-shadow(0 0 4px #007bff);
+    /* Estilos para el botón GIF */
+    .gif-btn {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 10003;
+        width: 30px;
+        height: 30px;
+        padding: 4px;
+        color: #888;
     }
-    #nextBtn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    .gif-btn svg {
+      width: 100%;
+      height: 100%;
+      stroke: currentColor;
     }
+    body.dark-mode .gif-btn {
+        color: #b0b0b0;
+    }
+
   </style>
 </head>
 <body>
@@ -944,14 +925,7 @@
       </svg>
     </div>
     <div class="right">
-      <button id="videoToggleBtn" class="icon-btn" title="Toggle Video Mode">
-        <svg class="video-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
-        </svg>
-        <svg class="chat-icon" style="display: none;" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-        </svg>
-      </button>
+      <button id="videoToggleBtn" class="icon-btn">📹</button>
       <button id="themeToggle" class="icon-btn">🌙</button>
       <div style="position: relative;">
         <button id="shareBtn" class="share-btn">
@@ -999,14 +973,27 @@
     <button id="emojiToggle" aria-label="Toggle emoji picker" aria-expanded="false">😊</button>
     <div class="inputWrapper">
       <textarea id="messageInput" placeholder="Type a message..."></textarea>
+      <button id="gifToggleBtn" class="icon-btn gif-btn" aria-label="Open GIF picker">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 10v4" />
+          <path d="M15 10v4" />
+          <path d="M12 10v4" />
+          <path d="M3 7h2" />
+          <path d="M19 7h2" />
+          <path d="M4 12h16" />
+          <path d="M3 17h2" />
+          <path d="M19 17h2" />
+          <rect x="2" y="5" width="20" height="14" rx="2" />
+        </svg>
+      </button>
     </div>
     <div class="footer-buttons">
-      <button id="nextBtn" title="Next" disabled>
+      <button id="nextBtn" title="Next" style="display: none;">
         <svg class="button-icon" viewBox="0 0 24 24" fill="white">
           <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
         </svg>
       </button>
-      <button id="sendBtn" title="Send">
+      <button id="sendBtn" title="Send" style="display: none;">
         <svg class="button-icon" viewBox="0 0 24 24" fill="white">
           <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
         </svg>
@@ -1016,14 +1003,17 @@
   <div id="emojiPicker" aria-hidden="true"></div>
   <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
   <script>
+    // === SCRIPT ORIGINAL (CON MODIFICACIONES) ===
+    
+    // -- Variables globales para video chat --
     let localStream;
     let peerConnection;
     let isVideoEnabled = false;
-    let hasStartedChat = false;
     const videoToggleBtn = document.getElementById('videoToggleBtn');
     const localVideo = document.getElementById('localVideo');
     const remoteVideo = document.getElementById('remoteVideo');
 
+    // Configuración de servidores STUN (necesarios para WebRTC)
     const stunServers = {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
@@ -1040,6 +1030,8 @@
     }
 
     document.addEventListener("DOMContentLoaded", () => {
+      // --- El resto del código DOMContentLoaded original está aquí ---
+      // (sin cambios, omitido por brevedad)
       const shareBtn = document.getElementById("shareBtn");
       if (shareBtn) {
         shareBtn.style.display = "flex";
@@ -1049,7 +1041,6 @@
         console.error("Share Button not found in DOM!");
       }
       const savedTheme = localStorage.getItem("theme");
-      const themeToggle = document.getElementById("themeToggle");
       if (savedTheme === "dark") {
         document.body.classList.add("dark-mode");
         themeToggle.textContent = "☀️";
@@ -1159,7 +1150,6 @@
       e.preventDefault();
       document.body.classList.toggle("dark-mode");
       themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
-
       if (window._emojiPickerInstance) {
         window._emojiPickerInstance.setOptions({
           theme: document.body.classList.contains("dark-mode") ? "dark" : "light"
@@ -1174,19 +1164,6 @@
     const shareSheet = document.getElementById("shareSheet");
     const startChattingBtn = document.getElementById("startChattingBtn");
     const nextBtn = document.getElementById("nextBtn");
-    const sendBtn = document.getElementById("sendBtn");
-    const messageInput = document.getElementById("messageInput");
-
-    // Logic for Next/Send button toggle
-    messageInput.addEventListener('input', () => {
-        if (messageInput.value.trim().length > 0) {
-            sendBtn.style.display = 'flex';
-            nextBtn.style.display = 'none';
-        } else {
-            sendBtn.style.display = 'none';
-            nextBtn.style.display = 'flex';
-        }
-    });
 
     const handleShareBtn = (e) => {
       e.preventDefault();
@@ -1214,13 +1191,15 @@
       }
     });
 
+    let hasStartedChat = false;
     const handleStartChatting = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
       if (ws) ws.close();
       hasStartedChat = true;
       startChattingBtn.style.display = 'none';
-      nextBtn.disabled = false;
+      nextBtn.style.display = 'flex'; // Mostrar Next en vez de Send
+      sendBtn.style.display = 'none';
       connectStranger();
     };
     startChattingBtn.addEventListener("click", handleStartChatting);
@@ -1273,6 +1252,7 @@
     window.TIKTALK_BACKEND = "https://tiktalkchat-backend-v2.onrender.com";
     const messagesDiv = document.getElementById("messages");
     const input = document.getElementById("messageInput");
+    const sendBtn = document.getElementById("sendBtn");
     const typingIndicator = document.getElementById("typingIndicator");
     const footer = document.querySelector("footer");
     const emojiPicker = document.getElementById("emojiPicker");
@@ -1282,6 +1262,7 @@
     const maxReconnectAttempts = 5;
     let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
 
+    // --- Función 'adjustLayoutForKeyboard' (sin cambios) ---
     function adjustLayoutForKeyboard() {
       const header = document.querySelector("header");
       const chatDiv = document.getElementById("chat");
@@ -1290,15 +1271,13 @@
       const startChattingBtn = document.getElementById("startChattingBtn");
       const nextBtn = document.getElementById("nextBtn");
       const emojiPicker = document.getElementById("emojiPicker");
-      const headerHeight = header.offsetHeight || 76;
+      const headerHeight = header.offsetHeight || 70;
       let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)') || '0', 10);
       let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
       const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
       const isEmojiPickerOpen = emojiPicker.classList.contains('show');
       const isDesktop = window.matchMedia("(min-width: 768px)").matches;
       let keyboardHeight = 0;
-
-      // Calculate keyboard height
       if ('virtualKeyboard' in navigator) {
         keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
       } else if (window.visualViewport) {
@@ -1306,25 +1285,15 @@
         const windowBottom = window.innerHeight;
         keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
       }
-
-      // Update lastKeyboardHeight only if keyboard is open
       if (keyboardHeight > 0) {
         lastKeyboardHeight = Math.max(keyboardHeight, 300);
         localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
       } else if (!isKeyboardOpen && !isEmojiPickerOpen) {
         lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
       }
-
-      // Set emoji picker height to match keyboard height
-      let emojiPickerHeight = lastKeyboardHeight;
-      if (isDesktop) {
-        emojiPickerHeight = Math.min(lastKeyboardHeight, 350);
-      } else {
-        emojiPickerHeight = Math.min(lastKeyboardHeight, window.innerHeight * 0.7);
-      }
-      document.documentElement.style.setProperty('--emoji-picker-height', `${emojiPickerHeight}px`);
-
-      // Adjust layout based on keyboard or emoji picker state
+      document.documentElement.style.setProperty('--keyboard-height', `${lastKeyboardHeight}px`);
+      document.documentElement.style.setProperty('--emoji-picker-height', `${lastKeyboardHeight}px`);
+      const emojiPickerHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--emoji-picker-height')) || 350;
       if (isKeyboardOpen) {
         footer.style.transition = 'bottom 0.3s ease';
         footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
@@ -1343,24 +1312,26 @@
         chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
         footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
         startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 60px)`;
-        emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
+        emojiPicker.style.bottom = isDesktop ? `calc(56px + 10px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
       } else {
         footer.style.transition = 'none';
         footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
         chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
         footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
-        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 60px)`;
-        emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
+        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + 60px + ${safeAreaBottom}px)`;
+        emojiPicker.style.bottom = isDesktop ? `calc(56px + 10px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
         footer.offsetHeight;
         setTimeout(() => {
           footer.style.transition = 'bottom 0.3s ease';
         }, 0);
       }
-
+      // Esta es la parte importante: si el modo video está activo, el chat no se superpone a la cabecera.
+      // Si el modo video NO está activo, se comporta como siempre.
       if (!document.body.classList.contains('video-mode')) {
-        chatDiv.style.paddingTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
+        chatDiv.style.marginTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
+        chatDiv.style.height = `calc(100vh - ${headerHeight}px - ${safeAreaBottom}px)`;
       }
-
+      
       requestAnimationFrame(() => {
         footer.offsetHeight;
         scrollToBottom();
@@ -1413,6 +1384,12 @@
       div.textContent = text;
       fragment.appendChild(div);
       messagesDiv.appendChild(fragment);
+      scrollToBottom();
+      startChattingBtn.style.display = 'none';
+      if(input.value.trim().length === 0) {
+        nextBtn.style.display = 'flex';
+      }
+      debouncedAdjustLayout();
     }
 
     function showPopup(text) {
@@ -1425,10 +1402,14 @@
             </div>
           </div>`;
         isConnected = false;
+        startChattingBtn.style.display = 'none';
+        nextBtn.style.display = 'flex';
       } else if (text.includes("Connected")) {
         messagesDiv.innerHTML = `
           <div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
         isConnected = true;
+        startChattingBtn.style.display = 'none';
+        nextBtn.style.display = 'flex';
         setTimeout(() => {
           if (isConnected && messagesDiv.innerHTML.includes("Connected")) {
             messagesDiv.innerHTML = '';
@@ -1437,6 +1418,8 @@
       } else {
         messagesDiv.innerHTML = `<div class="popup">${text}</div>`;
         isConnected = false;
+        startChattingBtn.style.display = 'none';
+        nextBtn.style.display = 'flex';
       }
       scrollToBottom();
       debouncedAdjustLayout();
@@ -1444,36 +1427,13 @@
     }
 
     function updateInputState() {
-      const isInputDisabled = !isConnected;
-      input.disabled = isInputDisabled;
-      document.querySelector('footer').classList.toggle('disabled', isInputDisabled);
-      
-      if (isConnected) {
-          sendBtn.style.display = 'none';
-          nextBtn.style.display = 'flex';
-      }
+      input.disabled = !isConnected;
+      // Los botones ahora se manejan con el listener del input
     }
 
+    // --- Lógica para el botón de Video ---
     videoToggleBtn.addEventListener('click', async () => {
-        const videoIcon = videoToggleBtn.querySelector('.video-icon');
-        const chatIcon = videoToggleBtn.querySelector('.chat-icon');
-        
         isVideoEnabled = !isVideoEnabled;
-
-        if (isVideoEnabled) {
-            videoIcon.style.display = 'none';
-            chatIcon.style.display = 'block';
-        } else {
-            videoIcon.style.display = 'block';
-            chatIcon.style.display = 'none';
-        }
-
-        // Show Start Chatting button on mode change and reset chat state
-        startChattingBtn.style.display = 'block';
-        hasStartedChat = false;
-        nextBtn.disabled = true;
-        messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
-        
         videoToggleBtn.classList.toggle('active', isVideoEnabled);
         document.body.classList.toggle('video-mode', isVideoEnabled);
         
@@ -1487,19 +1447,17 @@
                 isVideoEnabled = false;
                 videoToggleBtn.classList.remove('active');
                 document.body.classList.remove('video-mode');
-                videoIcon.style.display = 'block';
-                chatIcon.style.display = 'none';
-                startChattingBtn.style.display = 'block';
             }
         } else {
             stopAllStreams();
         }
         
+        // Avisar al servidor del cambio de modo
         if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
-            ws.close();
         }
         
+        // Re-ajustar el layout
         adjustLayoutForKeyboard();
     });
 
@@ -1518,21 +1476,15 @@
 
     function createPeerConnection() {
         peerConnection = new RTCPeerConnection(stunServers);
+
         peerConnection.onicecandidate = event => {
             if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
             }
         };
-        
+
         peerConnection.ontrack = event => {
-            if (event.streams && event.streams[0]) {
-              remoteVideo.srcObject = event.streams[0];
-            } else {
-                if (!remoteVideo.srcObject) {
-                    remoteVideo.srcObject = new MediaStream();
-                }
-                remoteVideo.srcObject.addTrack(event.track);
-            }
+            remoteVideo.srcObject = event.streams[0];
         };
 
         if (localStream) {
@@ -1546,15 +1498,18 @@
       if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
         ws.close();
       }
-      stopAllStreams();
+      stopAllStreams(); // Detener cualquier video anterior
       messagesDiv.innerHTML = ''; 
       showPopup("🔍 Searching for a stranger...");
       typingIndicator.style.display = "none";
+      nextBtn.style.display = 'flex';
+      sendBtn.style.display = 'none';
       ws = new WebSocket(window.TIKTALK_BACKEND.replace("http", "ws"));
 
       ws.onopen = () => {
         reconnectAttempts = 0;
         updateInputState();
+        // Informar al servidor si queremos video desde el inicio
         ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
       };
 
@@ -1567,9 +1522,13 @@
                 showPopup("🔍 Searching for a stranger...");
               } else if (data.text === "connected") {
                 showPopup("✅ Connected! Say Hi 👋");
-              } else if (data.text === 'initiate_offer') {
+                // Si estamos en modo video, iniciar la conexión WebRTC
                 if (isVideoEnabled) {
-                    if(!peerConnection) createPeerConnection();
+                  createPeerConnection();
+                }
+              } else if (data.text === 'initiate_offer') {
+                // El servidor nos dice que creemos una oferta (solo un cliente lo hará)
+                if (peerConnection) {
                     const offer = await peerConnection.createOffer();
                     await peerConnection.setLocalDescription(offer);
                     ws.send(JSON.stringify({ type: 'offer', offer: offer }));
@@ -1598,9 +1557,10 @@
                 }, 1500);
               }
               break;
+            // Casos para manejar la señalización de WebRTC
             case 'offer':
                 if (isVideoEnabled) {
-                    if (!peerConnection) createPeerConnection();
+                    createPeerConnection();
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
                     const answer = await peerConnection.createAnswer();
                     await peerConnection.setLocalDescription(answer);
@@ -1608,7 +1568,7 @@
                 }
                 break;
             case 'answer':
-                if (peerConnection && peerConnection.signalingState !== "stable") {
+                if (peerConnection) {
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
                 }
                 break;
@@ -1629,12 +1589,11 @@
         }
         typingIndicator.style.display = "none";
         isConnected = false;
-        stopAllStreams();
+        stopAllStreams(); // Limpiar video al cerrar conexión
         updateInputState();
       };
 
-      ws.onerror = (err) => {
-        console.error("WebSocket error:", err);
+      ws.onerror = () => {
         ws.close();
       };
     }
@@ -1646,10 +1605,9 @@
         ws.send(JSON.stringify({ type: "message", text: input.value }));
         addMessage(input.value, "me");
         input.value = "";
+        // Disparar manualmente el evento input para actualizar los botones
+        input.dispatchEvent(new Event('input'));
         
-        sendBtn.style.display = 'none';
-        nextBtn.style.display = 'flex';
-
         emojiPicker.classList.remove('show');
         emojiPicker.style.display = 'none';
         document.getElementById("emojiToggle").textContent = "😊";
@@ -1670,11 +1628,23 @@
     nextBtn.addEventListener("click", handleNext);
     nextBtn.addEventListener("touchstart", handleNext, { passive: false });
 
+    // Lógica para alternar entre Send y Next
     input.addEventListener("input", () => {
-      if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: "typing" }));
-      }
+        if (hasStartedChat) {
+            if (input.value.trim().length > 0) {
+                sendBtn.style.display = 'flex';
+                nextBtn.style.display = 'none';
+            } else {
+                sendBtn.style.display = 'none';
+                nextBtn.style.display = 'flex';
+            }
+        }
+        // Enviar evento de 'typing'
+        if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: "typing" }));
+        }
     });
+
 
     document.body.classList.add('auto-scroll-enabled');
     const observer = new MutationObserver(() => {
@@ -1682,11 +1652,11 @@
     });
     observer.observe(messagesDiv, { childList: true, subtree: true });
 
+    // Initial State
     function setInitialState() {
         startChattingBtn.style.display = 'block';
+        nextBtn.style.display = 'none';
         sendBtn.style.display = 'none';
-        nextBtn.style.display = 'flex';
-        nextBtn.disabled = true;
         messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
         updateInputState();
     }
