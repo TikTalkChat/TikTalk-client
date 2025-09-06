@@ -50,9 +50,6 @@
       box-sizing: border-box;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       border-radius: 0 0 16px 16px;
-      /* MODIFIED: Added transition for smooth shrinking */
-      transition: height 0.3s ease, padding 0.3s ease;
-      height: 76px;
     }
     body.dark-mode header {
       background: #10161d;
@@ -67,8 +64,6 @@
       height: 60px;
       width: auto;
       display: block;
-      /* MODIFIED: Added transition for smooth shrinking */
-      transition: height 0.3s ease;
     }
     .chat-wrapper {
       position: relative;
@@ -84,9 +79,8 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       contain: strict;
-      padding: calc(76px + env(safe-area-inset-top)) 15px calc(70px + env(safe-area-inset-bottom));
+      padding: calc(70px + env(safe-area-inset-top)) 15px calc(70px + env(safe-area-inset-bottom));
       -webkit-overflow-scrolling: touch;
-      transition: padding-top 0.3s ease;
     }
     #messages {
       display: flex;
@@ -221,19 +215,13 @@
       max-height: 40px;
       overflow: hidden !important;
       box-sizing: border-box;
-      /* MODIFIED: Added background and radius for container look */
-      background: #f0f2f5 !important;
-      border-radius: 20px;
-    }
-    body.dark-mode .inputWrapper {
-        background: #2d3748 !important;
+      background: transparent !important;
     }
     textarea {
       width: 100%;
       resize: none;
       padding: 10px 18px 10px 12px;
-      /* MODIFIED: Removed border */
-      border: none !important;
+      border: 1px solid #ccc !important;
       border-radius: 20px;
       font-size: 14px;
       outline: none;
@@ -250,8 +238,7 @@
       touch-action: manipulation;
     }
     body.dark-mode textarea {
-      /* MODIFIED: Removed border */
-      border: none !important;
+      border: 1px solid #4a5568 !important;
       background: transparent !important;
       color: #e5e7eb;
     }
@@ -803,8 +790,7 @@
     }
     .start-chatting-btn {
       position: fixed;
-      /* MODIFIED: Adjusted bottom value */
-      bottom: calc(87px + env(safe-area-inset-bottom));
+      bottom: calc(130px + env(safe-area-inset-bottom));
       left: 50%;
       transform: translateX(-50%);
       padding: 12px 24px;
@@ -870,14 +856,15 @@
       display: none;
       flex-direction: column;
       position: absolute;
-      top: calc(76px + env(safe-area-inset-top)); 
+      /* MODIFIED: Position below header */
+      top: calc(70px + env(safe-area-inset-top)); 
       left: 0;
       right: 0;
       width: 100%;
-      height: calc(50vh - 76px - env(safe-area-inset-top)); 
+      /* MODIFIED: Adjust height to fit below header */
+      height: calc(50vh - 70px - env(safe-area-inset-top)); 
       z-index: 100;
       background-color: #000;
-      transition: top 0.3s ease, height 0.3s ease;
     }
     body.video-mode #video-container {
       display: flex;
@@ -893,28 +880,9 @@
     #remoteVideo {
         transform: scaleX(-1);
     }
-    
     body.video-mode #chat {
       padding-top: calc(50vh + 15px);
     }
-
-    /* === NEW STYLES FOR VIDEO MODE HEADER === */
-    body.video-mode header {
-        height: 44px;
-        padding-top: 4px;
-        padding-bottom: 4px;
-    }
-    body.video-mode header svg.logo {
-        height: 36px;
-    }
-    body.video-mode #chat {
-        padding-top: calc(44px + env(safe-area-inset-top));
-    }
-    body.video-mode #video-container {
-        top: calc(44px + env(safe-area-inset-top));
-        height: calc(50vh - 44px - env(safe-area-inset-top));
-    }
-    
     #videoToggleBtn.active {
        filter: drop-shadow(0 0 4px #007bff);
     }
@@ -1278,7 +1246,12 @@
       }
     }
 
+    // ==========================================================
+    // ===>>> THE IMPORTANT CHANGE IS IN THE TWO LINES BELOW <<<===
+    // ==========================================================
     window.TIKTALK_BACKEND = "https://tiktalkchat-backend-v2.onrender.com";
+    const wsUrl = window.TIKTALK_BACKEND.replace("https", "wss");
+
     const messagesDiv = document.getElementById("messages");
     const input = document.getElementById("messageInput");
     const typingIndicator = document.getElementById("typingIndicator");
@@ -1298,7 +1271,7 @@
       const startChattingBtn = document.getElementById("startChattingBtn");
       const nextBtn = document.getElementById("nextBtn");
       const emojiPicker = document.getElementById("emojiPicker");
-      const headerHeight = header.offsetHeight || 76;
+      const headerHeight = header.offsetHeight || 70;
       let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)') || '0', 10);
       let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
       const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
@@ -1338,7 +1311,7 @@
         footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
         chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
         footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
-        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 25px)`; // MODIFIED
+        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 60px)`;
         if (emojiPicker.classList.contains('show')) {
           emojiPicker.classList.remove('show');
           emojiPicker.style.display = 'none';
@@ -1346,21 +1319,18 @@
           document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
         }
       } else if (isEmojiPickerOpen) {
-        // MODIFIED: Added isDesktop condition to prevent footer moving up
-        if (!isDesktop) {
-            footer.style.transition = 'bottom 0.3s ease';
-            footer.style.bottom = `calc(${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
-            chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
-            footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
-            startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 25px)`; // MODIFIED
-        }
+        footer.style.transition = 'bottom 0.3s ease';
+        footer.style.bottom = `calc(${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+        chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+        footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 60px)`;
         emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
       } else {
         footer.style.transition = 'none';
         footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
         chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
         footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
-        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 25px)`; // MODIFIED
+        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 60px)`;
         emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
         footer.offsetHeight;
         setTimeout(() => {
@@ -1369,7 +1339,8 @@
       }
 
       if (!document.body.classList.contains('video-mode')) {
-        chatDiv.style.paddingTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
+        chatDiv.style.marginTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
+        chatDiv.style.height = `calc(100vh - ${headerHeight}px - ${safeAreaBottom}px)`;
       }
 
       requestAnimationFrame(() => {
@@ -1535,6 +1506,7 @@
             }
         };
         
+        // MODIFIED: More robust ontrack handler
         peerConnection.ontrack = event => {
             if (event.streams && event.streams[0]) {
               remoteVideo.srcObject = event.streams[0];
@@ -1561,7 +1533,7 @@
       messagesDiv.innerHTML = ''; 
       showPopup("🔍 Searching for a stranger...");
       typingIndicator.style.display = "none";
-      ws = new WebSocket(window.TIKTALK_BACKEND.replace("http", "ws"));
+      ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
         reconnectAttempts = 0;
@@ -1625,7 +1597,7 @@
                 break;
             case 'candidate':
                 if (peerConnection) {
-                    await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                    await peerConnection.addIceCandidate(new RTCIcecandidate(data.candidate));
                 }
                 break;
           }
