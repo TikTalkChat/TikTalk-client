@@ -856,7 +856,7 @@
     #video-container {
       display: none;
       flex-direction: column;
-      position: absolute;
+      position: fixed;
       top: calc(76px + env(safe-area-inset-top));
       left: 0;
       right: 0;
@@ -865,19 +865,19 @@
       height: calc(100% - 76px - env(safe-area-inset-top));
       z-index: 100;
       background-color: #000;
-      transition: top 0.3s ease, bottom 0.3s ease;
+      overflow: hidden;
     }
     body.video-mode #video-container {
       display: flex !important;
       visibility: visible !important;
+      opacity: 1 !important;
     }
     #video-container video {
       width: 100%;
       height: 50%;
-      object-fit: cover;
+      object-fit: contain;
       background: #000;
-      transform: scaleX(-1);
-      display: block;
+      display: block !important;
       z-index: 101;
     }
     #video-container video#localVideo {
@@ -918,6 +918,7 @@
       max-width: 300px;
       border-radius: 4px;
       display: none;
+      white-space: pre-wrap;
     }
     body.video-mode #debug-overlay {
       display: block;
@@ -987,7 +988,7 @@
   </header>
   <div class="chat-wrapper">
     <div id="video-container">
-      <video id="remoteVideo" playsinline autoplay></video>
+      <video id="remoteVideo" playsinline autoplay muted></video>
       <video id="localVideo" playsinline autoplay muted></video>
     </div>
     <main id="chat">
@@ -1112,7 +1113,7 @@
 
         const { videoDeviceId, audioDeviceId } = await selectMediaDevices();
         const constraints = {
-          video: videoDeviceId ? { deviceId: { exact: videoDeviceId }, facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } } : false,
+          video: videoDeviceId ? { deviceId: { exact: videoDeviceId }, facingMode: 'user', width: { ideal: 640 }, height: { ideal: 360 } } : false,
           audio: audioDeviceId ? { deviceId: { exact: audioDeviceId }, echoCancellation: true, noiseSuppression: true, autoGainControl: true } : false
         };
 
@@ -1124,16 +1125,20 @@
         });
 
         localVideo.srcObject = localStream;
-        await localVideo.play().catch(error => {
-          console.error('Initial local video play failed:', error);
-          throw error;
-        });
-        updateDebugOverlay('Local video playing');
+        await localVideo.play();
+        updateDebugOverlay(`Local video playing\nNetwork state: ${localVideo.networkState}\nReady state: ${localVideo.readyState}`);
         console.log('Local video playing');
+        localVideo.addEventListener('loadedmetadata', () => {
+          updateDebugOverlay(`Local video metadata loaded\nWidth: ${localVideo.videoWidth}\nHeight: ${localVideo.videoHeight}`);
+        });
+        localVideo.addEventListener('error', () => {
+          updateDebugOverlay(`Local video error: ${localVideo.error?.message || 'Unknown error'}`);
+          showPopup('❌ Local video playback error. Please check camera.');
+        });
         return true;
       } catch (error) {
         console.error('Error initializing local stream:', error);
-        updateDebugOverlay(`Local stream error: ${error.name}`);
+        updateDebugOverlay(`Local stream error: ${error.name}\n${error.message}`);
         let errorMessage = '❌ Failed to access camera/microphone. ';
         if (error.name === 'NotAllowedError') errorMessage += 'Please grant permissions.';
         else if (error.name === 'NotFoundError') errorMessage += 'No camera or microphone found.';
@@ -1143,18 +1148,19 @@
       }
     }
 
-    function retryVideoPlayback(videoElement, maxRetries = 3, interval = 1000) {
+    function retryVideoPlayback(videoElement, maxRetries = 5, interval = 1000) {
       let retries = 0;
       function attemptPlay() {
-        videoElement.play().catch(error => {
+        videoElement.play().then(() => {
+          updateDebugOverlay(`${videoElement.id} playing\nNetwork state: ${videoElement.networkState}\nReady state: ${videoElement.readyState}`);
+        }).catch(error => {
           console.error(`Error playing ${videoElement.id}:`, error);
+          updateDebugOverlay(`${videoElement.id} play failed: ${error.message}\nRetry ${retries + 1}/${maxRetries}`);
           if (retries < maxRetries) {
             retries++;
-            updateDebugOverlay(`${videoElement.id} play failed, retrying (${retries}/${maxRetries})`);
             setTimeout(attemptPlay, interval);
           } else {
-            updateDebugOverlay(`${videoElement.id} play failed after ${maxRetries} retries`);
-            showPopup(`❌ Failed to play ${videoElement.id}. Please check device or refresh.`);
+            showPopup(`❌ Failed to play ${videoElement.id} after ${maxRetries} retries. Please refresh.`);
           }
         });
       }
@@ -1171,6 +1177,7 @@
       initializeEmojiPicker();
       adjustLayoutForKeyboard();
       messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
+      updateDebugOverlay('Page loaded');
     });
 
     function initializeEmojiPicker() {
@@ -1336,14 +1343,27 @@
           if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
             console.log('Sent ICE candidate:', event.candidate);
+            updateDebugOverlay('Sent ICE candidate');
           }
         };
         peerConnection.ontrack = event => {
           console.log('Received remote track:', event.track.kind, { enabled: event.track.enabled, readyState: event.track.readyState });
           updateDebugOverlay(`Remote track received: ${event.track.kind}\nEnabled: ${event.track.enabled}\nReadyState: ${event.track.readyState}`);
-          if (!remoteVideo.srcObject) remoteVideo.srcObject = new MediaStream();
-          remoteVideo.srcObject.addTrack(event.track);
+          if (!remoteVideo.srcObject) {
+            remoteVideo.srcObject = new MediaStream();
+          }
+          event.streams[0].getTracks().forEach(track => {
+            remoteVideo.srcObject.addTrack(track);
+            updateDebugOverlay(`Added track to remoteVideo: ${track.kind}`);
+          });
           retryVideoPlayback(remoteVideo);
+          remoteVideo.addEventListener('loadedmetadata', () => {
+            updateDebugOverlay(`Remote video metadata loaded\nWidth: ${remoteVideo.videoWidth}\nHeight: ${remoteVideo.videoHeight}`);
+          });
+          remoteVideo.addEventListener('error', () => {
+            updateDebugOverlay(`Remote video error: ${remoteVideo.error?.message || 'Unknown error'}`);
+            showPopup('❌ Remote video playback error. Please check connection.');
+          });
         };
         peerConnection.oniceconnectionstatechange = () => {
           console.log('ICE connection state:', peerConnection.iceConnectionState);
@@ -1382,7 +1402,7 @@
           ws.close();
           updateDebugOverlay('WebSocket connection timeout');
         }
-      }, 10000);
+      }, 15000);
 
       ws.onopen = () => {
         clearTimeout(signalingTimeout);
@@ -1410,6 +1430,9 @@
                 if (isVideoEnabled && !peerConnection && localStream) {
                   createPeerConnection();
                   retryVideoPlayback(localVideo);
+                }
+                if (isVideoEnabled) {
+                  retryVideoPlayback(remoteVideo);
                 }
               } else if (data.text === 'initiate_offer') {
                 if (isVideoEnabled && localStream) {
