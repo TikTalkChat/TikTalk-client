@@ -861,7 +861,7 @@
       background: #555;
     }
     
-    /* === FINAL VIDEO STYLES (REVERTED) === */
+    /* === FINAL VIDEO STYLES === */
     #video-container {
       display: none;
       flex-direction: column;
@@ -885,7 +885,6 @@
       transform: scaleX(-1);
     }
     
-    /* MODIFIED: Hides chat area and footer note in video mode */
     body.video-mode #chat,
     body.video-mode .footerNote {
       display: none;
@@ -911,9 +910,38 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
+
+    /* ADDED FOR ON-SCREEN CONSOLE */
+    #on-screen-console {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 25%;
+      background: rgba(0, 0, 0, 0.85);
+      color: #00ff00;
+      font-family: monospace;
+      font-size: 11px;
+      padding: 5px;
+      overflow-y: scroll;
+      z-index: 99999;
+      border-top: 2px solid #555;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    #on-screen-console .log-entry {
+        padding: 2px 4px;
+        border-radius: 3px;
+    }
+    #on-screen-console .log-entry:nth-child(odd) {
+        background: rgba(255,255,255,0.05);
+    }
   </style>
 </head>
 <body>
+  <div id="on-screen-console"></div>
+
   <header>
     <div class="left">
       <svg class="logo" width="auto" height="60" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TikTalk animated logo">
@@ -1013,6 +1041,40 @@
   <div id="emojiPicker" aria-hidden="true"></div>
   <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
   <script>
+    // ADDED FOR ON-SCREEN CONSOLE
+    (function () {
+        const consoleDiv = document.getElementById('on-screen-console');
+        if (!consoleDiv) return;
+        const oldLog = console.log;
+        console.log = function (message, ...args) {
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            let fullMessage = (typeof message ==='object' ? JSON.stringify(message, null, 2) : message);
+            if(args.length > 0) {
+                fullMessage += ' ' + args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
+            }
+            logEntry.textContent = `> ${fullMessage}`;
+            consoleDiv.appendChild(logEntry);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight; 
+            oldLog.apply(console, arguments);
+        };
+        const oldError = console.error;
+        console.error = function (message, ...args) {
+             const logEntry = document.createElement('div');
+             logEntry.className = 'log-entry';
+             logEntry.style.color = '#ff4d4d';
+             let fullMessage = (typeof message ==='object' ? JSON.stringify(message, null, 2) : message);
+             if(args.length > 0) {
+                fullMessage += ' ' + args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
+            }
+             logEntry.textContent = `> ERROR: ${fullMessage}`;
+             consoleDiv.appendChild(logEntry);
+             consoleDiv.scrollTop = consoleDiv.scrollHeight;
+             oldError.apply(console, arguments);
+        }
+    })();
+
+
     let localStream;
     let peerConnection;
     let isVideoEnabled = false;
@@ -1025,7 +1087,6 @@
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' }
-        // For better reliability, you might need a TURN server here as well
       ]
     };
 
@@ -1483,7 +1544,7 @@
                 console.log("[DEBUG] Getting user media...");
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 localVideo.srcObject = localStream;
-                console.log("[DEBUG] User media obtained.", localStream);
+                console.log("[DEBUG] User media obtained.");
             } catch (error) {
                 console.error("Error accessing media devices.", error);
                 alert("Could not access camera/microphone. Please check permissions.");
@@ -1547,7 +1608,7 @@
         };
 
         if (localStream) {
-            console.log("[DEBUG] Local tracks added to Peer Connection.");
+            console.log("[DEBUG] Adding local tracks to Peer Connection.");
             localStream.getTracks().forEach(track => {
                 peerConnection.addTrack(track, localStream);
             });
@@ -1594,7 +1655,7 @@
                 if(isConnected) {
                   showPopup("❌ Stranger disconnected");
                   isConnected = false;
-                  stopAllStreams(false); // Keep local video on stranger disconnect
+                  stopAllStreams(false); 
                 }
               } else if (data.text === "timeout") {
                  showPopup("No one was found. Click Next Button");
@@ -1650,7 +1711,7 @@
         }
         if (typingIndicator) typingIndicator.style.display = "none";
         isConnected = false;
-        stopAllStreams(false); // Keep local video on connection close
+        stopAllStreams(false);
         updateInputState();
       };
 
