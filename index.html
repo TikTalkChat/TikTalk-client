@@ -1056,7 +1056,7 @@
         const audioDevices = devices.filter(device => device.kind === 'audioinput');
         console.log('Available devices:', { video: videoDevices, audio: audioDevices });
         if (videoDevices.length === 0) {
-          showPopup('⚠️ No camera detected. Video may not work.');
+          showPopup('⚠️ No camera detected. Continuing with audio only.');
         }
         if (audioDevices.length === 0) {
           showPopup('⚠️ No microphone detected. Audio may not work.');
@@ -1077,6 +1077,7 @@
       if (localStream) {
         localStream.getTracks().forEach(track => track.stop());
         localStream = null;
+        localVideo.srcObject = null;
       }
       try {
         const hasPermissions = await checkPermissions();
@@ -1095,7 +1096,8 @@
         });
 
         localVideo.srcObject = localStream;
-        localVideo.play().catch(error => console.error('Error playing local video:', error));
+        await localVideo.play();
+        console.log('Local video playing');
         return true;
       } catch (error) {
         console.error('Error initializing local stream:', error);
@@ -1117,6 +1119,7 @@
       }
       initializeEmojiPicker();
       adjustLayoutForKeyboard();
+      messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
     });
 
     function initializeEmojiPicker() {
@@ -1256,12 +1259,12 @@
       if (stopLocal && localStream) {
         localStream.getTracks().forEach(track => track.stop());
         localStream = null;
+        localVideo.srcObject = null;
       }
       if (peerConnection) {
         peerConnection.close();
         peerConnection = null;
       }
-      if (stopLocal) localVideo.srcObject = null;
       remoteVideo.srcObject = null;
     }
 
@@ -1279,12 +1282,13 @@
           }
         };
         peerConnection.ontrack = event => {
-          console.log('Received remote track:', event.track.kind);
+          console.log('Received remote track:', event.track.kind, { enabled: event.track.enabled, readyState: event.track.readyState });
           if (!remoteVideo.srcObject) remoteVideo.srcObject = new MediaStream();
           remoteVideo.srcObject.addTrack(event.track);
           remoteVideo.play().catch(error => {
             console.error('Error playing remote video:', error);
-            showPopup('❌ Error playing remote video.');
+            showPopup('❌ Error playing remote video. Retrying...');
+            setTimeout(() => remoteVideo.play(), 1000);
           });
         };
         peerConnection.oniceconnectionstatechange = () => {
@@ -1325,7 +1329,13 @@
         clearTimeout(signalingTimeout);
         reconnectAttempts = 0;
         ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
-        if (isVideoEnabled && localStream) createPeerConnection();
+        if (isVideoEnabled && localStream) {
+          createPeerConnection();
+          localVideo.play().catch(error => {
+            console.error('Error replaying local video:', error);
+            showPopup('❌ Error playing local video. Please check permissions.');
+          });
+        }
       };
 
       ws.onmessage = async (event) => {
@@ -1338,7 +1348,10 @@
               else if (data.text === 'connected') {
                 clearTimeout(signalingTimeout);
                 showPopup('✅ Connected! Say Hi 👋');
-                if (isVideoEnabled && !peerConnection && localStream) createPeerConnection();
+                if (isVideoEnabled && !peerConnection && localStream) {
+                  createPeerConnection();
+                  localVideo.play().catch(error => console.error('Error replaying local video:', error));
+                }
               } else if (data.text === 'initiate_offer') {
                 if (isVideoEnabled && localStream) {
                   if (!peerConnection) createPeerConnection();
@@ -1442,11 +1455,17 @@
         chatIcon.style.display = 'block';
         videoToggleBtn.classList.add('active');
         document.body.classList.add('video-mode');
+        document.getElementById('video-container').style.display = 'flex';
+        localVideo.play().catch(error => {
+          console.error('Error playing local video after toggle:', error);
+          showPopup('❌ Error playing local video. Please check permissions.');
+        });
       } else {
         videoIcon.style.display = 'block';
         chatIcon.style.display = 'none';
         videoToggleBtn.classList.remove('active');
         document.body.classList.remove('video-mode');
+        document.getElementById('video-container').style.display = 'none';
         stopAllStreams();
         startChattingBtn.style.display = 'block';
         hasStartedChat = false;
@@ -1473,11 +1492,18 @@
         if (!streamInitialized) {
           isVideoEnabled = false;
           document.body.classList.remove('video-mode');
+          document.getElementById('video-container').style.display = 'none';
           videoToggleBtn.querySelector('.video-icon').style.display = 'block';
           videoToggleBtn.querySelector('.chat-icon').style.display = 'none';
           startChattingBtn.style.display = 'block';
+          showPopup('❌ Failed to start video. Please check permissions or devices.');
           return;
         }
+        document.getElementById('video-container').style.display = 'flex';
+        localVideo.play().catch(error => {
+          console.error('Error playing local video on start:', error);
+          showPopup('❌ Error playing local video. Please check permissions.');
+        });
       }
 
       connectStranger();
@@ -1497,6 +1523,7 @@
       if (!nextBtn.disabled) {
         isConnected = false;
         messagesDiv.innerHTML = '';
+        stopAllStreams();
         connectStranger();
       }
     });
@@ -1532,6 +1559,7 @@
       });
     }
 
+    const debouncedAdjustLayout = debounce(adjustLayoutForKeyboard, 100);
     window.addEventListener('resize', debouncedAdjustLayout);
     window.TIKTALK_BACKEND = 'https://tiktalkchat-backend-v2.onrender.com';
   </script>
