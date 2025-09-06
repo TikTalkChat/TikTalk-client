@@ -533,7 +533,7 @@
         width: 24px;
         height: 24px;
         position: absolute;
-        transition: opacity: 0.2s;
+        transition: opacity 0.2s;
     }
     
     .share-btn {
@@ -861,7 +861,7 @@
       background: #555;
     }
     
-    /* === FINAL VIDEO STYLES === */
+    /* === FINAL VIDEO STYLES (REVERTED WITH FIXES) === */
     #video-container {
       display: none;
       flex-direction: column;
@@ -880,12 +880,13 @@
     }
     #video-container video {
       width: 100%;
-      height: 50%; 
+      height: 50%;
       object-fit: cover;
+      transform: scaleX(-1);
+      background: #000; /* Fallback background for video */
     }
-    /* FIX: Only mirror the local video, not the remote one */
-    #localVideo {
-        transform: scaleX(-1);
+    #video-container video#localVideo {
+      border-top: 2px solid #fff; /* Visual separator between local and remote video */
     }
     
     body.video-mode #chat,
@@ -913,38 +914,9 @@
       opacity: 0.5;
       cursor: not-allowed;
     }
-
-    /* ADDED FOR ON-SCREEN CONSOLE */
-    #on-screen-console {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 25%;
-      background: rgba(0, 0, 0, 0.85);
-      color: #00ff00;
-      font-family: monospace;
-      font-size: 11px;
-      padding: 5px;
-      overflow-y: scroll;
-      z-index: 99999;
-      border-top: 2px solid #555;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    #on-screen-console .log-entry {
-        padding: 2px 4px;
-        border-radius: 3px;
-    }
-    #on-screen-console .log-entry:nth-child(odd) {
-        background: rgba(255,255,255,0.05);
-    }
   </style>
 </head>
 <body>
-  <div id="on-screen-console"></div>
-
   <header>
     <div class="left">
       <svg class="logo" width="auto" height="60" viewBox="0 0 420 140" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TikTalk animated logo">
@@ -1007,7 +979,7 @@
   </header>
   <div class="chat-wrapper">
     <div id="video-container">
-        <video id="remoteVideo" playsinline autoplay muted></video>
+        <video id="remoteVideo" playsinline autoplay></video>
         <video id="localVideo" playsinline autoplay muted></video>
     </div>
     <main id="chat">
@@ -1044,40 +1016,6 @@
   <div id="emojiPicker" aria-hidden="true"></div>
   <script src="https://cdn.jsdelivr.net/npm/emoji-mart@latest/dist/browser.js"></script>
   <script>
-    // ADDED FOR ON-SCREEN CONSOLE
-    (function () {
-        const consoleDiv = document.getElementById('on-screen-console');
-        if (!consoleDiv) return;
-        const oldLog = console.log;
-        console.log = function (message, ...args) {
-            const logEntry = document.createElement('div');
-            logEntry.className = 'log-entry';
-            let fullMessage = (typeof message ==='object' ? JSON.stringify(message, null, 2) : message);
-            if(args.length > 0) {
-                fullMessage += ' ' + args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
-            }
-            logEntry.textContent = `> ${fullMessage}`;
-            consoleDiv.appendChild(logEntry);
-            consoleDiv.scrollTop = consoleDiv.scrollHeight; 
-            oldLog.apply(console, arguments);
-        };
-        const oldError = console.error;
-        console.error = function (message, ...args) {
-             const logEntry = document.createElement('div');
-             logEntry.className = 'log-entry';
-             logEntry.style.color = '#ff4d4d';
-             let fullMessage = (typeof message ==='object' ? JSON.stringify(message, null, 2) : message);
-             if(args.length > 0) {
-                fullMessage += ' ' + args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg).join(' ');
-            }
-             logEntry.textContent = `> ERROR: ${fullMessage}`;
-             consoleDiv.appendChild(logEntry);
-             consoleDiv.scrollTop = consoleDiv.scrollHeight;
-             oldError.apply(console, arguments);
-        }
-    })();
-
-
     let localStream;
     let peerConnection;
     let isVideoEnabled = false;
@@ -1089,7 +1027,12 @@
     const stunServers = {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' }
+        { urls: 'stun:stun1.l.google.com:19302' },
+        {
+          urls: 'turn:turn.example.com:3478', // Replace with your TURN server
+          username: 'your-username', // Replace with your TURN server credentials
+          credential: 'your-credential' // Replace with your TURN server credentials
+        }
       ]
     };
 
@@ -1099,6 +1042,25 @@
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(this, args), wait);
       };
+    }
+
+    async function diagnoseMediaStream() {
+      if (!localStream) {
+        console.warn("No local stream available for diagnostics.");
+        return;
+      }
+      const videoTracks = localStream.getVideoTracks();
+      const audioTracks = localStream.getAudioTracks();
+      console.log("Video tracks:", videoTracks.length, videoTracks.map(t => ({ enabled: t.enabled, readyState: t.readyState })));
+      console.log("Audio tracks:", audioTracks.length, audioTracks.map(t => ({ enabled: t.enabled, readyState: t.readyState })));
+      
+      if (videoTracks.length === 0 || audioTracks.length === 0) {
+        showPopup("⚠️ Camera or microphone not detected. Please check your devices.");
+      } else if (!videoTracks[0].enabled || videoTracks[0].readyState !== 'live') {
+        showPopup("⚠️ Video track is not active. Please check camera settings.");
+      } else if (!audioTracks[0].enabled || audioTracks[0].readyState !== 'live') {
+        showPopup("⚠️ Audio track is not active. Please check microphone settings.");
+      }
     }
 
     document.addEventListener("DOMContentLoaded", () => {
@@ -1354,10 +1316,6 @@
       const startChattingBtn = document.getElementById("startChattingBtn");
       const nextBtn = document.getElementById("nextBtn");
       const emojiPicker = document.getElementById("emojiPicker");
-      
-      const consoleDiv = document.getElementById('on-screen-console');
-      const consoleHeight = consoleDiv ? consoleDiv.offsetHeight : 0;
-
       const headerHeight = header.offsetHeight || 76;
       let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)') || '0', 10);
       let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
@@ -1396,7 +1354,7 @@
         footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
         if(chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
         footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
-        startChattingBtn.style.bottom = `calc(${consoleHeight}px + ${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 35px)`;
+        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 35px)`;
         if (emojiPicker.classList.contains('show')) {
           emojiPicker.classList.remove('show');
           emojiPicker.style.display = 'none';
@@ -1409,7 +1367,7 @@
             footer.style.bottom = `calc(${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
             if(chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
             footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
-            startChattingBtn.style.bottom = `calc(${consoleHeight}px + ${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 35px)`;
+            startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 35px)`;
         }
         emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
       } else {
@@ -1417,7 +1375,7 @@
         footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
         if(chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
         footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
-        startChattingBtn.style.bottom = `calc(${consoleHeight}px + 95px + ${safeAreaBottom}px)`;
+        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 35px)`;
         emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
         footer.offsetHeight;
         setTimeout(() => {
@@ -1484,8 +1442,8 @@
     }
 
     function showPopup(text) {
-        const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
-        if (!targetDiv) return;
+      const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
+      if (!targetDiv) return;
 
       if (text.includes("Searching")) {
         targetDiv.innerHTML = `
@@ -1502,7 +1460,7 @@
         isConnected = true;
         setTimeout(() => {
           if (isConnected && targetDiv.innerHTML.includes("Connected")) {
-            targetDiv.innerHTML = document.body.classList.contains('video-mode') ? '' : ''; // Clear popup
+            targetDiv.innerHTML = document.body.classList.contains('video-mode') ? '' : '';
           }
         }, 3000);
       } else {
@@ -1526,205 +1484,255 @@
     }
 
     videoToggleBtn.addEventListener('click', async () => {
-        const videoIcon = videoToggleBtn.querySelector('.video-icon');
-        const chatIcon = videoToggleBtn.querySelector('.chat-icon');
-        
-        isVideoEnabled = !isVideoEnabled;
+      const videoIcon = videoToggleBtn.querySelector('.video-icon');
+      const chatIcon = videoToggleBtn.querySelector('.chat-icon');
+      
+      isVideoEnabled = !isVideoEnabled;
 
-        if (isVideoEnabled) {
-            videoIcon.style.display = 'none';
-            chatIcon.style.display = 'block';
-        } else {
-            videoIcon.style.display = 'block';
-            chatIcon.style.display = 'none';
-        }
+      if (isVideoEnabled) {
+          videoIcon.style.display = 'none';
+          chatIcon.style.display = 'block';
+          try {
+              // Check for camera and microphone permissions
+              const permissions = await navigator.permissions.query({ name: 'camera' });
+              const micPermissions = await navigator.permissions.query({ name: 'microphone' });
+              if (permissions.state !== 'granted' || micPermissions.state !== 'granted') {
+                  alert("Camera or microphone permission is required. Please allow access in your browser settings.");
+                  isVideoEnabled = false;
+                  document.body.classList.remove('video-mode');
+                  videoIcon.style.display = 'block';
+                  chatIcon.style.display = 'none';
+                  startChattingBtn.style.display = 'block';
+                  return;
+              }
 
-        startChattingBtn.style.display = 'block';
-        hasStartedChat = false;
-        nextBtn.disabled = true;
-        messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
-        
-        document.body.classList.toggle('video-mode', isVideoEnabled);
-        
-        if (isVideoEnabled) {
-            try {
-                console.log("[DEBUG] Getting user media...");
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                localVideo.srcObject = localStream;
-                console.log("[DEBUG] User media obtained.");
-            } catch (error) {
-                console.error("Error accessing media devices.", error);
-                alert("Could not access camera/microphone. Please check permissions.");
-                isVideoEnabled = false;
-                document.body.classList.remove('video-mode');
-                videoIcon.style.display = 'block';
-                chatIcon.style.display = 'none';
-                startChattingBtn.style.display = 'block';
-            }
-        } else {
-            stopAllStreams();
-        }
-        
-        isConnected = false;
-        if (ws && ws.readyState === WebSocket.OPEN) {
-            ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
-            ws.close();
-        }
-        
-        adjustLayoutForKeyboard();
+              // Request media stream with specific constraints
+              localStream = await navigator.mediaDevices.getUserMedia({
+                  video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+                  audio: true
+              });
+              localVideo.srcObject = localStream;
+              diagnoseMediaStream();
+              videoToggleBtn.classList.add('active');
+          } catch (error) {
+              console.error("Error accessing media devices:", error.name, error.message);
+              let errorMessage = "Could not access camera/microphone. ";
+              if (error.name === 'NotAllowedError') {
+                  errorMessage += "Please grant camera and microphone permissions.";
+              } else if (error.name === 'NotFoundError') {
+                  errorMessage += "No camera or microphone found.";
+              } else {
+                  errorMessage += "An unexpected error occurred.";
+              }
+              alert(errorMessage);
+              isVideoEnabled = false;
+              document.body.classList.remove('video-mode');
+              videoIcon.style.display = 'block';
+              chatIcon.style.display = 'none';
+              startChattingBtn.style.display = 'block';
+          }
+      } else {
+          videoIcon.style.display = 'block';
+          chatIcon.style.display = 'none';
+          videoToggleBtn.classList.remove('active');
+          stopAllStreams();
+          startChattingBtn.style.display = 'block';
+          hasStartedChat = false;
+          nextBtn.disabled = true;
+          messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
+      }
+
+      document.body.classList.toggle('video-mode', isVideoEnabled);
+      
+      if (isVideoEnabled && ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
+      } else if (ws && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
+          ws.close();
+      }
+      
+      adjustLayoutForKeyboard();
     });
 
     function stopAllStreams(stopLocal = true) {
-        console.log(`[DEBUG] stopAllStreams called. Clearing remote video. stopLocal=${stopLocal}`);
-        if (stopLocal && localStream) {
-            localStream.getTracks().forEach(track => track.stop());
-            localStream = null;
-        }
-        if (peerConnection) {
-            peerConnection.close();
-            peerConnection = null;
-        }
-        if (stopLocal) {
-            localVideo.srcObject = null;
-        }
-        remoteVideo.srcObject = null;
+      if (stopLocal && localStream) {
+          localStream.getTracks().forEach(track => track.stop());
+          localStream = null;
+      }
+      if (peerConnection) {
+          peerConnection.close();
+          peerConnection = null;
+      }
+      if (stopLocal) {
+          localVideo.srcObject = null;
+      }
+      remoteVideo.srcObject = null;
     }
 
     function createPeerConnection() {
-        console.log("[DEBUG] Creating Peer Connection.");
-        peerConnection = new RTCPeerConnection(stunServers);
-        
-        peerConnection.onicecandidate = event => {
-            if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
-                console.log("[DEBUG] Sending ICE candidate to peer.");
-                ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
-            }
-        };
-        
-        peerConnection.ontrack = event => {
-            console.log("[DEBUG] Remote stream received!");
-            if (event.streams && event.streams[0]) {
-              remoteVideo.srcObject = event.streams[0];
-            } else {
-                if (!remoteVideo.srcObject) {
-                    remoteVideo.srcObject = new MediaStream();
-                }
-                remoteVideo.srcObject.addTrack(event.track);
-            }
-            console.log('[DEBUG] remoteVideo.srcObject is now set.', remoteVideo.srcObject);
-        };
+      try {
+          peerConnection = new RTCPeerConnection(stunServers);
+          peerConnection.onicecandidate = event => {
+              if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
+                  ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
+                  console.log("Sent ICE candidate:", event.candidate);
+              }
+          };
+          
+          peerConnection.ontrack = event => {
+              console.log("Received remote track:", event.track.kind);
+              if (event.streams && event.streams[0]) {
+                  remoteVideo.srcObject = event.streams[0];
+                  console.log("Set remote video stream:", event.streams[0]);
+              } else {
+                  if (!remoteVideo.srcObject) {
+                      remoteVideo.srcObject = new MediaStream();
+                  }
+                  remoteVideo.srcObject.addTrack(event.track);
+                  console.log("Added remote track to stream:", event.track);
+              }
+          };
 
-        if (localStream) {
-            console.log("[DEBUG] Adding local tracks to Peer Connection.");
-            localStream.getTracks().forEach(track => {
-                peerConnection.addTrack(track, localStream);
-            });
-        }
+          peerConnection.oniceconnectionstatechange = () => {
+              console.log("ICE connection state:", peerConnection.iceConnectionState);
+              if (peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') {
+                  showPopup("❌ Video connection lost. Reconnecting...");
+                  stopAllStreams(false);
+                  connectStranger();
+              }
+          };
+
+          if (localStream) {
+              localStream.getTracks().forEach(track => {
+                  peerConnection.addTrack(track, localStream);
+                  console.log("Added local track:", track.kind);
+              });
+          } else {
+              console.warn("No local stream available to add tracks.");
+          }
+      } catch (error) {
+          console.error("Error creating PeerConnection:", error);
+          showPopup("❌ Failed to establish video connection.");
+      }
     }
     
     function connectStranger() {
       if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
         ws.close();
       }
-      stopAllStreams(false);
+      stopAllStreams(false); // Keep local stream when connecting
       const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
       if (targetDiv) targetDiv.innerHTML = '';
       showPopup("🔍 Searching for a stranger...");
       if (typingIndicator) typingIndicator.style.display = "none";
+      
       ws = new WebSocket(window.TIKTALK_BACKEND.replace("http", "ws"));
 
       ws.onopen = () => {
         reconnectAttempts = 0;
         updateInputState();
         ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
+        if (isVideoEnabled && localStream) {
+            createPeerConnection();
+        }
       };
 
       ws.onmessage = async (event) => {
         try {
-          const data = JSON.parse(event.data);
-          switch(data.type) {
-            case "system":
-              if (data.text === "waiting" && !isConnected) {
-                showPopup("🔍 Searching for a stranger...");
-              } else if (data.text === "connected") {
-                showPopup("✅ Connected! Say Hi 👋");
-              } else if (data.text === 'initiate_offer') {
-                console.log("[DEBUG] Received initiate_offer from server.");
-                if (isVideoEnabled) {
-                    if(!peerConnection) createPeerConnection();
-                    const offer = await peerConnection.createOffer();
-                    await peerConnection.setLocalDescription(offer);
-                    console.log("[DEBUG] Offer created.");
-                    ws.send(JSON.stringify({ type: 'offer', offer: offer }));
-                    console.log("[DEBUG] Offer sent to peer.");
-                }
-              } else if (data.text === "disconnected") {
-                if(isConnected) {
-                  showPopup("❌ Stranger disconnected");
-                  isConnected = false;
-                  stopAllStreams(false); 
-                }
-              } else if (data.text === "timeout") {
-                 showPopup("No one was found. Click Next Button");
-                 isConnected = false;
-              }
-              break;
-            case "message":
-              if (typingIndicator) typingIndicator.style.display = "none";
-              addMessage(data.text, "stranger");
-              break;
-            case "typing":
-              if (isConnected && typingIndicator) {
-                typingIndicator.style.display = "block";
-                clearTimeout(typingTimeout);
-                typingTimeout = setTimeout(() => {
-                  typingIndicator.style.display = "none";
-                }, 1500);
-              }
-              break;
-            case 'offer':
-                console.log("[DEBUG] Received offer from peer.");
-                if (isVideoEnabled) {
-                    if (!peerConnection) createPeerConnection();
-                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-                    const answer = await peerConnection.createAnswer();
-                    await peerConnection.setLocalDescription(answer);
-                    console.log("[DEBUG] Answer created.");
-                    ws.send(JSON.stringify({ type: 'answer', answer: answer }));
-                    console.log("[DEBUG] Answer sent to peer.");
-                }
-                break;
-            case 'answer':
-                console.log("[DEBUG] Received answer from peer.");
-                if (peerConnection && peerConnection.signalingState !== "stable") {
-                    await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-                }
-                break;
-            case 'candidate':
-                if (peerConnection) {
-                    console.log("[DEBUG] Received and adding ICE candidate.");
-                    await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-                }
-                break;
-          }
+            const data = JSON.parse(event.data);
+            switch(data.type) {
+                case "system":
+                    if (data.text === "waiting" && !isConnected) {
+                        showPopup("🔍 Searching for a stranger...");
+                    } else if (data.text === "connected") {
+                        showPopup("✅ Connected! Say Hi 👋");
+                        if (isVideoEnabled && !peerConnection) {
+                            createPeerConnection();
+                        }
+                    } else if (data.text === 'initiate_offer') {
+                        if (isVideoEnabled) {
+                            if (!peerConnection) createPeerConnection();
+                            const offer = await peerConnection.createOffer();
+                            await peerConnection.setLocalDescription(offer);
+                            ws.send(JSON.stringify({ type: 'offer', offer: offer }));
+                            console.log("Sent offer:", offer);
+                        }
+                    } else if (data.text === "disconnected") {
+                        if (isConnected) {
+                            showPopup("❌ Stranger disconnected");
+                            isConnected = false;
+                            stopAllStreams();
+                        }
+                    } else if (data.text === "timeout") {
+                        showPopup("No one was found. Click Next Button");
+                        isConnected = false;
+                    }
+                    break;
+                case "message":
+                    if (typingIndicator) typingIndicator.style.display = "none";
+                    addMessage(data.text, "stranger");
+                    break;
+                case "typing":
+                    if (isConnected && typingIndicator) {
+                        typingIndicator.style.display = "block";
+                        clearTimeout(typingTimeout);
+                        typingTimeout = setTimeout(() => {
+                            typingIndicator.style.display = "none";
+                        }, 1500);
+                    }
+                    break;
+                case 'offer':
+                    if (isVideoEnabled) {
+                        if (!peerConnection) createPeerConnection();
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                        const answer = await peerConnection.createAnswer();
+                        await peerConnection.setLocalDescription(answer);
+                        ws.send(JSON.stringify({ type: 'answer', answer: answer }));
+                        console.log("Sent answer:", answer);
+                    }
+                    break;
+                case 'answer':
+                    if (peerConnection && peerConnection.signalingState !== "stable") {
+                        await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                        console.log("Received answer:", data.answer);
+                    }
+                    break;
+                case 'candidate':
+                    if (peerConnection) {
+                        await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                        console.log("Added ICE candidate:", data.candidate);
+                    }
+                    break;
+            }
         } catch (e) {
-          console.error("Error parsing WebSocket message:", e);
+            console.error("Error parsing WebSocket message:", e);
+            showPopup("❌ Error in video connection. Please try again.");
         }
       };
 
       ws.onclose = () => {
         if (isConnected) {
-          showPopup("❌ Stranger disconnected");
+            showPopup("❌ Stranger disconnected");
         }
         if (typingIndicator) typingIndicator.style.display = "none";
         isConnected = false;
-        stopAllStreams(false);
+        stopAllStreams();
         updateInputState();
+        if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            setTimeout(() => {
+                showPopup(`🔄 Reconnecting... (Attempt ${reconnectAttempts}/${maxReconnectAttempts})`);
+                connectStranger();
+            }, 2000);
+        } else {
+            showPopup("❌ Maximum reconnection attempts reached. Please try again later.");
+        }
       };
 
       ws.onerror = (err) => {
         console.error("WebSocket error:", err);
         ws.close();
+        showPopup("❌ Connection error. Please check your network.");
       };
     }
     
