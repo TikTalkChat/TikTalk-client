@@ -861,7 +861,7 @@
       background: #555;
     }
     
-    /* === FINAL VIDEO STYLES === */
+    /* === FINAL VIDEO STYLES (REVERTED) === */
     #video-container {
       display: none;
       flex-direction: column;
@@ -870,8 +870,8 @@
       left: 0;
       right: 0;
       width: 100%;
-      /* MODIFIED: Stretches container to the top of the footer */
-      bottom: calc(56px + 10px + env(safe-area-inset-bottom));
+      /* MODIFIED: Stretches container to the bottom of the screen */
+      bottom: 0;
       z-index: 100;
       background-color: #000;
       transition: top 0.3s ease, bottom 0.3s ease;
@@ -881,12 +881,11 @@
     }
     #video-container video {
       width: 100%;
-      height: 50%; 
+      height: 50%; /* REVERTED: Back to 50/50 split */
       object-fit: cover;
       transform: scaleX(-1);
     }
     
-    /* MODIFIED: Hides chat area and footer note in video mode */
     body.video-mode #chat,
     body.video-mode .footerNote {
       display: none;
@@ -1215,6 +1214,7 @@
     const handleStartChatting = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
+      isConnected = false;
       if (ws) ws.close();
       hasStartedChat = true;
       startChattingBtn.style.display = 'none';
@@ -1494,6 +1494,7 @@
             stopAllStreams();
         }
         
+        isConnected = false; // ADDED: Prevents "disconnect" message on mode change
         if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
             ws.close();
@@ -1502,8 +1503,8 @@
         adjustLayoutForKeyboard();
     });
 
-    function stopAllStreams() {
-        if (localStream) {
+    function stopAllStreams(stopLocal = true) {
+        if (stopLocal && localStream) {
             localStream.getTracks().forEach(track => track.stop());
             localStream = null;
         }
@@ -1511,7 +1512,9 @@
             peerConnection.close();
             peerConnection = null;
         }
-        localVideo.srcObject = null;
+        if (stopLocal) {
+            localVideo.srcObject = null;
+        }
         remoteVideo.srcObject = null;
     }
 
@@ -1545,7 +1548,7 @@
       if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
         ws.close();
       }
-      stopAllStreams();
+      stopAllStreams(false); // MODIFIED: Keep local stream when connecting
       const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
       if (targetDiv) targetDiv.innerHTML = '';
       showPopup("🔍 Searching for a stranger...");
@@ -1664,6 +1667,7 @@
     const handleNext = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
+      isConnected = false; // ADDED: Prevents "disconnect" message on Next
       connectStranger();
       debouncedAdjustLayout();
     };
