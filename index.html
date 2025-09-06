@@ -533,7 +533,7 @@
         width: 24px;
         height: 24px;
         position: absolute;
-        transition: opacity 0.2s;
+        transition: opacity: 0.2s;
     }
     
     .share-btn {
@@ -870,7 +870,6 @@
       left: 0;
       right: 0;
       width: 100%;
-      /* MODIFIED: Stretches container to the bottom of the screen */
       bottom: 0;
       z-index: 100;
       background-color: #000;
@@ -881,11 +880,12 @@
     }
     #video-container video {
       width: 100%;
-      height: 50%; /* REVERTED: Back to 50/50 split */
+      height: 50%; 
       object-fit: cover;
       transform: scaleX(-1);
     }
     
+    /* MODIFIED: Hides chat area and footer note in video mode */
     body.video-mode #chat,
     body.video-mode .footerNote {
       display: none;
@@ -1025,6 +1025,7 @@
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' }
+        // For better reliability, you might need a TURN server here as well
       ]
     };
 
@@ -1479,8 +1480,10 @@
         
         if (isVideoEnabled) {
             try {
+                console.log("[DEBUG] Getting user media...");
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
                 localVideo.srcObject = localStream;
+                console.log("[DEBUG] User media obtained.", localStream);
             } catch (error) {
                 console.error("Error accessing media devices.", error);
                 alert("Could not access camera/microphone. Please check permissions.");
@@ -1494,7 +1497,7 @@
             stopAllStreams();
         }
         
-        isConnected = false; // ADDED: Prevents "disconnect" message on mode change
+        isConnected = false;
         if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
             ws.close();
@@ -1505,10 +1508,12 @@
 
     function stopAllStreams(stopLocal = true) {
         if (stopLocal && localStream) {
+            console.log("[DEBUG] Stopping local stream.");
             localStream.getTracks().forEach(track => track.stop());
             localStream = null;
         }
         if (peerConnection) {
+            console.log("[DEBUG] Closing Peer Connection.");
             peerConnection.close();
             peerConnection = null;
         }
@@ -1519,14 +1524,18 @@
     }
 
     function createPeerConnection() {
+        console.log("[DEBUG] Creating Peer Connection.");
         peerConnection = new RTCPeerConnection(stunServers);
+        
         peerConnection.onicecandidate = event => {
             if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
+                console.log("[DEBUG] Sending ICE candidate to peer.");
                 ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
             }
         };
         
         peerConnection.ontrack = event => {
+            console.log("[DEBUG] Remote stream received!");
             if (event.streams && event.streams[0]) {
               remoteVideo.srcObject = event.streams[0];
             } else {
@@ -1538,6 +1547,7 @@
         };
 
         if (localStream) {
+            console.log("[DEBUG] Local tracks added to Peer Connection.");
             localStream.getTracks().forEach(track => {
                 peerConnection.addTrack(track, localStream);
             });
@@ -1548,7 +1558,7 @@
       if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
         ws.close();
       }
-      stopAllStreams(false); // MODIFIED: Keep local stream when connecting
+      stopAllStreams(false);
       const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
       if (targetDiv) targetDiv.innerHTML = '';
       showPopup("🔍 Searching for a stranger...");
@@ -1571,17 +1581,20 @@
               } else if (data.text === "connected") {
                 showPopup("✅ Connected! Say Hi 👋");
               } else if (data.text === 'initiate_offer') {
+                console.log("[DEBUG] Received initiate_offer from server.");
                 if (isVideoEnabled) {
                     if(!peerConnection) createPeerConnection();
                     const offer = await peerConnection.createOffer();
                     await peerConnection.setLocalDescription(offer);
+                    console.log("[DEBUG] Offer created.");
                     ws.send(JSON.stringify({ type: 'offer', offer: offer }));
+                    console.log("[DEBUG] Offer sent to peer.");
                 }
               } else if (data.text === "disconnected") {
                 if(isConnected) {
                   showPopup("❌ Stranger disconnected");
                   isConnected = false;
-                  stopAllStreams();
+                  stopAllStreams(false); // Keep local video on stranger disconnect
                 }
               } else if (data.text === "timeout") {
                  showPopup("No one was found. Click Next Button");
@@ -1602,21 +1615,26 @@
               }
               break;
             case 'offer':
+                console.log("[DEBUG] Received offer from peer.");
                 if (isVideoEnabled) {
                     if (!peerConnection) createPeerConnection();
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
                     const answer = await peerConnection.createAnswer();
                     await peerConnection.setLocalDescription(answer);
+                    console.log("[DEBUG] Answer created.");
                     ws.send(JSON.stringify({ type: 'answer', answer: answer }));
+                    console.log("[DEBUG] Answer sent to peer.");
                 }
                 break;
             case 'answer':
+                console.log("[DEBUG] Received answer from peer.");
                 if (peerConnection && peerConnection.signalingState !== "stable") {
                     await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
                 }
                 break;
             case 'candidate':
                 if (peerConnection) {
+                    console.log("[DEBUG] Received and adding ICE candidate.");
                     await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
                 }
                 break;
@@ -1632,7 +1650,7 @@
         }
         if (typingIndicator) typingIndicator.style.display = "none";
         isConnected = false;
-        stopAllStreams();
+        stopAllStreams(false); // Keep local video on connection close
         updateInputState();
       };
 
@@ -1667,7 +1685,7 @@
     const handleNext = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
-      isConnected = false; // ADDED: Prevents "disconnect" message on Next
+      isConnected = false;
       connectStranger();
       debouncedAdjustLayout();
     };
