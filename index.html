@@ -856,29 +856,25 @@
     #video-container {
       display: none;
       flex-direction: column;
-      position: fixed;
+      position: absolute;
       top: calc(76px + env(safe-area-inset-top));
       left: 0;
       right: 0;
-      bottom: 0;
       width: 100%;
-      height: calc(100% - 76px - env(safe-area-inset-top));
+      bottom: 0;
       z-index: 100;
       background-color: #000;
-      overflow: hidden;
+      transition: top 0.3s ease, bottom 0.3s ease;
     }
     body.video-mode #video-container {
-      display: flex !important;
-      visibility: visible !important;
-      opacity: 1 !important;
+      display: flex;
     }
     #video-container video {
       width: 100%;
       height: 50%;
-      object-fit: contain;
+      object-fit: cover;
+      transform: scaleX(-1);
       background: #000;
-      display: block !important;
-      z-index: 101;
     }
     #video-container video#localVideo {
       border-top: 2px solid #fff;
@@ -897,7 +893,6 @@
     }
     body.video-mode #video-container {
       top: calc(44px + env(safe-area-inset-top));
-      height: calc(100% - 44px - env(safe-area-inset-top));
     }
     #videoToggleBtn.active {
       filter: drop-shadow(0 0 4px #007bff);
@@ -905,23 +900,6 @@
     #nextBtn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
-    }
-    #debug-overlay {
-      position: fixed;
-      top: calc(80px + env(safe-area-inset-top));
-      left: 10px;
-      background: rgba(0, 0, 0, 0.7);
-      color: #fff;
-      padding: 8px;
-      font-size: 12px;
-      z-index: 10002;
-      max-width: 300px;
-      border-radius: 4px;
-      display: none;
-      white-space: pre-wrap;
-    }
-    body.video-mode #debug-overlay {
-      display: block;
     }
   </style>
 </head>
@@ -988,7 +966,7 @@
   </header>
   <div class="chat-wrapper">
     <div id="video-container">
-      <video id="remoteVideo" playsinline autoplay muted></video>
+      <video id="remoteVideo" playsinline autoplay></video>
       <video id="localVideo" playsinline autoplay muted></video>
     </div>
     <main id="chat">
@@ -1002,7 +980,6 @@
       </div>
     </main>
   </div>
-  <div id="debug-overlay"></div>
   <button id="startChattingBtn" class="start-chatting-btn">Start Chat</button>
   <p class="footerNote">Made in India <span class="heart">♥️</span></p>
   <footer>
@@ -1033,7 +1010,6 @@
     const videoToggleBtn = document.getElementById('videoToggleBtn');
     const localVideo = document.getElementById('localVideo');
     const remoteVideo = document.getElementById('remoteVideo');
-    const debugOverlay = document.getElementById('debug-overlay');
 
     const stunServers = {
       iceServers: [
@@ -1047,11 +1023,6 @@
       ]
     };
 
-    function updateDebugOverlay(message) {
-      debugOverlay.textContent = message;
-      console.log('Debug:', message);
-    }
-
     function debounce(func, wait) {
       let timeout;
       return function (...args) {
@@ -1064,7 +1035,8 @@
       try {
         const cameraPermission = await navigator.permissions.query({ name: 'camera' });
         const micPermission = await navigator.permissions.query({ name: 'microphone' });
-        updateDebugOverlay(`Camera permission: ${cameraPermission.state}\nMicrophone permission: ${micPermission.state}`);
+        console.log('Camera permission:', cameraPermission.state);
+        console.log('Microphone permission:', micPermission.state);
         if (cameraPermission.state === 'denied' || micPermission.state === 'denied') {
           showPopup('⚠️ Please allow camera and microphone access in your browser settings.');
           return false;
@@ -1082,7 +1054,7 @@
         const devices = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(device => device.kind === 'videoinput');
         const audioDevices = devices.filter(device => device.kind === 'audioinput');
-        updateDebugOverlay(`Available devices:\nVideo: ${videoDevices.length}\nAudio: ${audioDevices.length}`);
+        console.log('Available devices:', { video: videoDevices, audio: audioDevices });
         if (videoDevices.length === 0) {
           showPopup('⚠️ No camera detected. Continuing with audio only.');
         }
@@ -1113,32 +1085,22 @@
 
         const { videoDeviceId, audioDeviceId } = await selectMediaDevices();
         const constraints = {
-          video: videoDeviceId ? { deviceId: { exact: videoDeviceId }, facingMode: 'user', width: { ideal: 640 }, height: { ideal: 360 } } : false,
+          video: videoDeviceId ? { deviceId: { exact: videoDeviceId }, facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } } : false,
           audio: audioDeviceId ? { deviceId: { exact: audioDeviceId }, echoCancellation: true, noiseSuppression: true, autoGainControl: true } : false
         };
 
         localStream = await navigator.mediaDevices.getUserMedia(constraints);
-        updateDebugOverlay(`Local stream initialized:\nVideo tracks: ${localStream.getVideoTracks().length}\nAudio tracks: ${localStream.getAudioTracks().length}`);
-        console.log('Local stream tracks:', {
+        console.log('Local stream initialized:', {
           videoTracks: localStream.getVideoTracks().map(t => ({ enabled: t.enabled, readyState: t.readyState })),
           audioTracks: localStream.getAudioTracks().map(t => ({ enabled: t.enabled, readyState: t.readyState }))
         });
 
         localVideo.srcObject = localStream;
         await localVideo.play();
-        updateDebugOverlay(`Local video playing\nNetwork state: ${localVideo.networkState}\nReady state: ${localVideo.readyState}`);
         console.log('Local video playing');
-        localVideo.addEventListener('loadedmetadata', () => {
-          updateDebugOverlay(`Local video metadata loaded\nWidth: ${localVideo.videoWidth}\nHeight: ${localVideo.videoHeight}`);
-        });
-        localVideo.addEventListener('error', () => {
-          updateDebugOverlay(`Local video error: ${localVideo.error?.message || 'Unknown error'}`);
-          showPopup('❌ Local video playback error. Please check camera.');
-        });
         return true;
       } catch (error) {
         console.error('Error initializing local stream:', error);
-        updateDebugOverlay(`Local stream error: ${error.name}\n${error.message}`);
         let errorMessage = '❌ Failed to access camera/microphone. ';
         if (error.name === 'NotAllowedError') errorMessage += 'Please grant permissions.';
         else if (error.name === 'NotFoundError') errorMessage += 'No camera or microphone found.';
@@ -1146,25 +1108,6 @@
         showPopup(errorMessage);
         return false;
       }
-    }
-
-    function retryVideoPlayback(videoElement, maxRetries = 5, interval = 1000) {
-      let retries = 0;
-      function attemptPlay() {
-        videoElement.play().then(() => {
-          updateDebugOverlay(`${videoElement.id} playing\nNetwork state: ${videoElement.networkState}\nReady state: ${videoElement.readyState}`);
-        }).catch(error => {
-          console.error(`Error playing ${videoElement.id}:`, error);
-          updateDebugOverlay(`${videoElement.id} play failed: ${error.message}\nRetry ${retries + 1}/${maxRetries}`);
-          if (retries < maxRetries) {
-            retries++;
-            setTimeout(attemptPlay, interval);
-          } else {
-            showPopup(`❌ Failed to play ${videoElement.id} after ${maxRetries} retries. Please refresh.`);
-          }
-        });
-      }
-      attemptPlay();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -1177,7 +1120,6 @@
       initializeEmojiPicker();
       adjustLayoutForKeyboard();
       messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
-      updateDebugOverlay('Page loaded');
     });
 
     function initializeEmojiPicker() {
@@ -1299,10 +1241,6 @@
         setTimeout(() => {
           if (isConnected && targetDiv.innerHTML.includes('Connected')) {
             targetDiv.innerHTML = document.body.classList.contains('video-mode') ? '' : '';
-            if (isVideoEnabled) {
-              retryVideoPlayback(localVideo);
-              retryVideoPlayback(remoteVideo);
-            }
           }
         }, 3000);
       } else {
@@ -1328,13 +1266,11 @@
         peerConnection = null;
       }
       remoteVideo.srcObject = null;
-      updateDebugOverlay('Streams stopped');
     }
 
     function createPeerConnection() {
       if (!localStream) {
         showPopup('⚠️ Local stream not available. Please toggle video mode again.');
-        updateDebugOverlay('No local stream for PeerConnection');
         return null;
       }
       try {
@@ -1343,31 +1279,20 @@
           if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
             console.log('Sent ICE candidate:', event.candidate);
-            updateDebugOverlay('Sent ICE candidate');
           }
         };
         peerConnection.ontrack = event => {
           console.log('Received remote track:', event.track.kind, { enabled: event.track.enabled, readyState: event.track.readyState });
-          updateDebugOverlay(`Remote track received: ${event.track.kind}\nEnabled: ${event.track.enabled}\nReadyState: ${event.track.readyState}`);
-          if (!remoteVideo.srcObject) {
-            remoteVideo.srcObject = new MediaStream();
-          }
-          event.streams[0].getTracks().forEach(track => {
-            remoteVideo.srcObject.addTrack(track);
-            updateDebugOverlay(`Added track to remoteVideo: ${track.kind}`);
-          });
-          retryVideoPlayback(remoteVideo);
-          remoteVideo.addEventListener('loadedmetadata', () => {
-            updateDebugOverlay(`Remote video metadata loaded\nWidth: ${remoteVideo.videoWidth}\nHeight: ${remoteVideo.videoHeight}`);
-          });
-          remoteVideo.addEventListener('error', () => {
-            updateDebugOverlay(`Remote video error: ${remoteVideo.error?.message || 'Unknown error'}`);
-            showPopup('❌ Remote video playback error. Please check connection.');
+          if (!remoteVideo.srcObject) remoteVideo.srcObject = new MediaStream();
+          remoteVideo.srcObject.addTrack(event.track);
+          remoteVideo.play().catch(error => {
+            console.error('Error playing remote video:', error);
+            showPopup('❌ Error playing remote video. Retrying...');
+            setTimeout(() => remoteVideo.play(), 1000);
           });
         };
         peerConnection.oniceconnectionstatechange = () => {
           console.log('ICE connection state:', peerConnection.iceConnectionState);
-          updateDebugOverlay(`ICE state: ${peerConnection.iceConnectionState}`);
           if (['disconnected', 'failed'].includes(peerConnection.iceConnectionState)) {
             showPopup('❌ Video connection lost. Reconnecting...');
             stopAllStreams(false);
@@ -1377,13 +1302,11 @@
         localStream.getTracks().forEach(track => {
           peerConnection.addTrack(track, localStream);
           console.log('Added local track:', track.kind, { enabled: track.enabled });
-          updateDebugOverlay(`Added local track: ${track.kind}`);
         });
         return peerConnection;
       } catch (error) {
         console.error('Error creating PeerConnection:', error);
         showPopup('❌ Failed to establish video connection.');
-        updateDebugOverlay(`PeerConnection error: ${error.message}`);
         return null;
       }
     }
@@ -1393,25 +1316,25 @@
       stopAllStreams(false);
       showPopup('🔍 Searching for a stranger...');
       typingIndicator.style.display = 'none';
-      updateDebugOverlay('Connecting to WebSocket...');
 
       ws = new WebSocket(window.TIKTALK_BACKEND.replace('http', 'ws'));
       const signalingTimeout = setTimeout(() => {
         if (!isConnected) {
           showPopup('⚠️ Connection timeout. Please check your network and try again.');
           ws.close();
-          updateDebugOverlay('WebSocket connection timeout');
         }
-      }, 15000);
+      }, 10000);
 
       ws.onopen = () => {
         clearTimeout(signalingTimeout);
         reconnectAttempts = 0;
         ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
-        updateDebugOverlay('WebSocket connected');
         if (isVideoEnabled && localStream) {
           createPeerConnection();
-          retryVideoPlayback(localVideo);
+          localVideo.play().catch(error => {
+            console.error('Error replaying local video:', error);
+            showPopup('❌ Error playing local video. Please check permissions.');
+          });
         }
       };
 
@@ -1419,20 +1342,15 @@
         try {
           const data = JSON.parse(event.data);
           console.log('Received message:', data);
-          updateDebugOverlay(`Received message: ${data.type}`);
           switch (data.type) {
             case 'system':
               if (data.text === 'waiting') showPopup('🔍 Searching for a stranger...');
               else if (data.text === 'connected') {
                 clearTimeout(signalingTimeout);
                 showPopup('✅ Connected! Say Hi 👋');
-                updateDebugOverlay('Connected to stranger');
                 if (isVideoEnabled && !peerConnection && localStream) {
                   createPeerConnection();
-                  retryVideoPlayback(localVideo);
-                }
-                if (isVideoEnabled) {
-                  retryVideoPlayback(remoteVideo);
+                  localVideo.play().catch(error => console.error('Error replaying local video:', error));
                 }
               } else if (data.text === 'initiate_offer') {
                 if (isVideoEnabled && localStream) {
@@ -1442,24 +1360,19 @@
                     await peerConnection.setLocalDescription(offer);
                     ws.send(JSON.stringify({ type: 'offer', offer }));
                     console.log('Sent offer:', offer);
-                    updateDebugOverlay('Sent offer');
                   }
                 } else {
                   showPopup('⚠️ Local stream not available. Please toggle video mode again.');
-                  updateDebugOverlay('No local stream for offer');
                 }
               } else if (data.text === 'disconnected') {
                 showPopup('❌ Stranger disconnected');
                 isConnected = false;
                 stopAllStreams();
-                updateDebugOverlay('Stranger disconnected');
               } else if (data.text === 'timeout') {
                 showPopup('No one was found. Click Next Button');
                 isConnected = false;
-                updateDebugOverlay('Connection timeout');
               } else if (data.text === 'error') {
                 showPopup(`❌ Server error: ${data.error || 'Unknown error'}`);
-                updateDebugOverlay(`Server error: ${data.error || 'Unknown'}`);
               }
               break;
             case 'message':
@@ -1482,45 +1395,38 @@
                   await peerConnection.setLocalDescription(answer);
                   ws.send(JSON.stringify({ type: 'answer', answer }));
                   console.log('Sent answer:', answer);
-                  updateDebugOverlay('Sent answer');
                 }
               } else {
                 showPopup('⚠️ Local stream not available. Please toggle video mode again.');
-                updateDebugOverlay('No local stream for answer');
               }
               break;
             case 'answer':
               if (peerConnection) {
                 await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
                 console.log('Set remote answer:', data.answer);
-                updateDebugOverlay('Set remote answer');
               }
               break;
             case 'candidate':
               if (peerConnection) {
                 await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
                 console.log('Added ICE candidate:', data.candidate);
-                updateDebugOverlay('Added ICE candidate');
               }
               break;
           }
         } catch (error) {
           console.error('Error processing WebSocket message:', error);
           showPopup('❌ Error processing message from server.');
-          updateDebugOverlay(`WebSocket message error: ${error.message}`);
         }
       };
 
       ws.onclose = () => {
         if (isConnected) {
           showPopup('❌ Connection lost. Reconnecting...');
-          updateDebugOverlay('WebSocket closed');
           if (reconnectAttempts < maxReconnectAttempts) {
             reconnectAttempts++;
             setTimeout(connectStranger, 2000);
           } else {
             showPopup('❌ Failed to reconnect. Please try again later.');
-            updateDebugOverlay('Max reconnect attempts reached');
           }
         }
       };
@@ -1528,7 +1434,6 @@
       ws.onerror = (error) => {
         console.error('WebSocket error:', error);
         showPopup('❌ WebSocket error. Please check your connection.');
-        updateDebugOverlay(`WebSocket error: ${error}`);
       };
     }
 
@@ -1544,8 +1449,6 @@
           videoIcon.style.display = 'block';
           chatIcon.style.display = 'none';
           startChattingBtn.style.display = 'block';
-          document.getElementById('video-container').style.display = 'none';
-          updateDebugOverlay('Video toggle failed: Stream not initialized');
           return;
         }
         videoIcon.style.display = 'none';
@@ -1553,7 +1456,10 @@
         videoToggleBtn.classList.add('active');
         document.body.classList.add('video-mode');
         document.getElementById('video-container').style.display = 'flex';
-        retryVideoPlayback(localVideo);
+        localVideo.play().catch(error => {
+          console.error('Error playing local video after toggle:', error);
+          showPopup('❌ Error playing local video. Please check permissions.');
+        });
       } else {
         videoIcon.style.display = 'block';
         chatIcon.style.display = 'none';
@@ -1565,7 +1471,6 @@
         hasStartedChat = false;
         nextBtn.disabled = true;
         messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
-        updateDebugOverlay('Video mode disabled');
       }
 
       if (ws && ws.readyState === WebSocket.OPEN) {
@@ -1592,11 +1497,13 @@
           videoToggleBtn.querySelector('.chat-icon').style.display = 'none';
           startChattingBtn.style.display = 'block';
           showPopup('❌ Failed to start video. Please check permissions or devices.');
-          updateDebugOverlay('Start chat failed: Stream not initialized');
           return;
         }
         document.getElementById('video-container').style.display = 'flex';
-        retryVideoPlayback(localVideo);
+        localVideo.play().catch(error => {
+          console.error('Error playing local video on start:', error);
+          showPopup('❌ Error playing local video. Please check permissions.');
+        });
       }
 
       connectStranger();
