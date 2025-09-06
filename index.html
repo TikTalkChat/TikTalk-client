@@ -335,7 +335,6 @@
       right: 8px;
       margin: 0 auto;
       width: calc(100% - 16px);
-      max-width: 400px;
       height: var(--emoji-picker-height, 350px);
       max-height: var(--emoji-picker-height, 70vh);
       overflow-y: auto;
@@ -780,6 +779,7 @@
       width: 20px;
       height: 20px;
       margin-right: 8px;
+      vertical-align: middle;
     }
     .connected-checkmark::after {
       content: "";
@@ -861,49 +861,30 @@
       background: #555;
     }
     
-    /* === 🚀 NEW & IMPROVED VIDEO STYLES 🚀 === */
+    /* === VIDEO CONTAINER FIXES === */
     #video-container {
       display: none;
-      position: relative; /* Changed for positioning context */
-      top: calc(76px + env(safe-area-inset-top)); 
+      position: absolute;
+      top: calc(76px + env(safe-area-inset-top));
       left: 0;
       right: 0;
-      width: 100%;
       bottom: 0;
       z-index: 100;
       background-color: #000;
-      transition: top 0.3s ease, bottom 0.3s ease;
+      transition: top 0.3s ease;
+      flex-direction: column;
     }
-    
     body.video-mode #video-container {
-      display: block; /* Changed from flex to block */
+      display: flex;
     }
-
     #video-container video {
-        background-color: #1a1a1a; /* Add a background for when the stream is loading */
+      width: 100%;
+      height: 50%;
+      object-fit: cover;
+      transform: scaleX(-1); /* Mirror local video */
     }
-    
     #remoteVideo {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        /* No mirror transform needed here, stranger should appear normal */
-    }
-    
-    #localVideo {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        width: 25%;
-        max-width: 160px;
-        height: auto;
-        aspect-ratio: 4 / 3;
-        border-radius: 12px;
-        border: 2px solid #fff;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-        transform: scaleX(-1); /* Mirror effect for self-view is standard */
-        z-index: 101; /* Make sure local video is on top */
-        object-fit: cover;
+      transform: scaleX(1); /* Don't mirror remote video */
     }
     
     body.video-mode #chat,
@@ -930,6 +911,39 @@
     #nextBtn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
+    }
+    
+    /* Video controls */
+    .video-controls {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      z-index: 101;
+    }
+    .video-control-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border: none;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .video-control-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+    .video-control-btn:active {
+      transform: scale(0.95);
     }
   </style>
 </head>
@@ -998,6 +1012,11 @@
     <div id="video-container">
         <video id="remoteVideo" playsinline autoplay></video>
         <video id="localVideo" playsinline autoplay muted></video>
+        <div class="video-controls">
+          <button class="video-control-btn" id="muteBtn">🔇</button>
+          <button class="video-control-btn" id="videoOffBtn">📹</button>
+          <button class="video-control-btn" id="endCallBtn">📞</button>
+        </div>
     </div>
     <main id="chat">
       <div id="messages"></div>
@@ -1037,28 +1056,22 @@
     let peerConnection;
     let isVideoEnabled = false;
     let hasStartedChat = false;
+    let isMuted = false;
+    let isVideoOff = false;
     const videoToggleBtn = document.getElementById('videoToggleBtn');
     const localVideo = document.getElementById('localVideo');
     const remoteVideo = document.getElementById('remoteVideo');
+    const muteBtn = document.getElementById('muteBtn');
+    const videoOffBtn = document.getElementById('videoOffBtn');
+    const endCallBtn = document.getElementById('endCallBtn');
 
-    // ✅ **FIXED**: Added more STUN servers and a free TURN server for better connectivity.
-    // NOTE: Free TURN servers can be unreliable. For a real application, you should host your own.
-    const iceConfiguration = {
+    const stunServers = {
       iceServers: [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun1.l.google.com:19302' },
         { urls: 'stun:stun2.l.google.com:19302' },
-        { urls: 'stun:stun.services.mozilla.com' },
-        {
-            urls: 'turn:openrelay.metered.ca:80',
-            username: 'openrelayproject',
-            credential: 'openrelayproject'
-        },
-        {
-            urls: 'turn:openrelay.metered.ca:443',
-            username: 'openrelayproject',
-            credential: 'openrelayproject'
-        }
+        { urls: 'stun:stun3.l.google.com:19302' },
+        { urls: 'stun:stun4.l.google.com:19302' }
       ]
     };
 
@@ -1257,6 +1270,44 @@
     };
     startChattingBtn.addEventListener("click", handleStartChatting);
     startChattingBtn.addEventListener("touchstart", handleStartChatting, { passive: false });
+
+    // Video control handlers
+    muteBtn.addEventListener('click', () => {
+      if (localStream) {
+        const audioTracks = localStream.getAudioTracks();
+        if (audioTracks.length > 0) {
+          isMuted = !isMuted;
+          audioTracks[0].enabled = !isMuted;
+          muteBtn.textContent = isMuted ? '🔊' : '🔇';
+        }
+      }
+    });
+
+    videoOffBtn.addEventListener('click', () => {
+      if (localStream) {
+        const videoTracks = localStream.getVideoTracks();
+        if (videoTracks.length > 0) {
+          isVideoOff = !isVideoOff;
+          videoTracks[0].enabled = !isVideoOff;
+          videoOffBtn.textContent = isVideoOff ? '📷' : '📹';
+        }
+      }
+    });
+
+    endCallBtn.addEventListener('click', () => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'disconnect' }));
+      }
+      stopAllStreams();
+      isConnected = false;
+      document.body.classList.remove('video-mode');
+      document.getElementById('video-container').style.display = 'none';
+      document.getElementById('chat').style.display = 'block';
+      document.querySelector('.footerNote').style.display = 'block';
+      startChattingBtn.style.display = 'block';
+      nextBtn.disabled = true;
+      showPopup("Call ended");
+    });
 
     function shareApp(platform) {
       let url = window.location.href;
@@ -1499,9 +1550,11 @@
         if (isVideoEnabled) {
             videoIcon.style.display = 'none';
             chatIcon.style.display = 'block';
+            videoToggleBtn.classList.add('active');
         } else {
             videoIcon.style.display = 'block';
             chatIcon.style.display = 'none';
+            videoToggleBtn.classList.remove('active');
         }
 
         startChattingBtn.style.display = 'block';
@@ -1513,8 +1566,16 @@
         
         if (isVideoEnabled) {
             try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                localStream = await navigator.mediaDevices.getUserMedia({ 
+                  video: { width: 1280, height: 720 },
+                  audio: true 
+                });
                 localVideo.srcObject = localStream;
+                // Reset control buttons
+                muteBtn.textContent = '🔇';
+                videoOffBtn.textContent = '📹';
+                isMuted = false;
+                isVideoOff = false;
             } catch (error) {
                 console.error("Error accessing media devices.", error);
                 alert("Could not access camera/microphone. Please check permissions.");
@@ -1522,13 +1583,14 @@
                 document.body.classList.remove('video-mode');
                 videoIcon.style.display = 'block';
                 chatIcon.style.display = 'none';
+                videoToggleBtn.classList.remove('active');
                 startChattingBtn.style.display = 'block';
             }
         } else {
             stopAllStreams();
         }
         
-        isConnected = false; // Prevents "disconnect" message on mode change
+        isConnected = false;
         if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
             ws.close();
@@ -1553,9 +1615,7 @@
     }
 
     function createPeerConnection() {
-        // ✅ **FIXED**: Using the new configuration with TURN servers
-        peerConnection = new RTCPeerConnection(iceConfiguration);
-
+        peerConnection = new RTCPeerConnection(stunServers);
         peerConnection.onicecandidate = event => {
             if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
@@ -1584,7 +1644,7 @@
       if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
         ws.close();
       }
-      stopAllStreams(false); // Keep local stream when connecting
+      stopAllStreams(false);
       const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
       if (targetDiv) targetDiv.innerHTML = '';
       showPopup("🔍 Searching for a stranger...");
@@ -1606,6 +1666,9 @@
                 showPopup("🔍 Searching for a stranger...");
               } else if (data.text === "connected") {
                 showPopup("✅ Connected! Say Hi 👋");
+                if (isVideoEnabled && !peerConnection) {
+                  createPeerConnection();
+                }
               } else if (data.text === 'initiate_offer') {
                 if (isVideoEnabled) {
                     if(!peerConnection) createPeerConnection();
@@ -1653,10 +1716,7 @@
                 break;
             case 'candidate':
                 if (peerConnection) {
-                    // It's safer to check for a remote description before adding candidates
-                    if (peerConnection.remoteDescription) {
-                        await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-                    }
+                    await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
                 }
                 break;
           }
@@ -1673,6 +1733,14 @@
         isConnected = false;
         stopAllStreams();
         updateInputState();
+        
+        // Try to reconnect if it wasn't a manual disconnect
+        if (reconnectAttempts < maxReconnectAttempts) {
+          reconnectAttempts++;
+          setTimeout(() => {
+            connectStranger();
+          }, 2000 * reconnectAttempts);
+        }
       };
 
       ws.onerror = (err) => {
@@ -1706,7 +1774,7 @@
     const handleNext = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
-      isConnected = false; // Prevents "disconnect" message on Next
+      isConnected = false;
       connectStranger();
       debouncedAdjustLayout();
     };
