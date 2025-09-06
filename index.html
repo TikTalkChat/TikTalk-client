@@ -882,7 +882,10 @@
       width: 100%;
       height: 50%; 
       object-fit: cover;
-      transform: scaleX(-1);
+    }
+    /* FIX: Only mirror the local video, not the remote one */
+    #localVideo {
+        transform: scaleX(-1);
     }
     
     body.video-mode #chat,
@@ -1352,7 +1355,6 @@
       const nextBtn = document.getElementById("nextBtn");
       const emojiPicker = document.getElementById("emojiPicker");
       
-      // FIX: Get console height to offset the start button
       const consoleDiv = document.getElementById('on-screen-console');
       const consoleHeight = consoleDiv ? consoleDiv.offsetHeight : 0;
 
@@ -1415,7 +1417,7 @@
         footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
         if(chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
         footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
-        startChattingBtn.style.bottom = `calc(${consoleHeight}px + ${footer.offsetHeight}px + ${safeAreaBottom}px + 35px)`;
+        startChattingBtn.style.bottom = `calc(${consoleHeight}px + 95px + ${safeAreaBottom}px)`;
         emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
         footer.offsetHeight;
         setTimeout(() => {
@@ -1573,13 +1575,12 @@
     });
 
     function stopAllStreams(stopLocal = true) {
+        console.log(`[DEBUG] stopAllStreams called. Clearing remote video. stopLocal=${stopLocal}`);
         if (stopLocal && localStream) {
-            console.log("[DEBUG] Stopping local stream.");
             localStream.getTracks().forEach(track => track.stop());
             localStream = null;
         }
         if (peerConnection) {
-            console.log("[DEBUG] Closing Peer Connection.");
             peerConnection.close();
             peerConnection = null;
         }
@@ -1610,6 +1611,7 @@
                 }
                 remoteVideo.srcObject.addTrack(event.track);
             }
+            console.log('[DEBUG] remoteVideo.srcObject is now set.', remoteVideo.srcObject);
         };
 
         if (localStream) {
