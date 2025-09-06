@@ -937,6 +937,15 @@
     #on-screen-console .log-entry:nth-child(odd) {
         background: rgba(255,255,255,0.05);
     }
+    /* FIX: Adjust button position to be above the on-screen console */
+    #on-screen-console ~ .start-chatting-btn {
+      bottom: calc(25% + 35px + env(safe-area-inset-bottom));
+      transition: bottom 0.3s ease;
+    }
+    #on-screen-console ~ .footerNote {
+       bottom: calc(25% + 10px + env(safe-area-inset-bottom));
+       transition: bottom 0.3s ease;
+    }
   </style>
 </head>
 <body>
