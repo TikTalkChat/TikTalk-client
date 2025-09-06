@@ -50,6 +50,9 @@
       box-sizing: border-box;
       box-shadow: 0 2px 10px rgba(0,0,0,0.1);
       border-radius: 0 0 16px 16px;
+      /* MODIFICATION: Added transitions for smooth shrinking */
+      transition: height 0.3s ease, padding 0.3s ease;
+      height: 76px;
     }
     body.dark-mode header {
       background: #10161d;
@@ -64,6 +67,8 @@
       height: 60px;
       width: auto;
       display: block;
+      /* MODIFICATION: Added transition for smooth shrinking */
+      transition: height 0.3s ease;
     }
     .chat-wrapper {
       position: relative;
@@ -79,8 +84,9 @@
       overflow-y: auto;
       overscroll-behavior: contain;
       contain: strict;
-      padding: calc(70px + env(safe-area-inset-top)) 15px calc(70px + env(safe-area-inset-bottom));
+      padding: calc(76px + env(safe-area-inset-top)) 15px calc(70px + env(safe-area-inset-bottom));
       -webkit-overflow-scrolling: touch;
+      transition: all 0.3s ease;
     }
     #messages {
       display: flex;
@@ -173,7 +179,7 @@
       padding: 6px;
       gap: 8px;
       background: #fff;
-      z-index: 10000;
+      z-index: 10002; /* MODIFICATION: Increased Z-index for overlay */
       height: 56px;
       min-height: 56px;
       max-height: 56px;
@@ -184,7 +190,8 @@
       -webkit-appearance: none;
       border-radius: 35px;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-      transition: bottom 0.3s ease;
+      /* MODIFICATION: Transition for auto-hide */
+      transition: bottom 0.3s ease, transform 0.4s ease-in-out, opacity 0.4s ease-in-out;
     }
     body.dark-mode footer {
       background: #10161d;
@@ -215,13 +222,17 @@
       max-height: 40px;
       overflow: hidden !important;
       box-sizing: border-box;
-      background: transparent !important;
+      background: #f0f2f5 !important;
+      border-radius: 20px;
+    }
+     body.dark-mode .inputWrapper {
+        background: #2d3748 !important;
     }
     textarea {
       width: 100%;
       resize: none;
       padding: 10px 18px 10px 12px;
-      border: 1px solid #ccc !important;
+      border: none !important;
       border-radius: 20px;
       font-size: 14px;
       outline: none;
@@ -238,7 +249,7 @@
       touch-action: manipulation;
     }
     body.dark-mode textarea {
-      border: 1px solid #4a5568 !important;
+      border: none !important;
       background: transparent !important;
       color: #e5e7eb;
     }
@@ -845,24 +856,29 @@
     body.dark-mode textarea::-webkit-scrollbar-thumb {
       background: #555;
     }
+
+    /* === START: NEW VIDEO MODE STYLES === */
     #video-container {
       display: none;
       flex-direction: column;
       position: absolute;
-      top: calc(70px + env(safe-area-inset-top)); 
+      /* MODIFICATION: Adjusted top to match original larger header size */
+      top: calc(76px + env(safe-area-inset-top)); 
       left: 0;
       right: 0;
       width: 100%;
-      height: calc(50vh - 70px - env(safe-area-inset-top)); 
+      /* MODIFICATION: Stretches container to the bottom of the screen */
+      bottom: 0;
       z-index: 100;
       background-color: #000;
+      transition: top 0.3s ease;
     }
     body.video-mode #video-container {
       display: flex;
     }
     #video-container video {
       width: 100%;
-      height: 50%;
+      height: 50%; /* Each video takes half the container height */
       object-fit: cover;
     }
     #localVideo {
@@ -871,9 +887,68 @@
     #remoteVideo {
         transform: scaleX(-1);
     }
-    body.video-mode #chat {
-      padding-top: calc(50vh + 15px);
+    
+    /* MODIFICATION 1: Shrink header in video mode */
+    body.video-mode header {
+        height: 44px;
+        padding-top: 4px;
+        padding-bottom: 4px;
     }
+    body.video-mode header svg.logo {
+        height: 36px;
+    }
+
+    /* MODIFICATION 2: Adjust video container for shrunken header */
+    body.video-mode #video-container {
+        top: calc(44px + env(safe-area-inset-top));
+    }
+
+    /* MODIFICATION 3: Style chat as an overlay in video mode */
+    body.video-mode #chat {
+      display: block; /* Ensure it's visible */
+      position: absolute;
+      top: 50%; /* Start from middle of the screen */
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: transparent; /* No background color */
+      z-index: 101; /* Place it above the video container */
+      padding-top: 0;
+      padding-bottom: calc(56px + 15px + env(safe-area-inset-bottom)); /* Space for footer */
+      pointer-events: all; /* Allow scrolling */
+      -webkit-mask-image: linear-gradient(to top, black 80%, transparent 100%);
+      mask-image: linear-gradient(to top, black 80%, transparent 100%);
+    }
+    body.video-mode #messages {
+      color: #fff;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+     body.video-mode .msg {
+      background-color: rgba(0, 0, 0, 0.4);
+      box-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+    body.video-mode .me {
+        background-color: rgba(0, 80, 170, 0.6);
+    }
+    body.video-mode .stranger {
+        background-color: rgba(80, 80, 80, 0.6);
+    }
+    body.video-mode .popup {
+        color: #f0f0f0;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+    body.video-mode .footerNote {
+        display: none;
+    }
+    
+    /* MODIFICATION 4: Style for hidden footer */
+    body.video-mode footer.hidden {
+        transform: translateY(120%);
+        opacity: 0;
+        pointer-events: none;
+    }
+    /* === END: NEW VIDEO MODE STYLES === */
+    
     #videoToggleBtn.active {
        filter: drop-shadow(0 0 4px #007bff);
     }
@@ -990,6 +1065,8 @@
     const videoToggleBtn = document.getElementById('videoToggleBtn');
     const localVideo = document.getElementById('localVideo');
     const remoteVideo = document.getElementById('remoteVideo');
+    // ADDITION: Variable for footer auto-hide timer
+    let footerHideTimeout;
 
     const stunServers = {
       iceServers: [
@@ -1230,6 +1307,7 @@
 
     function scrollToBottom() {
       const chatDiv = document.getElementById("chat");
+       if (chatDiv.style.display === 'none') return;
       const isNearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 100;
       if (isNearBottom && messagesDiv.children.length > 0) {
         chatDiv.scrollTop = chatDiv.scrollHeight;
@@ -1256,7 +1334,7 @@
       const footer = document.querySelector("footer");
       const startChattingBtn = document.getElementById("startChattingBtn");
       const emojiPicker = document.getElementById("emojiPicker");
-      const headerHeight = header.offsetHeight || 70;
+      const headerHeight = header.offsetHeight || 76;
       let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)') || '0', 10);
       let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
       const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
@@ -1287,12 +1365,14 @@
       }
       document.documentElement.style.setProperty('--emoji-picker-height', `${emojiPickerHeight}px`);
 
+      const footerNoteHeight = 20;
+
       if (isKeyboardOpen) {
         footer.style.transition = 'bottom 0.3s ease';
         footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
-        chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
-        footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
-        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 60px)`;
+        if(chatDiv && !document.body.classList.contains('video-mode')) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
+        if(footerNote) footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
+        if(startChattingBtn) startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 35px)`;
         if (emojiPicker.classList.contains('show')) {
           emojiPicker.classList.remove('show');
           emojiPicker.style.display = 'none';
@@ -1300,28 +1380,29 @@
           document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
         }
       } else if (isEmojiPickerOpen) {
-        footer.style.transition = 'bottom 0.3s ease';
-        footer.style.bottom = `calc(${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
-        chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
-        footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
-        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 60px)`;
+        if (!isDesktop) {
+            footer.style.transition = 'bottom 0.3s ease';
+            footer.style.bottom = `calc(${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+            if(chatDiv && !document.body.classList.contains('video-mode')) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
+            if(footerNote) footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
+            if(startChattingBtn) startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 35px)`;
+        }
         emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
       } else {
         footer.style.transition = 'none';
         footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
-        chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
-        footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
-        startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 60px)`;
+        if(chatDiv && !document.body.classList.contains('video-mode')) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
+        if(footerNote) footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
+        if(startChattingBtn) startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 35px)`;
         emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
         footer.offsetHeight;
         setTimeout(() => {
-          footer.style.transition = 'bottom 0.3s ease';
+          footer.style.transition = 'bottom 0.3s ease, transform 0.4s ease-in-out, opacity 0.4s ease-in-out';
         }, 0);
       }
 
-      if (!document.body.classList.contains('video-mode')) {
-        chatDiv.style.marginTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
-        chatDiv.style.height = `calc(100vh - ${headerHeight}px - ${safeAreaBottom}px)`;
+      if (chatDiv && !document.body.classList.contains('video-mode')) {
+        chatDiv.style.paddingTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
       }
 
       requestAnimationFrame(() => {
@@ -1445,8 +1526,12 @@
                 startChattingBtn.style.display = 'block';
             }
         } else {
-            stopAllStreams(true); // Turn off camera when toggling video mode off
+            stopAllStreams(true); 
         }
+        
+        // ADDITION: Reset footer state when changing mode
+        footer.classList.remove('hidden');
+        clearTimeout(footerHideTimeout);
         
         if (ws && ws.readyState === WebSocket.OPEN) {
             ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
@@ -1455,20 +1540,12 @@
         adjustLayoutForKeyboard();
     });
 
-    // ==========================================================
-    // ===>>> START OF UPDATED CODE FOR BLACK SCREEN FIX <<<===
-    // ==========================================================
-
     function stopAllStreams(stopLocal = true) {
-        // Sirf peer connection ko band karein
         if (peerConnection) {
             peerConnection.close();
             peerConnection = null;
         }
-        // Remote video ko saaf karein
         remoteVideo.srcObject = null;
-
-        // Agar kaha gaya hai, tabhi local stream (camera) ko band karein
         if (stopLocal && localStream) {
             localStream.getTracks().forEach(track => track.stop());
             localStream = null;
@@ -1477,26 +1554,20 @@
     }
 
     function createPeerConnection() {
-        // Purana connection band karein agar maujood hai
         if (peerConnection) {
             peerConnection.close();
         }
-
         peerConnection = new RTCPeerConnection(stunServers);
-
         peerConnection.onicecandidate = event => {
             if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
                 ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
             }
         };
-        
         peerConnection.ontrack = event => {
             if (remoteVideo.srcObject !== event.streams[0]) {
               remoteVideo.srcObject = event.streams[0];
             }
         };
-
-        // Local stream se tracks ko naye connection me add karein
         if (localStream) {
             localStream.getTracks().forEach(track => {
                 peerConnection.addTrack(track, localStream);
@@ -1508,10 +1579,7 @@
       if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
         ws.close();
       }
-      
-      // Connection reset karein lekin local stream (camera) band na karein
       stopAllStreams(false); 
-      
       messagesDiv.innerHTML = ''; 
       showPopup("🔍 Searching for a stranger...");
       typingIndicator.style.display = "none";
@@ -1532,9 +1600,13 @@
                 showPopup("🔍 Searching for a stranger...");
               } else if (data.text === "connected") {
                 showPopup("✅ Connected! Say Hi 👋");
-                if (isVideoEnabled && !peerConnection) {
-                    createPeerConnection();
-                }
+                 // ADDITION: Start timer to hide footer on connection
+                 if (isVideoEnabled) {
+                    clearTimeout(footerHideTimeout);
+                    footerHideTimeout = setTimeout(() => {
+                        footer.classList.add('hidden');
+                    }, 3000);
+                 }
               } else if (data.text === 'initiate_offer') {
                 if (isVideoEnabled) {
                     if(!peerConnection) createPeerConnection();
@@ -1547,6 +1619,9 @@
                   showPopup("❌ Stranger disconnected");
                   isConnected = false;
                   stopAllStreams(false);
+                  // ADDITION: Reset footer state
+                  footer.classList.remove('hidden');
+                  clearTimeout(footerHideTimeout);
                 }
               } else if (data.text === "timeout") {
                  showPopup("No one was found. Click Next Button");
@@ -1599,6 +1674,9 @@
         isConnected = false;
         stopAllStreams(false);
         updateInputState();
+        // ADDITION: Reset footer state
+        footer.classList.remove('hidden');
+        clearTimeout(footerHideTimeout);
       };
 
       ws.onerror = (err) => {
@@ -1607,10 +1685,6 @@
       };
     }
     
-    // ========================================================
-    // ===>>> END OF UPDATED CODE FOR BLACK SCREEN FIX <<<===
-    // ========================================================
-
     const handleSend = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
@@ -1636,6 +1710,9 @@
     const handleNext = (e) => {
       e.preventDefault();
       e.stopImmediatePropagation();
+      // ADDITION: Reset footer state on Next
+      footer.classList.remove('hidden');
+      clearTimeout(footerHideTimeout);
       connectStranger();
       debouncedAdjustLayout();
     };
@@ -1646,6 +1723,31 @@
       if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: "typing" }));
       }
+      // ADDITION: Keep footer visible while typing
+      if (isVideoEnabled && isConnected) {
+        if (footer.classList.contains('hidden')) {
+            footer.classList.remove('hidden');
+        }
+        clearTimeout(footerHideTimeout);
+        footerHideTimeout = setTimeout(() => {
+            if(input.value.trim().length === 0) { // Only hide if input is empty
+               footer.classList.add('hidden');
+            }
+        }, 4000);
+      }
+    });
+    
+    // ADDITION: Add click listener to show the footer
+    const chatWrapper = document.querySelector('.chat-wrapper');
+    chatWrapper.addEventListener('click', () => {
+        if (isVideoEnabled && footer.classList.contains('hidden')) {
+            footer.classList.remove('hidden');
+            clearTimeout(footerHideTimeout);
+            // Re-hide after a delay
+            footerHideTimeout = setTimeout(() => {
+                footer.classList.add('hidden');
+            }, 4000);
+        }
     });
 
     document.body.classList.add('auto-scroll-enabled');
