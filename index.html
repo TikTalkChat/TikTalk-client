@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>TikTalk - Stranger Chat</title>
   <style>
-    /* === ESTILOS ORIGINALES (WITH EMOJI PICKER HEIGHT CHANGES) === */
     * {
       margin: 0;
       padding: 0;
@@ -224,7 +223,7 @@
       border-radius: 20px;
     }
     body.dark-mode .inputWrapper {
-        background: #2d3748 !important;
+      background: #2d3748 !important;
     }
     textarea {
       width: 100%;
@@ -300,9 +299,8 @@
     button:active {
       opacity: 0.85;
     }
-    
     .footer-buttons {
-        margin-left: 8px;
+      margin-left: 8px;
     }
     #sendBtn, #nextBtn {
       width: 46px;
@@ -320,15 +318,13 @@
       box-shadow: 0 2px 8px rgba(0,123,255,0.4);
     }
     #nextBtn {
-       background: #007bff;
-       box-shadow: 0 2px 8px rgba(0,123,255,0.4);
+      background: #007bff;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.4);
     }
-
     #sendBtn svg, #nextBtn svg {
       width: 24px;
       height: 24px;
     }
-
     #emojiPicker {
       position: fixed;
       left: 8px;
@@ -379,7 +375,7 @@
         height: var(--emoji-picker-height, 350px);
         max-height: var(--emoji-picker-height, 350px);
         transform: translate(0, 30px) scale(0.98);
-        bottom: calc(56px + 15px + env(safe-area-inset-bottom)); 
+        bottom: calc(56px + 15px + env(safe-area-inset-bottom));
       }
       #emojiPicker.show {
         transform: translate(0, 0) scale(1);
@@ -515,27 +511,24 @@
       border: none;
       border-radius: 50%;
       box-shadow: none;
-      color: #334155; 
+      color: #334155;
       position: relative;
     }
     body.dark-mode .icon-btn {
       color: #cbd5e1;
     }
-    
     #themeToggle {
-        font-size: 20px;
+      font-size: 20px;
     }
     .icon-btn:active {
       transform: scale(0.95);
     }
-    
     #videoToggleBtn svg {
-        width: 24px;
-        height: 24px;
-        position: absolute;
-        transition: opacity 0.2s;
+      width: 24px;
+      height: 24px;
+      position: absolute;
+      transition: opacity 0.2s;
     }
-    
     .share-btn {
       padding: 0;
       background: transparent;
@@ -860,13 +853,11 @@
     body.dark-mode textarea::-webkit-scrollbar-thumb {
       background: #555;
     }
-    
-    /* === FINAL VIDEO STYLES (REVERTED WITH FIXES) === */
     #video-container {
       display: none;
       flex-direction: column;
       position: absolute;
-      top: calc(76px + env(safe-area-inset-top)); 
+      top: calc(76px + env(safe-area-inset-top));
       left: 0;
       right: 0;
       width: 100%;
@@ -883,32 +874,28 @@
       height: 50%;
       object-fit: cover;
       transform: scaleX(-1);
-      background: #000; /* Fallback background for video */
+      background: #000;
     }
     #video-container video#localVideo {
-      border-top: 2px solid #fff; /* Visual separator between local and remote video */
+      border-top: 2px solid #fff;
     }
-    
     body.video-mode #chat,
     body.video-mode .footerNote {
       display: none;
     }
-
-    /* === HEADER SHRINK STYLES === */
     body.video-mode header {
-        height: 44px;
-        padding-top: 4px;
-        padding-bottom: 4px;
+      height: 44px;
+      padding-top: 4px;
+      padding-bottom: 4px;
     }
     body.video-mode header svg.logo {
-        height: 36px;
+      height: 36px;
     }
     body.video-mode #video-container {
-        top: calc(44px + env(safe-area-inset-top));
+      top: calc(44px + env(safe-area-inset-top));
     }
-    
     #videoToggleBtn.active {
-       filter: drop-shadow(0 0 4px #007bff);
+      filter: drop-shadow(0 0 4px #007bff);
     }
     #nextBtn:disabled {
       opacity: 0.5;
@@ -946,10 +933,10 @@
     <div class="right">
       <button id="videoToggleBtn" class="icon-btn" title="Toggle Video Mode">
         <svg class="video-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+          <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
         </svg>
         <svg class="chat-icon" style="display: none;" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+          <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
         </svg>
       </button>
       <button id="themeToggle" class="icon-btn">🌙</button>
@@ -979,8 +966,8 @@
   </header>
   <div class="chat-wrapper">
     <div id="video-container">
-        <video id="remoteVideo" playsinline autoplay></video>
-        <video id="localVideo" playsinline autoplay muted></video>
+      <video id="remoteVideo" playsinline autoplay></video>
+      <video id="localVideo" playsinline autoplay muted></video>
     </div>
     <main id="chat">
       <div id="messages"></div>
@@ -1006,7 +993,7 @@
           <path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
         </svg>
       </button>
-      <button id="sendBtn" title="Send">
+      <button id="sendBtn" title="Send" style="display: none;">
         <svg class="button-icon" viewBox="0 0 24 24" fill="white">
           <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
         </svg>
@@ -1044,869 +1031,509 @@
       };
     }
 
-    async function diagnoseMediaStream() {
-      if (!localStream) {
-        console.warn("No local stream available for diagnostics.");
-        showPopup("⚠️ Local stream not initialized. Please toggle video mode again.");
-        return;
-      }
-      const videoTracks = localStream.getVideoTracks();
-      const audioTracks = localStream.getAudioTracks();
-      console.log("Video tracks:", videoTracks.length, videoTracks.map(t => ({ enabled: t.enabled, readyState: t.readyState })));
-      console.log("Audio tracks:", audioTracks.length, audioTracks.map(t => ({ enabled: t.enabled, readyState: t.readyState })));
-      
-      if (videoTracks.length === 0) {
-        showPopup("⚠️ Camera not detected. Please check your camera.");
-      }
-      if (audioTracks.length === 0) {
-        showPopup("⚠️ Microphone not detected. Please check your microphone.");
-      } else if (!audioTracks[0].enabled || audioTracks[0].readyState !== 'live') {
-        showPopup("⚠️ Microphone is not active. Please check microphone settings or permissions.");
+    async function checkPermissions() {
+      try {
+        const cameraPermission = await navigator.permissions.query({ name: 'camera' });
+        const micPermission = await navigator.permissions.query({ name: 'microphone' });
+        console.log('Camera permission:', cameraPermission.state);
+        console.log('Microphone permission:', micPermission.state);
+        if (cameraPermission.state === 'denied' || micPermission.state === 'denied') {
+          showPopup('⚠️ Please allow camera and microphone access in your browser settings.');
+          return false;
+        }
+        return true;
+      } catch (error) {
+        console.error('Error checking permissions:', error);
+        showPopup('❌ Error checking permissions. Please ensure camera and microphone access is allowed.');
+        return false;
       }
     }
 
-    async function selectAudioDevice() {
+    async function selectMediaDevices() {
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(device => device.kind === 'videoinput');
         const audioDevices = devices.filter(device => device.kind === 'audioinput');
-        if (audioDevices.length > 0) {
-          console.log("Available audio devices:", audioDevices);
-          // Select the first available audio device (can be customized)
-          return audioDevices[0].deviceId;
-        } else {
-          console.warn("No audio input devices found.");
-          showPopup("⚠️ No microphone detected. Please connect a microphone.");
-          return null;
+        console.log('Available devices:', { video: videoDevices, audio: audioDevices });
+        if (videoDevices.length === 0) {
+          showPopup('⚠️ No camera detected. Video may not work.');
         }
+        if (audioDevices.length === 0) {
+          showPopup('⚠️ No microphone detected. Audio may not work.');
+          return { videoDeviceId: null, audioDeviceId: null };
+        }
+        return {
+          videoDeviceId: videoDevices[0]?.deviceId || null,
+          audioDeviceId: audioDevices[0]?.deviceId || null
+        };
       } catch (error) {
-        console.error("Error enumerating audio devices:", error);
-        showPopup("❌ Error accessing audio devices. Please check permissions.");
+        console.error('Error enumerating devices:', error);
+        showPopup('❌ Error accessing media devices. Please check permissions.');
+        return { videoDeviceId: null, audioDeviceId: null };
+      }
+    }
+
+    async function initializeLocalStream() {
+      if (localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+      }
+      try {
+        const hasPermissions = await checkPermissions();
+        if (!hasPermissions) throw new Error('Permissions not granted');
+
+        const { videoDeviceId, audioDeviceId } = await selectMediaDevices();
+        const constraints = {
+          video: videoDeviceId ? { deviceId: { exact: videoDeviceId }, facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } } : false,
+          audio: audioDeviceId ? { deviceId: { exact: audioDeviceId }, echoCancellation: true, noiseSuppression: true, autoGainControl: true } : false
+        };
+
+        localStream = await navigator.mediaDevices.getUserMedia(constraints);
+        console.log('Local stream initialized:', {
+          videoTracks: localStream.getVideoTracks().map(t => ({ enabled: t.enabled, readyState: t.readyState })),
+          audioTracks: localStream.getAudioTracks().map(t => ({ enabled: t.enabled, readyState: t.readyState }))
+        });
+
+        localVideo.srcObject = localStream;
+        localVideo.play().catch(error => console.error('Error playing local video:', error));
+        return true;
+      } catch (error) {
+        console.error('Error initializing local stream:', error);
+        let errorMessage = '❌ Failed to access camera/microphone. ';
+        if (error.name === 'NotAllowedError') errorMessage += 'Please grant permissions.';
+        else if (error.name === 'NotFoundError') errorMessage += 'No camera or microphone found.';
+        else errorMessage += 'An unexpected error occurred.';
+        showPopup(errorMessage);
+        return false;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme');
+      const themeToggle = document.getElementById('themeToggle');
+      if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeToggle.textContent = '☀️';
+      }
+      initializeEmojiPicker();
+      adjustLayoutForKeyboard();
+    });
+
+    function initializeEmojiPicker() {
+      const emojiPicker = document.getElementById('emojiPicker');
+      const input = document.getElementById('messageInput');
+      if (window.EmojiMart) {
+        const picker = new EmojiMart.Picker({
+          onEmojiSelect: (e) => {
+            input.value += e.native;
+            input.focus();
+            debouncedAdjustLayout();
+          },
+          theme: document.body.classList.contains('dark-mode') ? 'dark' : 'light',
+          previewPosition: 'none',
+          skinTonePosition: 'search',
+          categories: ['frequent', 'people', 'nature', 'foods', 'activity', 'places', 'objects', 'symbols', 'flags']
+        });
+        emojiPicker.appendChild(picker);
+        window._emojiPickerInstance = picker;
+      }
+    }
+
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+      document.body.classList.toggle('dark-mode');
+      themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+      localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+    });
+
+    const emojiToggle = document.getElementById('emojiToggle');
+    const emojiPicker = document.getElementById('emojiPicker');
+    emojiToggle.addEventListener('click', (e) => {
+      e.preventDefault();
+      const isPickerOpen = emojiPicker.classList.contains('show');
+      emojiPicker.classList.toggle('show');
+      emojiPicker.style.display = isPickerOpen ? 'none' : 'block';
+      emojiToggle.textContent = isPickerOpen ? '😊' : '⌨️';
+      emojiToggle.setAttribute('aria-expanded', !isPickerOpen);
+      if (!isPickerOpen) input.blur();
+      debouncedAdjustLayout();
+    });
+
+    const shareBtn = document.getElementById('shareBtn');
+    const shareSheet = document.getElementById('shareSheet');
+    shareBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      shareSheet.classList.toggle('show');
+      shareSheet.style.display = shareSheet.classList.contains('show') ? 'flex' : 'none';
+    });
+
+    function shareApp(platform) {
+      const url = window.location.href;
+      if (platform === 'whatsapp') window.open(`https://wa.me/?text=${encodeURIComponent(url)}`, '_blank');
+      else if (platform === 'instagram') window.open('https://www.instagram.com/', '_blank');
+      else if (platform === 'facebook') window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+      else if (platform === 'x') window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}`, '_blank');
+      else if (platform === 'link') {
+        navigator.clipboard.writeText(url).then(() => showCopyPopup('✅ Copied!'));
+      }
+    }
+
+    function showCopyPopup(message) {
+      let popup = document.getElementById('copyLinkPopup');
+      if (!popup) {
+        popup = document.createElement('div');
+        popup.id = 'copyLinkPopup';
+        document.body.appendChild(popup);
+      }
+      popup.textContent = message;
+      popup.classList.add('show');
+      setTimeout(() => popup.classList.remove('show'), 2000);
+    }
+
+    const startChattingBtn = document.getElementById('startChattingBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const sendBtn = document.getElementById('sendBtn');
+    const messageInput = document.getElementById('messageInput');
+    const messagesDiv = document.getElementById('messages');
+    const typingIndicator = document.getElementById('typingIndicator');
+    let ws, typingTimeout, isConnected = false, reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+
+    messageInput.addEventListener('input', () => {
+      if (messageInput.value.trim().length > 0) {
+        sendBtn.style.display = 'flex';
+        nextBtn.style.display = 'none';
+        if (ws && isConnected) ws.send(JSON.stringify({ type: 'typing' }));
+      } else {
+        sendBtn.style.display = 'none';
+        nextBtn.style.display = 'flex';
+      }
+    });
+
+    function scrollToBottom() {
+      const chatDiv = document.getElementById('chat');
+      if (chatDiv && getComputedStyle(chatDiv).display !== 'none') {
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+      }
+    }
+
+    function addMessage(text, who) {
+      const div = document.createElement('div');
+      div.className = `msg ${who}`;
+      div.textContent = text;
+      messagesDiv.appendChild(div);
+      scrollToBottom();
+    }
+
+    function showPopup(text) {
+      const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
+      if (!targetDiv) return;
+      targetDiv.innerHTML = text.includes('Searching')
+        ? `<div class="popup"><div class="searching-container"><div class="pulse-dots"><div class="pulse-dot"></div><div class="pulse-dot"></div><div class="pulse-dot"></div></div><div class="searching-text">Searching for a stranger...</div></div></div>`
+        : text.includes('Connected')
+        ? `<div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`
+        : `<div class="popup">${text}</div>`;
+      if (text.includes('Connected')) {
+        isConnected = true;
+        setTimeout(() => {
+          if (isConnected && targetDiv.innerHTML.includes('Connected')) {
+            targetDiv.innerHTML = document.body.classList.contains('video-mode') ? '' : '';
+          }
+        }, 3000);
+      } else {
+        isConnected = false;
+      }
+      scrollToBottom();
+      updateInputState();
+    }
+
+    function updateInputState() {
+      messageInput.disabled = !isConnected;
+      document.querySelector('footer').classList.toggle('disabled', !isConnected);
+    }
+
+    function stopAllStreams(stopLocal = true) {
+      if (stopLocal && localStream) {
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+      }
+      if (peerConnection) {
+        peerConnection.close();
+        peerConnection = null;
+      }
+      if (stopLocal) localVideo.srcObject = null;
+      remoteVideo.srcObject = null;
+    }
+
+    function createPeerConnection() {
+      if (!localStream) {
+        showPopup('⚠️ Local stream not available. Please toggle video mode again.');
+        return null;
+      }
+      try {
+        peerConnection = new RTCPeerConnection(stunServers);
+        peerConnection.onicecandidate = event => {
+          if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
+            console.log('Sent ICE candidate:', event.candidate);
+          }
+        };
+        peerConnection.ontrack = event => {
+          console.log('Received remote track:', event.track.kind);
+          if (!remoteVideo.srcObject) remoteVideo.srcObject = new MediaStream();
+          remoteVideo.srcObject.addTrack(event.track);
+          remoteVideo.play().catch(error => {
+            console.error('Error playing remote video:', error);
+            showPopup('❌ Error playing remote video.');
+          });
+        };
+        peerConnection.oniceconnectionstatechange = () => {
+          console.log('ICE connection state:', peerConnection.iceConnectionState);
+          if (['disconnected', 'failed'].includes(peerConnection.iceConnectionState)) {
+            showPopup('❌ Video connection lost. Reconnecting...');
+            stopAllStreams(false);
+            connectStranger();
+          }
+        };
+        localStream.getTracks().forEach(track => {
+          peerConnection.addTrack(track, localStream);
+          console.log('Added local track:', track.kind, { enabled: track.enabled });
+        });
+        return peerConnection;
+      } catch (error) {
+        console.error('Error creating PeerConnection:', error);
+        showPopup('❌ Failed to establish video connection.');
         return null;
       }
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const shareBtn = document.getElementById("shareBtn");
-      if (shareBtn) {
-        shareBtn.style.display = "flex";
-        shareBtn.style.visibility = "visible";
-        shareBtn.style.opacity = "1";
-      } else {
-        console.error("Share Button not found in DOM!");
-      }
-      const savedTheme = localStorage.getItem("theme");
-      const themeToggle = document.getElementById("themeToggle");
-      if (savedTheme === "dark") {
-        document.body.classList.add("dark-mode");
-        themeToggle.textContent = "☀️";
-      }
-      if ('virtualKeyboard' in navigator) {
-        navigator.virtualKeyboard.overlaysContent = true;
-        navigator.virtualKeyboard.addEventListener('geometrychange', debouncedAdjustLayout);
-      }
-      function initializeEmojiPicker() {
-        const emojiPicker = document.getElementById("emojiPicker");
-        const input = document.getElementById("messageInput");
-        if (window.EmojiMart) {
-          const picker = new EmojiMart.Picker({
-            onEmojiSelect: (e) => {
-              if (!emojiPicker.classList.contains('show') || document.activeElement !== input) {
-                return;
-              }
-              input.value += e.native;
-              input.focus();
-              debouncedAdjustLayout();
-            },
-            theme: document.body.classList.contains("dark-mode") ? "dark" : "light",
-            previewPosition: "none",
-            skinTonePosition: "search",
-            categories: ["frequent", "people", "nature", "foods", "activity", "places", "objects", "symbols", "flags"],
-            emoji: "😊"
-          });
-          emojiPicker.appendChild(picker);
-          window._emojiPickerInstance = picker;
+    async function connectStranger() {
+      if (ws && ws.readyState !== WebSocket.CLOSED) ws.close();
+      stopAllStreams(false);
+      showPopup('🔍 Searching for a stranger...');
+      typingIndicator.style.display = 'none';
+
+      ws = new WebSocket(window.TIKTALK_BACKEND.replace('http', 'ws'));
+      const signalingTimeout = setTimeout(() => {
+        if (!isConnected) {
+          showPopup('⚠️ Connection timeout. Please check your network and try again.');
+          ws.close();
         }
-      }
-      initializeEmojiPicker();
-      const emojiToggle = document.getElementById("emojiToggle");
-      const emojiPicker = document.getElementById("emojiPicker");
-      const input = document.getElementById("messageInput");
-      const footer = document.querySelector("footer");
-      let wasPickerOpenBeforeKeyboard = false;
-      const handleEmojiToggle = (e) => {
-        if (e.target !== emojiToggle || e.currentTarget !== emojiToggle) {
+      }, 10000);
+
+      ws.onopen = () => {
+        clearTimeout(signalingTimeout);
+        reconnectAttempts = 0;
+        ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
+        if (isVideoEnabled && localStream) createPeerConnection();
+      };
+
+      ws.onmessage = async (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log('Received message:', data);
+          switch (data.type) {
+            case 'system':
+              if (data.text === 'waiting') showPopup('🔍 Searching for a stranger...');
+              else if (data.text === 'connected') {
+                clearTimeout(signalingTimeout);
+                showPopup('✅ Connected! Say Hi 👋');
+                if (isVideoEnabled && !peerConnection && localStream) createPeerConnection();
+              } else if (data.text === 'initiate_offer') {
+                if (isVideoEnabled && localStream) {
+                  if (!peerConnection) createPeerConnection();
+                  if (peerConnection) {
+                    const offer = await peerConnection.createOffer();
+                    await peerConnection.setLocalDescription(offer);
+                    ws.send(JSON.stringify({ type: 'offer', offer }));
+                    console.log('Sent offer:', offer);
+                  }
+                } else {
+                  showPopup('⚠️ Local stream not available. Please toggle video mode again.');
+                }
+              } else if (data.text === 'disconnected') {
+                showPopup('❌ Stranger disconnected');
+                isConnected = false;
+                stopAllStreams();
+              } else if (data.text === 'timeout') {
+                showPopup('No one was found. Click Next Button');
+                isConnected = false;
+              } else if (data.text === 'error') {
+                showPopup(`❌ Server error: ${data.error || 'Unknown error'}`);
+              }
+              break;
+            case 'message':
+              typingIndicator.style.display = 'none';
+              addMessage(data.text, 'stranger');
+              break;
+            case 'typing':
+              if (isConnected) {
+                typingIndicator.style.display = 'block';
+                clearTimeout(typingTimeout);
+                typingTimeout = setTimeout(() => typingIndicator.style.display = 'none', 1500);
+              }
+              break;
+            case 'offer':
+              if (isVideoEnabled && localStream) {
+                if (!peerConnection) createPeerConnection();
+                if (peerConnection) {
+                  await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
+                  const answer = await peerConnection.createAnswer();
+                  await peerConnection.setLocalDescription(answer);
+                  ws.send(JSON.stringify({ type: 'answer', answer }));
+                  console.log('Sent answer:', answer);
+                }
+              } else {
+                showPopup('⚠️ Local stream not available. Please toggle video mode again.');
+              }
+              break;
+            case 'answer':
+              if (peerConnection) {
+                await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
+                console.log('Set remote answer:', data.answer);
+              }
+              break;
+            case 'candidate':
+              if (peerConnection) {
+                await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
+                console.log('Added ICE candidate:', data.candidate);
+              }
+              break;
+          }
+        } catch (error) {
+          console.error('Error processing WebSocket message:', error);
+          showPopup('❌ Error processing message from server.');
+        }
+      };
+
+      ws.onclose = () => {
+        if (isConnected) {
+          showPopup('❌ Connection lost. Reconnecting...');
+          if (reconnectAttempts < maxReconnectAttempts) {
+            reconnectAttempts++;
+            setTimeout(connectStranger, 2000);
+          } else {
+            showPopup('❌ Failed to reconnect. Please try again later.');
+          }
+        }
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        showPopup('❌ WebSocket error. Please check your connection.');
+      };
+    }
+
+    videoToggleBtn.addEventListener('click', async () => {
+      isVideoEnabled = !isVideoEnabled;
+      const videoIcon = videoToggleBtn.querySelector('.video-icon');
+      const chatIcon = videoToggleBtn.querySelector('.chat-icon');
+
+      if (isVideoEnabled) {
+        const streamInitialized = await initializeLocalStream();
+        if (!streamInitialized) {
+          isVideoEnabled = false;
+          videoIcon.style.display = 'block';
+          chatIcon.style.display = 'none';
+          startChattingBtn.style.display = 'block';
           return;
         }
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        const isPickerOpen = emojiPicker.classList.contains('show');
-        if (isPickerOpen) {
-          emojiPicker.classList.remove('show');
-          emojiPicker.style.display = 'none';
-          emojiToggle.textContent = "😊";
-          emojiToggle.setAttribute('aria-expanded', 'false');
-          wasPickerOpenBeforeKeyboard = false;
-          input.focus();
-        } else {
-          emojiPicker.classList.add('show');
-          emojiPicker.style.display = 'block';
-          emojiToggle.textContent = "⌨️";
-          emojiToggle.setAttribute('aria-expanded', 'true');
-          input.blur();
-        }
-        debouncedAdjustLayout();
-      };
-      emojiToggle.removeEventListener("click", handleEmojiToggle);
-      emojiToggle.removeEventListener("touchstart", handleEmojiToggle);
-      emojiToggle.removeEventListener("pointerdown", handleEmojiToggle);
-      emojiToggle.addEventListener("click", handleEmojiToggle, { passive: false });
-      emojiToggle.addEventListener("touchstart", handleEmojiToggle, { passive: false });
-      const handleInputInteraction = (e) => {
-        e.stopImmediatePropagation();
-      };
-      input.removeEventListener("click", handleInputInteraction);
-      input.removeEventListener("touchstart", handleInputInteraction);
-      input.addEventListener("click", handleInputInteraction, { passive: true });
-      input.addEventListener("touchstart", handleInputInteraction, { passive: true });
-      input.addEventListener("focus", () => {
-        if (emojiPicker.classList.contains('show')) {
-          emojiPicker.classList.remove('show');
-          emojiPicker.style.display = 'none';
-          emojiToggle.textContent = "😊";
-          emojiToggle.setAttribute('aria-expanded', 'false');
-          wasPickerOpenBeforeKeyboard = true;
-        }
-        adjustLayoutForKeyboard();
-        if (!rafId) rafId = requestAnimationFrame(updateLayout);
-      });
-      input.addEventListener("blur", () => {
-        setTimeout(() => {
-          const isStillFocused = document.activeElement === input || document.activeElement === emojiToggle;
-          if (!isStillFocused) {
-            adjustLayoutForKeyboard();
-          }
-        }, 50);
-        if (wasPickerOpenBeforeKeyboard) {
-          emojiPicker.classList.add('show');
-          emojiPicker.style.display = 'block';
-          emojiToggle.textContent = "⌨️";
-          emojiToggle.setAttribute('aria-expanded', 'true');
-        }
-        if (rafId) {
-          cancelAnimationFrame(rafId);
-          rafId = null;
-        }
-      });
-      input.addEventListener("input", debouncedAdjustLayout);
-    });
-
-    const themeToggle = document.getElementById("themeToggle");
-    const handleThemeToggle = (e) => {
-      e.preventDefault();
-      document.body.classList.toggle("dark-mode");
-      themeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️" : "🌙";
-
-      if (window._emojiPickerInstance) {
-        window._emojiPickerInstance.setOptions({
-          theme: document.body.classList.contains("dark-mode") ? "dark" : "light"
-        });
+        videoIcon.style.display = 'none';
+        chatIcon.style.display = 'block';
+        videoToggleBtn.classList.add('active');
+        document.body.classList.add('video-mode');
+      } else {
+        videoIcon.style.display = 'block';
+        chatIcon.style.display = 'none';
+        videoToggleBtn.classList.remove('active');
+        document.body.classList.remove('video-mode');
+        stopAllStreams();
+        startChattingBtn.style.display = 'block';
+        hasStartedChat = false;
+        nextBtn.disabled = true;
+        messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
       }
-      localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
-    };
-    themeToggle.addEventListener("click", handleThemeToggle);
-    themeToggle.addEventListener("touchstart", handleThemeToggle, { passive: false });
 
-    const shareBtn = document.getElementById("shareBtn");
-    const shareSheet = document.getElementById("shareSheet");
-    const startChattingBtn = document.getElementById("startChattingBtn");
-    const nextBtn = document.getElementById("nextBtn");
-    const sendBtn = document.getElementById("sendBtn");
-    const messageInput = document.getElementById("messageInput");
-
-    // Logic for Next/Send button toggle
-    messageInput.addEventListener('input', () => {
-        if (messageInput.value.trim().length > 0) {
-            sendBtn.style.display = 'flex';
-            nextBtn.style.display = 'none';
-        } else {
-            sendBtn.style.display = 'none';
-            nextBtn.style.display = 'flex';
-        }
-    });
-
-    const handleShareBtn = (e) => {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      const btnRect = shareBtn.getBoundingClientRect();
-      shareSheet.style.top = (btnRect.bottom + window.scrollY) + "px";
-      shareSheet.style.right = (window.innerWidth - btnRect.right) + "px";
-      shareSheet.classList.toggle('show');
-      if (shareSheet.classList.contains('show')) shareSheet.style.display = 'flex';
-      else setTimeout(() => { shareSheet.style.display = 'none'; }, 300);
-    };
-    shareBtn.addEventListener("click", handleShareBtn);
-    shareBtn.addEventListener("touchstart", handleShareBtn, { passive: false });
-
-    document.addEventListener("click", (e) => {
-      if (!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')) {
-        shareSheet.classList.remove('show');
-        setTimeout(() => { shareSheet.style.display = 'none'; }, 300);
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
       }
-    });
-    document.addEventListener("touchstart", (e) => {
-      if (!shareSheet.contains(e.target) && e.target !== shareBtn && shareSheet.classList.contains('show')) {
-        shareSheet.classList.remove('show');
-        setTimeout(() => { shareSheet.style.display = 'none'; }, 300);
-      }
+      adjustLayoutForKeyboard();
     });
 
-    const handleStartChatting = async (e) => {
+    startChattingBtn.addEventListener('click', async (e) => {
       e.preventDefault();
-      e.stopImmediatePropagation();
       isConnected = false;
       if (ws) ws.close();
       hasStartedChat = true;
       startChattingBtn.style.display = 'none';
       nextBtn.disabled = false;
 
-      if (isVideoEnabled && !localStream) {
-          try {
-              // Reinitialize local stream if not present
-              localStream = await navigator.mediaDevices.getUserMedia({
-                  video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
-                  audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
-              });
-              localVideo.srcObject = localStream;
-              diagnoseMediaStream();
-          } catch (error) {
-              console.error("Error reinitializing local stream:", error);
-              showPopup("❌ Failed to start video. Please check camera/microphone permissions.");
-              isVideoEnabled = false;
-              document.body.classList.remove('video-mode');
-              videoToggleBtn.querySelector('.video-icon').style.display = 'block';
-              videoToggleBtn.querySelector('.chat-icon').style.display = 'none';
-              startChattingBtn.style.display = 'block';
-              return;
-          }
+      if (isVideoEnabled) {
+        const streamInitialized = await initializeLocalStream();
+        if (!streamInitialized) {
+          isVideoEnabled = false;
+          document.body.classList.remove('video-mode');
+          videoToggleBtn.querySelector('.video-icon').style.display = 'block';
+          videoToggleBtn.querySelector('.chat-icon').style.display = 'none';
+          startChattingBtn.style.display = 'block';
+          return;
+        }
       }
 
       connectStranger();
-      debouncedAdjustLayout();
-    };
-    startChattingBtn.addEventListener("click", handleStartChatting);
-    startChattingBtn.addEventListener("touchstart", handleStartChatting, { passive: false });
+    });
 
-    function shareApp(platform) {
-      let url = window.location.href;
-      if (platform === "whatsapp") window.open("https://wa.me/?text=" + encodeURIComponent(url), "_blank");
-      else if (platform === "instagram") window.open("https://www.instagram.com/", "_blank");
-      else if (platform === "facebook") window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url), "_blank");
-      else if (platform === "x") window.open("https://twitter.com/intent/tweet?url=" + encodeURIComponent(url), "_blank");
-      else if (platform === "link") {
-        const tempInput = document.createElement('input');
-        tempInput.value = url;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand('copy');
-        document.body.removeChild(tempInput);
-        showCopyPopup("✅ Copied!");
+    sendBtn.addEventListener('click', () => {
+      if (messageInput.value.trim() && isConnected && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'message', text: messageInput.value }));
+        addMessage(messageInput.value, 'me');
+        messageInput.value = '';
+        sendBtn.style.display = 'none';
+        nextBtn.style.display = 'flex';
       }
-    }
+    });
 
-    function showCopyPopup(message) {
-      let existing = document.getElementById("copyLinkPopup");
-      if (existing) existing.remove();
-      const popup = document.createElement("div");
-      popup.id = "copyLinkPopup";
-      popup.textContent = message;
-      document.body.appendChild(popup);
-      const shareBtnRect = shareBtn.getBoundingClientRect();
-      const sheetRect = shareSheet.getBoundingClientRect();
-      popup.style.top = (sheetRect.bottom + window.scrollY + 10) + "px";
-      popup.style.right = (window.innerWidth - sheetRect.right) + "px";
-      popup.style.transform = 'translateY(-10px)';
-      void popup.offsetWidth;
-      popup.classList.add('show');
-      setTimeout(() => {
-        popup.classList.remove('show');
-      }, 2000);
-    }
-
-    function scrollToBottom() {
-      const chatDiv = document.getElementById("chat");
-      if (!chatDiv || getComputedStyle(chatDiv).display === 'none') return;
-      const isNearBottom = chatDiv.scrollHeight - chatDiv.scrollTop - chatDiv.clientHeight < 100;
-      if (isNearBottom && messagesDiv.children.length > 0) {
-        chatDiv.scrollTop = chatDiv.scrollHeight;
+    nextBtn.addEventListener('click', () => {
+      if (!nextBtn.disabled) {
+        isConnected = false;
+        messagesDiv.innerHTML = '';
+        connectStranger();
       }
-    }
-
-    window.TIKTALK_BACKEND = "https://tiktalkchat-backend-v2.onrender.com";
-    const messagesDiv = document.getElementById("messages");
-    const input = document.getElementById("messageInput");
-    const typingIndicator = document.getElementById("typingIndicator");
-    const footer = document.querySelector("footer");
-    const emojiPicker = document.getElementById("emojiPicker");
-    let ws, typingTimeout;
-    let isConnected = false;
-    let reconnectAttempts = 0;
-    const maxReconnectAttempts = 5;
-    let lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
+    });
 
     function adjustLayoutForKeyboard() {
-      const header = document.querySelector("header");
-      const chatDiv = document.getElementById("chat");
-      const footerNote = document.querySelector(".footerNote");
-      const footer = document.querySelector("footer");
-      const startChattingBtn = document.getElementById("startChattingBtn");
-      const emojiPicker = document.getElementById("emojiPicker");
-      const headerHeight = header.offsetHeight || 76;
-      let safeAreaTop = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-top)') || '0', 10);
-      let safeAreaBottom = parseInt(getComputedStyle(document.documentElement).getPropertyValue('env(safe-area-inset-bottom)') || '0', 10);
-      const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
+      const footer = document.querySelector('footer');
+      const chatDiv = document.getElementById('chat');
+      const footerNote = document.querySelector('.footerNote');
+      const startChattingBtn = document.getElementById('startChattingBtn');
+      const emojiPicker = document.getElementById('emojiPicker');
+      const isKeyboardOpen = document.activeElement === messageInput;
       const isEmojiPickerOpen = emojiPicker.classList.contains('show');
-      const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-      let keyboardHeight = 0;
+      const keyboardHeight = window.visualViewport ? Math.max(0, window.innerHeight - (window.visualViewport.height + window.visualViewport.offsetTop)) : 0;
 
-      if ('virtualKeyboard' in navigator) {
-        keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
-      } else if (window.visualViewport) {
-        const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
-        const windowBottom = window.innerHeight;
-        keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
-      }
-
-      if (keyboardHeight > 0) {
-        lastKeyboardHeight = Math.max(keyboardHeight, 300);
-        localStorage.setItem('lastKeyboardHeight', lastKeyboardHeight);
-      } else if (!isKeyboardOpen && !isEmojiPickerOpen) {
-        lastKeyboardHeight = parseInt(localStorage.getItem('lastKeyboardHeight')) || 350;
-      }
-
-      let emojiPickerHeight = lastKeyboardHeight;
-      if (isDesktop) {
-        emojiPickerHeight = Math.min(lastKeyboardHeight, 350);
-      } else {
-        emojiPickerHeight = Math.min(lastKeyboardHeight, window.innerHeight * 0.7);
-      }
-      document.documentElement.style.setProperty('--emoji-picker-height', `${emojiPickerHeight}px`);
-      
-      const footerNoteHeight = 20;
-
-      // Smooth transitions with requestAnimationFrame
       requestAnimationFrame(() => {
-          if (isKeyboardOpen) {
-              footer.style.transition = 'bottom 0.3s ease';
-              footer.style.bottom = `calc(${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
-              if (chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
-              footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 10px)`;
-              startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${keyboardHeight}px + ${safeAreaBottom}px + 35px)`;
-              if (emojiPicker.classList.contains('show')) {
-                  emojiPicker.classList.remove('show');
-                  emojiPicker.style.display = 'none';
-                  document.getElementById("emojiToggle").textContent = "😊";
-                  document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
-              }
-          } else if (isEmojiPickerOpen) {
-              if (!isDesktop) {
-                  footer.style.transition = 'bottom 0.3s ease';
-                  footer.style.bottom = `calc(${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
-                  if (chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
-                  footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 10px)`;
-                  startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${emojiPickerHeight}px + ${safeAreaBottom}px + 35px)`;
-              }
-              emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
-          } else {
-              footer.style.transition = 'none';
-              footer.style.bottom = `calc(10px + ${safeAreaBottom}px)`;
-              if (chatDiv) chatDiv.style.paddingBottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px + ${footerNoteHeight}px)`;
-              footerNote.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 10px)`;
-              startChattingBtn.style.bottom = `calc(${footer.offsetHeight}px + ${safeAreaBottom}px + 35px)`;
-              emojiPicker.style.bottom = isDesktop ? `calc(56px + 15px + ${safeAreaBottom}px)` : `calc(10px + ${safeAreaBottom}px)`;
-              footer.offsetHeight;
-              setTimeout(() => {
-                  footer.style.transition = 'bottom 0.3s ease';
-              }, 0);
-          }
-
-          if (chatDiv && !document.body.classList.contains('video-mode')) {
-              chatDiv.style.paddingTop = `calc(${headerHeight}px + ${safeAreaTop}px)`;
-          }
-
-          scrollToBottom();
-      });
-    }
-
-    const debouncedAdjustLayout = debounce(adjustLayoutForKeyboard, 50);
-    let rafId;
-    function updateLayout() {
-      adjustLayoutForKeyboard();
-      rafId = requestAnimationFrame(updateLayout);
-    }
-    if (window.visualViewport && !('virtualKeyboard' in navigator)) {
-      window.visualViewport.addEventListener("resize", () => {
-        const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
-        const windowBottom = window.innerHeight;
-        const keyboardHeight = windowBottom - visualViewportBottom;
-        if (keyboardHeight === 0 && document.activeElement !== document.getElementById("messageInput")) {
-          adjustLayoutForKeyboard();
+        if (isKeyboardOpen) {
+          footer.style.bottom = `calc(${keyboardHeight}px + 10px)`;
+          chatDiv.style.paddingBottom = `calc(56px + ${keyboardHeight}px + 10px)`;
+          footerNote.style.bottom = `calc(56px + ${keyboardHeight}px + 10px)`;
+          startChattingBtn.style.bottom = `calc(56px + ${keyboardHeight}px + 35px)`;
+        } else if (isEmojiPickerOpen) {
+          footer.style.bottom = `calc(350px + 10px)`;
+          chatDiv.style.paddingBottom = `calc(56px + 350px + 10px)`;
+          footerNote.style.bottom = `calc(56px + 350px + 10px)`;
+          startChattingBtn.style.bottom = `calc(56px + 350px + 35px)`;
         } else {
-          debouncedAdjustLayout();
-        }
-      });
-      window.visualViewport.addEventListener("scroll", debouncedAdjustLayout);
-    }
-    setInterval(() => {
-      const isKeyboardOpen = document.activeElement === document.getElementById("messageInput");
-      const isEmojiPickerOpen = document.getElementById("emojiPicker").classList.contains('show');
-      let keyboardHeight = 0;
-      if ('virtualKeyboard' in navigator) {
-        keyboardHeight = navigator.virtualKeyboard.boundingRect.height;
-      } else if (window.visualViewport) {
-        const visualViewportBottom = window.visualViewport.height + window.visualViewport.offsetTop;
-        const windowBottom = window.innerHeight;
-        keyboardHeight = Math.max(0, windowBottom - visualViewportBottom);
-      }
-      if (!isKeyboardOpen && keyboardHeight === 0 && !isEmojiPickerOpen) {
-        adjustLayoutForKeyboard();
-      }
-    }, 500);
-    window.addEventListener("resize", debouncedAdjustLayout);
-    window.addEventListener("touchstart", debouncedAdjustLayout);
-    window.addEventListener("touchmove", debouncedAdjustLayout);
-    window.addEventListener("load", debouncedAdjustLayout);
-
-    function addMessage(text, who) {
-      const fragment = document.createDocumentFragment();
-      const div = document.createElement("div");
-      div.className = "msg " + who;
-      div.textContent = text;
-      fragment.appendChild(div);
-      messagesDiv.appendChild(fragment);
-    }
-
-    function showPopup(text) {
-      const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
-      if (!targetDiv) return;
-
-      if (text.includes("Searching")) {
-        targetDiv.innerHTML = `
-          <div class="popup">
-            <div class="searching-container">
-              <div class="pulse-dots"><div class="pulse-dot"></div><div class="pulse-dot"></div><div class="pulse-dot"></div></div>
-              <div class="searching-text">Searching for a stranger...</div>
-            </div>
-          </div>`;
-        isConnected = false;
-      } else if (text.includes("Connected")) {
-        targetDiv.innerHTML = `
-          <div class="popup"><span class="connected-checkmark"></span><span>Connected! Say Hi 👋</span></div>`;
-        isConnected = true;
-        setTimeout(() => {
-          if (isConnected && targetDiv.innerHTML.includes("Connected")) {
-            targetDiv.innerHTML = document.body.classList.contains('video-mode') ? '' : '';
-          }
-        }, 3000);
-      } else {
-        targetDiv.innerHTML = `<div class="popup">${text}</div>`;
-        isConnected = false;
-      }
-      scrollToBottom();
-      debouncedAdjustLayout();
-      updateInputState();
-    }
-
-    function updateInputState() {
-      const isInputDisabled = !isConnected;
-      input.disabled = isInputDisabled;
-      document.querySelector('footer').classList.toggle('disabled', isInputDisabled);
-      
-      if (isConnected) {
-          sendBtn.style.display = 'none';
-          nextBtn.style.display = 'flex';
-      }
-    }
-
-    videoToggleBtn.addEventListener('click', async () => {
-      const videoIcon = videoToggleBtn.querySelector('.video-icon');
-      const chatIcon = videoToggleBtn.querySelector('.chat-icon');
-      
-      isVideoEnabled = !isVideoEnabled;
-
-      if (isVideoEnabled) {
-          videoIcon.style.display = 'none';
-          chatIcon.style.display = 'block';
-          try {
-              // Check for camera and microphone permissions
-              const permissions = await navigator.permissions.query({ name: 'camera' });
-              const micPermissions = await navigator.permissions.query({ name: 'microphone' });
-              if (permissions.state !== 'granted' || micPermissions.state !== 'granted') {
-                  alert("Camera and microphone permissions are required. Please allow access in your browser settings.");
-                  isVideoEnabled = false;
-                  document.body.classList.remove('video-mode');
-                  videoIcon.style.display = 'block';
-                  chatIcon.style.display = 'none';
-                  startChattingBtn.style.display = 'block';
-                  return;
-              }
-
-              // Select audio device
-              const audioDeviceId = await selectAudioDevice();
-              if (!audioDeviceId) {
-                  isVideoEnabled = false;
-                  document.body.classList.remove('video-mode');
-                  videoIcon.style.display = 'block';
-                  chatIcon.style.display = 'none';
-                  startChattingBtn.style.display = 'block';
-                  return;
-              }
-
-              // Request media stream with specific audio device
-              localStream = await navigator.mediaDevices.getUserMedia({
-                  video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
-                  audio: { 
-                      deviceId: audioDeviceId ? { exact: audioDeviceId } : undefined,
-                      echoCancellation: true, 
-                      noiseSuppression: true, 
-                      autoGainControl: true 
-                  }
-              });
-
-              // Verify and enable audio track
-              const audioTracks = localStream.getAudioTracks();
-              if (audioTracks.length === 0) {
-                  alert("No microphone detected. Please connect a microphone and try again.");
-                  isVideoEnabled = false;
-                  document.body.classList.remove('video-mode');
-                  videoIcon.style.display = 'block';
-                  chatIcon.style.display = 'none';
-                  startChattingBtn.style.display = 'block';
-                  return;
-              }
-              audioTracks.forEach(track => {
-                  track.enabled = true; // Explicitly enable audio track
-                  console.log("Audio track status:", { enabled: track.enabled, readyState: track.readyState });
-              });
-
-              localVideo.srcObject = localStream;
-              diagnoseMediaStream();
-              videoToggleBtn.classList.add('active');
-          } catch (error) {
-              console.error("Error accessing media devices:", error.name, error.message);
-              let errorMessage = "Could not access camera/microphone. ";
-              if (error.name === 'NotAllowedError') {
-                  errorMessage += "Please grant camera and microphone permissions.";
-              } else if (error.name === 'NotFoundError') {
-                  errorMessage += "No camera or microphone found.";
-              } else {
-                  errorMessage += "An unexpected error occurred.";
-              }
-              alert(errorMessage);
-              isVideoEnabled = false;
-              document.body.classList.remove('video-mode');
-              videoIcon.style.display = 'block';
-              chatIcon.style.display = 'none';
-              startChattingBtn.style.display = 'block';
-          }
-      } else {
-          videoIcon.style.display = 'block';
-          chatIcon.style.display = 'none';
-          videoToggleBtn.classList.remove('active');
-          stopAllStreams();
-          startChattingBtn.style.display = 'block';
-          hasStartedChat = false;
-          nextBtn.disabled = true;
-          messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
-      }
-
-      document.body.classList.toggle('video-mode', isVideoEnabled);
-      
-      if (isVideoEnabled && ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
-      } else if (ws && ws.readyState === WebSocket.OPEN) {
-          ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
-          ws.close();
-      }
-      
-      adjustLayoutForKeyboard();
-    });
-
-    function stopAllStreams(stopLocal = true) {
-      if (stopLocal && localStream) {
-          localStream.getTracks().forEach(track => track.stop());
-          localStream = null;
-      }
-      if (peerConnection) {
-          peerConnection.close();
-          peerConnection = null;
-      }
-      if (stopLocal) {
-          localVideo.srcObject = null;
-      }
-      remoteVideo.srcObject = null;
-    }
-
-    function createPeerConnection() {
-      try {
-          peerConnection = new RTCPeerConnection(stunServers);
-          peerConnection.onicecandidate = event => {
-              if (event.candidate && ws && ws.readyState === WebSocket.OPEN) {
-                  ws.send(JSON.stringify({ type: 'candidate', candidate: event.candidate }));
-                  console.log("Sent ICE candidate:", event.candidate);
-              }
-          };
-          
-          peerConnection.ontrack = event => {
-              console.log("Received remote track:", event.track.kind);
-              if (event.streams && event.streams[0]) {
-                  remoteVideo.srcObject = event.streams[0];
-                  console.log("Set remote video stream:", event.streams[0]);
-              } else {
-                  if (!remoteVideo.srcObject) {
-                      remoteVideo.srcObject = new MediaStream();
-                  }
-                  remoteVideo.srcObject.addTrack(event.track);
-                  console.log("Added remote track to stream:", event.track);
-              }
-          };
-
-          peerConnection.oniceconnectionstatechange = () => {
-              console.log("ICE connection state:", peerConnection.iceConnectionState);
-              if (peerConnection.iceConnectionState === 'disconnected' || peerConnection.iceConnectionState === 'failed') {
-                  console.error("ICE connection failed or disconnected:", peerConnection.iceConnectionState);
-                  showPopup("❌ Video connection lost. Reconnecting...");
-                  stopAllStreams(false);
-                  connectStranger();
-              }
-          };
-
-          peerConnection.onnegotiationneeded = async () => {
-              try {
-                  console.log("Negotiation needed, creating offer...");
-                  const offer = await peerConnection.createOffer();
-                  await peerConnection.setLocalDescription(offer);
-                  ws.send(JSON.stringify({ type: 'offer', offer: offer }));
-                  console.log("Sent offer on negotiationneeded:", offer);
-              } catch (error) {
-                  console.error("Error during negotiation:", error);
-                  showPopup("❌ Error in video negotiation. Please try again.");
-              }
-          };
-
-          if (localStream) {
-              localStream.getTracks().forEach(track => {
-                  peerConnection.addTrack(track, localStream);
-                  console.log("Added local track:", track.kind, { enabled: track.enabled, readyState: track.readyState });
-              });
-              // Verify audio track transmission
-              const audioTracks = localStream.getAudioTracks();
-              if (audioTracks.length === 0) {
-                  console.warn("No audio tracks found in local stream.");
-                  showPopup("⚠️ No microphone detected. Audio may not work.");
-              }
-          } else {
-              console.warn("No local stream available to add tracks.");
-              showPopup("⚠️ Local stream not initialized. Please toggle video mode again.");
-          }
-      } catch (error) {
-          console.error("Error creating PeerConnection:", error);
-          showPopup("❌ Failed to establish video connection.");
-      }
-    }
-    
-    function connectStranger() {
-      if (ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)) {
-        ws.close();
-      }
-      stopAllStreams(false); // Keep local stream when connecting
-      const targetDiv = document.body.classList.contains('video-mode') ? document.getElementById('video-container') : messagesDiv;
-      if (targetDiv) targetDiv.innerHTML = '';
-      showPopup("🔍 Searching for a stranger...");
-      if (typingIndicator) typingIndicator.style.display = "none";
-      
-      ws = new WebSocket(window.TIKTALK_BACKEND.replace("http", "ws"));
-
-      const signalingTimeout = setTimeout(() => {
-          if (!isConnected) {
-              showPopup("⚠️ Connection timeout. Please check your network and try again.");
-              ws.close();
-          }
-      }, 10000); // 10-second timeout for signaling
-
-      ws.onopen = () => {
-          clearTimeout(signalingTimeout);
-          reconnectAttempts = 0;
-          updateInputState();
-          ws.send(JSON.stringify({ type: 'mode_change', video: isVideoEnabled }));
-          if (isVideoEnabled && localStream) {
-              createPeerConnection();
-          } else if (isVideoEnabled && !localStream) {
-              console.warn("No local stream available on WebSocket open.");
-              showPopup("⚠️ Local stream not initialized. Please toggle video mode again.");
-          }
-      };
-
-      ws.onmessage = async (event) => {
-          try {
-              const data = JSON.parse(event.data);
-              switch(data.type) {
-                  case "system":
-                      if (data.text === "waiting" && !isConnected) {
-                          showPopup("🔍 Searching for a stranger...");
-                      } else if (data.text === "connected") {
-                          clearTimeout(signalingTimeout);
-                          showPopup("✅ Connected! Say Hi 👋");
-                          if (isVideoEnabled && !peerConnection && localStream) {
-                              createPeerConnection();
-                          }
-                      } else if (data.text === 'initiate_offer') {
-                          if (isVideoEnabled && localStream) {
-                              if (!peerConnection) createPeerConnection();
-                              const offer = await peerConnection.createOffer();
-                              await peerConnection.setLocalDescription(offer);
-                              ws.send(JSON.stringify({ type: 'offer', offer: offer }));
-                              console.log("Sent offer:", offer);
-                          } else {
-                              console.warn("Cannot initiate offer: No local stream.");
-                              showPopup("⚠️ Local stream not available. Please toggle video mode again.");
-                          }
-                      } else if (data.text === "disconnected") {
-                          if (isConnected) {
-                              showPopup("❌ Stranger disconnected");
-                              isConnected = false;
-                              stopAllStreams();
-                          }
-                      } else if (data.text === "timeout") {
-                          showPopup("No one was found. Click Next Button");
-                          isConnected = false;
-                      }
-                      break;
-                  case "message":
-                      if (typingIndicator) typingIndicator.style.display = "none";
-                      addMessage(data.text, "stranger");
-                      break;
-                  case "typing":
-                      if (isConnected && typingIndicator) {
-                          typingIndicator.style.display = "block";
-                          clearTimeout(typingTimeout);
-                          typingTimeout = setTimeout(() => {
-                              typingIndicator.style.display = "none";
-                          }, 1500);
-                      }
-                      break;
-                  case 'offer':
-                      if (isVideoEnabled && localStream) {
-                          if (!peerConnection) createPeerConnection();
-                          await peerConnection.setRemoteDescription(new RTCSessionDescription(data.offer));
-                          const answer = await peerConnection.createAnswer();
-                          await peerConnection.setLocalDescription(answer);
-                          ws.send(JSON.stringify({ type: 'answer', answer: answer }));
-                          console.log("Sent answer:", answer);
-                      }
-                      break;
-                  case 'answer':
-                      if (peerConnection && peerConnection.signalingState !== "stable") {
-                          await peerConnection.setRemoteDescription(new RTCSessionDescription(data.answer));
-                          console.log("Received answer:", data.answer);
-                      }
-                      break;
-                  case 'candidate':
-                      if (peerConnection) {
-                          await peerConnection.addIceCandidate(new RTCIceCandidate(data.candidate));
-                          console.log("Added ICE candidate:", data.candidate);
-                      }
-                      break;
-              }
-          } catch (e) {
-              console.error("Error parsing WebSocket message:", e);
-              showPopup("❌ Error in video connection. Please try again.");
-          }
-      };
-
-      ws.onclose = () => {
-          clearTimeout(signalingTimeout);
-          if (isConnected) {
-              showPopup("❌ Stranger disconnected");
-          }
-          if (typingIndicator) typingIndicator.style.display = "none";
-          isConnected = false;
-          stopAllStreams();
-          updateInputState();
-          if (reconnectAttempts < maxReconnectAttempts) {
-              reconnectAttempts++;
-              setTimeout(() => {
-                  showPopup(`🔄 Reconnecting... (Attempt ${reconnectAttempts}/${maxReconnectAttempts})`);
-                  connectStranger();
-              }, 2000);
-          } else {
-              showPopup("❌ Maximum reconnection attempts reached. Please try again later.");
-          }
-      };
-
-      ws.onerror = (err) => {
-          console.error("WebSocket error:", err);
-          clearTimeout(signalingTimeout);
-          ws.close();
-          showPopup("❌ Connection error. Please check your network or server status.");
-      };
-    }
-    
-    const handleSend = (e) => {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      if (isConnected && input.value.trim()) {
-        ws.send(JSON.stringify({ type: "message", text: input.value }));
-        addMessage(input.value, "me");
-        input.value = "";
-        
-        sendBtn.style.display = 'none';
-        nextBtn.style.display = 'flex';
-
-        // Hide emoji picker if open
-        if (emojiPicker.classList.contains('show')) {
-            emojiPicker.classList.remove('show');
-            emojiPicker.style.display = 'none';
-            document.getElementById("emojiToggle").textContent = "😊";
-            document.getElementById("emojiToggle").setAttribute('aria-expanded', 'false');
+          footer.style.bottom = '10px';
+          chatDiv.style.paddingBottom = '66px';
+          footerNote.style.bottom = '66px';
+          startChattingBtn.style.bottom = '91px';
         }
         scrollToBottom();
-        debouncedAdjustLayout();
-      }
-    };
-    sendBtn.addEventListener("click", handleSend);
-    sendBtn.addEventListener("touchstart", handleSend, { passive: false });
-
-    const handleNext = (e) => {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      isConnected = false;
-      connectStranger();
-      debouncedAdjustLayout();
-    };
-    nextBtn.addEventListener("click", handleNext);
-    nextBtn.addEventListener("touchstart", handleNext, { passive: false });
-
-    input.addEventListener("input", () => {
-      if (isConnected && ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: "typing" }));
-      }
-    });
-
-    document.body.classList.add('auto-scroll-enabled');
-    const observer = new MutationObserver(() => {
-      scrollToBottom();
-    });
-    if (messagesDiv) observer.observe(messagesDiv, { childList: true, subtree: true });
-
-    function setInitialState() {
-        startChattingBtn.style.display = 'block';
-        sendBtn.style.display = 'none';
-        nextBtn.style.display = 'flex';
-        nextBtn.disabled = true;
-        messagesDiv.innerHTML = `<div class="popup">Welcome to TikTalk! Click 'Start Chat' to connect with a stranger.</div>`;
-        updateInputState();
+      });
     }
-    setInitialState();
+
+    window.addEventListener('resize', debouncedAdjustLayout);
+    window.TIKTALK_BACKEND = 'https://tiktalkchat-backend-v2.onrender.com';
   </script>
 </body>
 </html>
